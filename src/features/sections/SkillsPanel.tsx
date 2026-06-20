@@ -38,7 +38,7 @@ export function SkillsPanel({ character, update }: Props) {
             <span className="w-9 text-right font-display font-bold text-tormenta-300">
               {signed(skill.total)}
             </span>
-            <span className={`flex-1 ${skill.unusable ? 'text-stone-500' : 'text-stone-200'}`}>
+            <span className={`flex-1 ${skill.unusable ? 'text-stone-500' : 'text-[var(--text)]'}`}>
               {skill.name}
               {skill.onlyTrained && (
                 <span className="ml-1 text-[10px] text-amber-500/80" title="Só treinada">

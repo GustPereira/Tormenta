@@ -48,7 +48,7 @@ export function InventoryPanel({ character, update }: Props) {
           />
         </label>
         <span className="text-stone-400">
-          Espaços usados: <span className="text-stone-200">{totalSpaces}</span>
+          Espaços usados: <span className="text-[var(--text)]">{totalSpaces}</span>
         </span>
       </div>
 

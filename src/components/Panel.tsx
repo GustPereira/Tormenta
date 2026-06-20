@@ -12,7 +12,7 @@ interface PanelProps {
 export function Panel({ title, children, className = '', action }: PanelProps) {
   return (
     <section
-      className={`rounded-lg border border-stone-700 bg-stone-900/50 p-4 ${className}`}
+      className={`rounded-lg border border-[var(--card-border)] bg-[var(--card-bg)] p-4 ${className}`}
     >
       <div className="flex items-center justify-between">
         <h2 className={sectionTitle}>{title}</h2>

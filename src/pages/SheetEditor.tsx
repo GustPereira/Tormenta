@@ -1,17 +1,18 @@
-import { useEffect } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { Button } from '../components/Button'
-import { AbilitiesPanel } from '../features/sections/AbilitiesPanel'
-import { AttacksPanel } from '../features/sections/AttacksPanel'
-import { AttributesPanel } from '../features/sections/AttributesPanel'
-import { IdentityHeader } from '../features/sections/IdentityHeader'
-import { InventoryPanel } from '../features/sections/InventoryPanel'
-import { NotesPanel } from '../features/sections/NotesPanel'
-import { SkillsPanel } from '../features/sections/SkillsPanel'
-import { SpellsPanel } from '../features/sections/SpellsPanel'
-import { VitalsPanel } from '../features/sections/VitalsPanel'
+import { Tabs } from '../components/Tabs'
+import { MainSheet } from '../features/MainSheet'
+import { SettingsPanel } from '../features/sections/SettingsPanel'
+import { deleteCharacter } from '../db'
 import { downloadCharacter } from '../io'
+import { buildThemeStyle } from '../lib/theme'
 import { useSheetStore } from '../store/sheetStore'
+
+const TABS = [
+  { id: 'principal', label: 'Principal' },
+  { id: 'config', label: 'Configurações' },
+]
 
 const STATUS_LABEL: Record<string, string> = {
   saving: 'Salvando…',
@@ -20,7 +21,9 @@ const STATUS_LABEL: Record<string, string> = {
 
 export function SheetEditor() {
   const { id } = useParams<{ id: string }>()
+  const navigate = useNavigate()
   const { character, status, load, update, reset } = useSheetStore()
+  const [tab, setTab] = useState('principal')
 
   useEffect(() => {
     if (id) void load(id)
@@ -42,10 +45,22 @@ export function SheetEditor() {
     return <p className="px-4 py-8 text-stone-400">Carregando…</p>
   }
 
-  const props = { character, update }
+  async function handleDelete() {
+    if (!character) return
+    if (
+      !window.confirm(
+        `Excluir a ficha "${character.name}"? Esta ação não pode ser desfeita.`,
+      )
+    ) {
+      return
+    }
+    await deleteCharacter(character.id)
+    navigate('/')
+  }
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-6">
+    <div className="min-h-screen" style={buildThemeStyle(character.theme)}>
+      <div className="mx-auto max-w-6xl px-4 py-6">
       <header className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <Link to="/" className="text-sm text-tormenta-400 hover:underline">
           ← Minhas Fichas
@@ -60,26 +75,14 @@ export function SheetEditor() {
         </div>
       </header>
 
-      <div className="space-y-4">
-        <IdentityHeader {...props} />
+      <Tabs tabs={TABS} active={tab} onChange={setTab} />
 
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-          <div className="space-y-4 lg:col-span-2">
-            <AttributesPanel {...props} />
-            <VitalsPanel {...props} />
-            <AttacksPanel {...props} />
-          </div>
-          <SkillsPanel {...props} />
-        </div>
-
-        <AbilitiesPanel {...props} />
-
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-          <SpellsPanel {...props} />
-          <InventoryPanel {...props} />
-        </div>
-
-        <NotesPanel {...props} />
+      <div className="py-6">
+        {tab === 'principal' && <MainSheet character={character} update={update} />}
+        {tab === 'config' && (
+          <SettingsPanel character={character} update={update} onDelete={handleDelete} />
+        )}
+      </div>
       </div>
     </div>
   )

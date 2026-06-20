@@ -57,6 +57,17 @@ describe('SheetEditor (página única)', () => {
     await waitFor(() => expect(within(row).getByText('+6')).toBeInTheDocument())
   })
 
+  it('mostra a aba Configurações com ações da ficha', async () => {
+    const c = createBlankCharacter('Config Teste')
+    await saveCharacter(c)
+    const user = userEvent.setup()
+    renderAt(c.id)
+
+    await user.click(await screen.findByRole('tab', { name: /configurações/i }))
+    expect(screen.getByRole('button', { name: /restaurar pv\/pm/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /excluir ficha/i })).toBeInTheDocument()
+  })
+
   it('permite selecionar uma origem do catálogo', async () => {
     const c = createBlankCharacter('Origem Teste')
     await saveCharacter(c)

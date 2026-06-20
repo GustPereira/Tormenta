@@ -66,7 +66,7 @@ function Pool({
   onChange: (v: number | null) => void
 }) {
   return (
-    <div className="rounded-md border border-stone-700 bg-stone-800/60 p-2 text-center">
+    <div className="rounded-md border border-[var(--card-border)] bg-[var(--card-bg)] p-2 text-center">
       <div className="text-[11px] uppercase text-stone-400">{label}</div>
       <div className="flex items-center justify-center gap-1">
         <input
@@ -84,7 +84,7 @@ function Pool({
 
 function Big({ label, value }: { label: string; value: number | string }) {
   return (
-    <div className="rounded-md border border-stone-700 bg-stone-800/60 p-2 text-center">
+    <div className="rounded-md border border-[var(--card-border)] bg-[var(--card-bg)] p-2 text-center">
       <div className="text-[11px] uppercase text-stone-400">{label}</div>
       <div className="font-display text-2xl font-bold text-tormenta-300">{value}</div>
     </div>
@@ -95,7 +95,7 @@ function Info({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex justify-between gap-2 border-b border-stone-800 py-0.5">
       <dt className="text-stone-400">{label}</dt>
-      <dd className="text-right text-stone-200">{value}</dd>
+      <dd className="text-right text-[var(--text)]">{value}</dd>
     </div>
   )
 }

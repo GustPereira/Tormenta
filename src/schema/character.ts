@@ -84,6 +84,46 @@ export const abilitySchema = z.object({
 })
 export type Ability = z.infer<typeof abilitySchema>
 
+/** Tema visual da ficha: cores por área e fonte. */
+export const themeSchema = z.object({
+  /** Fundo da página inteira. */
+  pageBg: z.string().default('#1a1414'),
+  /** Fundo dos cards/seções. */
+  cardBg: z.string().default('#1c1917'),
+  /** Borda das seções. */
+  cardBorder: z.string().default('#44403c'),
+  /** Cor de destaque (títulos, números, realces). */
+  accent: z.string().default('#c23434'),
+  /** Cor do texto principal. */
+  textColor: z.string().default('#f5efe6'),
+  /** Cor dos rótulos e textos secundários (labels, legendas, dicas). */
+  mutedColor: z.string().default('#a8a29e'),
+  /** Cor de fundo do botão padrão. */
+  buttonColor: z.string().default('#44403c'),
+  /** Cor do texto dos botões. */
+  buttonTextColor: z.string().default('#f5f5f4'),
+  /** Cor de fundo dos campos (input, select). */
+  inputBg: z.string().default('#292524'),
+  /** Cor do texto dentro dos campos. */
+  inputText: z.string().default('#f5f5f4'),
+  fontId: z.string().default('cinzel'),
+})
+export type Theme = z.infer<typeof themeSchema>
+
+export const DEFAULT_THEME: Theme = {
+  pageBg: '#1a1414',
+  cardBg: '#1c1917',
+  cardBorder: '#44403c',
+  accent: '#c23434',
+  textColor: '#f5efe6',
+  mutedColor: '#a8a29e',
+  buttonColor: '#44403c',
+  buttonTextColor: '#f5f5f4',
+  inputBg: '#292524',
+  inputText: '#f5f5f4',
+  fontId: 'cinzel',
+}
+
 export const characterSchema = z.object({
   schemaVersion: z.literal(CURRENT_SCHEMA_VERSION),
   id: z.string(),
@@ -123,6 +163,8 @@ export const characterSchema = z.object({
   conditions: z.string().default(''),
   resistances: z.string().default(''),
   notes: z.string().default(''),
+
+  theme: themeSchema.default(DEFAULT_THEME),
 })
 
 export type Character = z.infer<typeof characterSchema>
@@ -162,5 +204,6 @@ export function createBlankCharacter(name = 'Nova Ficha'): Character {
     conditions: '',
     resistances: '',
     notes: '',
+    theme: { ...DEFAULT_THEME },
   }
 }

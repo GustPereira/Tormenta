@@ -34,7 +34,7 @@ export function AttributesPanel({ character, update }: Props) {
           return (
             <div
               key={key}
-              className="flex flex-col items-center rounded-md border border-stone-700 bg-stone-800/60 p-2"
+              className="flex flex-col items-center rounded-md border border-[var(--card-border)] bg-[var(--card-bg)] p-2"
             >
               <span className="text-xs uppercase text-stone-400">
                 {ATTRIBUTE_ABBR[key]}
@@ -43,7 +43,7 @@ export function AttributesPanel({ character, update }: Props) {
                 type="number"
                 value={character.attributes[key]}
                 onChange={(e) => setBase(key, Number(e.target.value) || 0)}
-                className="w-12 bg-transparent text-center font-display text-2xl font-bold text-stone-100 focus:outline-none"
+                className="w-12 bg-transparent text-center font-display text-2xl font-bold text-[var(--text)] focus:outline-none"
                 aria-label={ATTRIBUTE_ABBR[key]}
               />
               <span className="text-[11px] text-tormenta-300">

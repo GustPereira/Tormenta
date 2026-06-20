@@ -25,12 +25,12 @@ export function IdentityHeader({ character, update }: Props) {
     update((c) => ({ ...c, classes: c.classes.filter((_, idx) => idx !== i) }))
 
   return (
-    <div className="rounded-lg border border-tormenta-800/60 bg-stone-900/60 p-4">
+    <div className="rounded-lg border border-[var(--card-border)] bg-[var(--card-bg)] p-4">
       <input
         type="text"
         value={character.name}
         onChange={(e) => set('name', e.target.value)}
-        className="w-full bg-transparent font-display text-3xl font-bold text-stone-100 focus:outline-none"
+        className="w-full bg-transparent font-display text-3xl font-bold text-[var(--text)] focus:outline-none"
         aria-label="Nome do personagem"
         placeholder="Nome do personagem"
       />

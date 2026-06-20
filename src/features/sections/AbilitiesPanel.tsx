@@ -69,7 +69,7 @@ function Group({
       ) : (
         <ul className="space-y-2">
           {items.map((a) => (
-            <li key={a.id} className="rounded-md border border-stone-700 bg-stone-800/40 p-2">
+            <li key={a.id} className="rounded-md border border-[var(--card-border)] bg-[var(--card-bg)] p-2">
               <div className="flex gap-1">
                 <input
                   type="text"
