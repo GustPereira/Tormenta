@@ -1,0 +1,166 @@
+import { z } from 'zod'
+
+/**
+ * Versão atual do schema da ficha. Incrementar sempre que o formato persistido
+ * mudar de forma incompatível, e adicionar a migração correspondente em migrate.ts.
+ */
+export const CURRENT_SCHEMA_VERSION = 2 as const
+
+/** Os seis atributos do Tormenta T20. No T20 o valor do atributo JÁ É o modificador. */
+export const ATTRIBUTE_KEYS = [
+  'forca',
+  'destreza',
+  'constituicao',
+  'inteligencia',
+  'sabedoria',
+  'carisma',
+] as const
+
+export type AttributeKey = (typeof ATTRIBUTE_KEYS)[number]
+
+export const attributeKeySchema = z.enum(ATTRIBUTE_KEYS)
+
+export const attributesSchema = z.object({
+  forca: z.number().int(),
+  destreza: z.number().int(),
+  constituicao: z.number().int(),
+  inteligencia: z.number().int(),
+  sabedoria: z.number().int(),
+  carisma: z.number().int(),
+})
+export type Attributes = z.infer<typeof attributesSchema>
+
+/** Uma entrada de classe — suporta multiclasse (várias entradas). */
+export const classEntrySchema = z.object({
+  classId: z.string(),
+  level: z.number().int().min(1),
+})
+export type ClassEntry = z.infer<typeof classEntrySchema>
+
+export const raceSchema = z.object({
+  raceId: z.string(),
+})
+export type Race = z.infer<typeof raceSchema>
+
+export const inventoryItemSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  quantity: z.number().int().min(0).default(1),
+  /** Peso em espaços (sistema de carga do T20). */
+  spaces: z.number().min(0).default(0),
+  equipped: z.boolean().default(false),
+  notes: z.string().default(''),
+})
+export type InventoryItem = z.infer<typeof inventoryItemSchema>
+
+/** Uma magia conhecida, agrupada por círculo (1 a 5). */
+export const spellSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  circle: z.number().int().min(1).max(5).default(1),
+  prepared: z.boolean().default(false),
+  notes: z.string().default(''),
+})
+export type Spell = z.infer<typeof spellSchema>
+
+/** Um ataque/conjuração da tabela de ataques. */
+export const attackSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  attackBonus: z.string().default(''),
+  damage: z.string().default(''),
+  critical: z.string().default(''),
+  damageType: z.string().default(''),
+  range: z.string().default(''),
+})
+export type Attack = z.infer<typeof attackSchema>
+
+/** Uma habilidade/poder, agrupada por fonte (racial&origem ou classe&geral). */
+export const abilitySchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  group: z.enum(['racial', 'classe']).default('classe'),
+  notes: z.string().default(''),
+})
+export type Ability = z.infer<typeof abilitySchema>
+
+export const characterSchema = z.object({
+  schemaVersion: z.literal(CURRENT_SCHEMA_VERSION),
+  id: z.string(),
+  name: z.string(),
+  meta: z.object({
+    createdAt: z.string(),
+    updatedAt: z.string(),
+  }),
+
+  /** Identidade narrativa. */
+  player: z.string().default(''),
+  origin: z.string().default(''),
+  deity: z.string().default(''),
+  alignment: z.string().default(''),
+
+  /** Escolhas que alimentam o motor de regras. */
+  attributes: attributesSchema,
+  /** Atributos escolhidos para o bônus livre da raça ("+1 em N atributos diferentes"). */
+  attributeChoices: z.array(attributeKeySchema).default([]),
+  race: raceSchema.nullable().default(null),
+  /** Id da origem escolhida (catálogo de origens). */
+  originId: z.string().nullable().default(null),
+  classes: z.array(classEntrySchema).default([]),
+  /** IDs das perícias treinadas pelo jogador. */
+  trainedSkills: z.array(z.string()).default([]),
+  abilities: z.array(abilitySchema).default([]),
+  spells: z.array(spellSchema).default([]),
+  attacks: z.array(attackSchema).default([]),
+  inventory: z.array(inventoryItemSchema).default([]),
+  /** Dinheiro em Tibares (T$). */
+  money: z.number().min(0).default(0),
+
+  /** PV/PM atuais (null = cheio). */
+  currentHitPoints: z.number().nullable().default(null),
+  currentMana: z.number().nullable().default(null),
+
+  conditions: z.string().default(''),
+  resistances: z.string().default(''),
+  notes: z.string().default(''),
+})
+
+export type Character = z.infer<typeof characterSchema>
+
+/** Cria uma ficha nova em branco, pronta para edição. */
+export function createBlankCharacter(name = 'Nova Ficha'): Character {
+  const now = new Date().toISOString()
+  return {
+    schemaVersion: CURRENT_SCHEMA_VERSION,
+    id: crypto.randomUUID(),
+    name,
+    meta: { createdAt: now, updatedAt: now },
+    player: '',
+    origin: '',
+    deity: '',
+    alignment: '',
+    attributes: {
+      forca: 0,
+      destreza: 0,
+      constituicao: 0,
+      inteligencia: 0,
+      sabedoria: 0,
+      carisma: 0,
+    },
+    attributeChoices: [],
+    race: null,
+    originId: null,
+    classes: [],
+    trainedSkills: [],
+    abilities: [],
+    spells: [],
+    attacks: [],
+    inventory: [],
+    money: 0,
+    currentHitPoints: null,
+    currentMana: null,
+    conditions: '',
+    resistances: '',
+    notes: '',
+  }
+}

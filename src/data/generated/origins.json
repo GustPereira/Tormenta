@@ -1,0 +1,626 @@
+[
+  {
+    "id": "academia-arcana-estudante-da-academia",
+    "name": "Academia Arcana - Estudante da Academia",
+    "power": "Estudante da Academia",
+    "items": "Coleção de livros (uma qualquer), essência de mana x2."
+  },
+  {
+    "id": "academia-arcana-turista-da-academia",
+    "name": "Academia Arcana - Turista da Academia",
+    "power": "Turista da Academia",
+    "items": "Três pergaminhos de magias arcanas de 1º círculo à sua escolha."
+  },
+  {
+    "id": "acolito",
+    "name": "Acólito",
+    "power": "Membro da Igreja",
+    "items": "Símbolo sagrado, traje de sacerdote."
+  },
+  {
+    "id": "ahlen-descendente-colleniano",
+    "name": "Ahlen - Descendente Colleniano",
+    "power": "Descendente Colleniano",
+    "items": "Arma simples, estojo de disfarces, ração de viagem x5."
+  },
+  {
+    "id": "ahlen-trapaceiro-ahleniense",
+    "name": "Ahlen - Trapaceiro Ahleniense",
+    "power": "Trapaceiro Ahleniense",
+    "items": "Essência de sombra, gazua, estojo de disfarces."
+  },
+  {
+    "id": "amigo-dos-animais",
+    "name": "Amigo dos Animais",
+    "power": "Amigo Especial",
+    "items": "Cão de caça, cavalo, pônei ou trobo (escolha um)."
+  },
+  {
+    "id": "amnesico",
+    "name": "Amnésico",
+    "power": "Lembranças Graduais",
+    "items": "Um item a escolha do mestre de até T$ 100, que pode ser uma pista da sua vida antiga."
+  },
+  {
+    "id": "aristocrata",
+    "name": "Aristocrata",
+    "power": "Sangue Azul",
+    "items": "Joia de família no valor de T$ 300, traje da corte."
+  },
+  {
+    "id": "artesao",
+    "name": "Artesão",
+    "power": "Frutos do Trabalho",
+    "items": "Instrumentos de ofício (qualquer), um item que você possa fabricar de até T$ 50."
+  },
+  {
+    "id": "artista",
+    "name": "Artista",
+    "power": "Dom artístico",
+    "items": "Estojo de disfarces ou um instrumento musical a sua escolha."
+  },
+  {
+    "id": "aslothia-querido-filho",
+    "name": "Aslothia - Querido Filho",
+    "power": "Querido Filho",
+    "items": "Essência de sombra, manto camuflado (urbano)."
+  },
+  {
+    "id": "assistente-de-laboratorio",
+    "name": "Assistente de Laboratório",
+    "power": "Esse Cheiro...",
+    "items": "Instrumentos de Ofício (alquimista)."
+  },
+  {
+    "id": "batedor",
+    "name": "Batedor",
+    "power": "À Prova de Tudo",
+    "items": "Barraca, equipamento de viagem, uma arma simples ou marcial de ataque à distância."
+  },
+  {
+    "id": "bielefeld-escudeiro-da-luz",
+    "name": "Bielefeld - Escudeiro da Luz",
+    "power": "Escudeiro da Luz",
+    "items": "Cota de malha ou escudo pesado, enfeite de elmo com o símbolo da Ordem da Luz."
+  },
+  {
+    "id": "bielefeld-escudeiro-solitario",
+    "name": "Bielefeld - Escudeiro Solitário",
+    "power": "Escudeiro Solitário",
+    "items": "Cota de malha, escudo pesado, enfeite de elmo."
+  },
+  {
+    "id": "capanga",
+    "name": "Capanga",
+    "power": "Confissão",
+    "items": "Tatuagem ou outro adereço de sua gangue (+1 em Intimidação), uma arma simples corpo a corpo."
+  },
+  {
+    "id": "catacumbas-de-leverick-prisioneiro-das-catacumbas",
+    "name": "Catacumbas de Leverick - Prisioneiro das Catacumbas",
+    "power": "Prisioneiro das Catacumbas",
+    "items": "Arma marcial encontrada no corpo de alguém que não sobreviveu às Catacumbas."
+  },
+  {
+    "id": "charlatao",
+    "name": "Charlatão",
+    "power": "Alpinista Social",
+    "items": "Estojo de disfarces, joia falsificada (valor aparente de T$ 100, sem valor real)."
+  },
+  {
+    "id": "circense",
+    "name": "Circense",
+    "power": "Truque de Mágica",
+    "items": "Três bolas coloridas para malabarismo (+1 em Atuação)."
+  },
+  {
+    "id": "conflagracao-do-aco-sucateiro-de-batalhas",
+    "name": "Conflagração do Aço - Sucateiro de Batalhas",
+    "power": "Sucateiro de Batalhas",
+    "items": "Arma simples ou marcial, bálsamo restaurador, escudo leve ou pesado, essência de mana, ração de viagem x5, T$ 4d6."
+  },
+  {
+    "id": "criminoso",
+    "name": "Criminoso",
+    "power": "Punguista",
+    "items": "Estojo de disfarces ou gazua."
+  },
+  {
+    "id": "curandeiro",
+    "name": "Curandeiro",
+    "power": "Médico de Campo",
+    "items": "Bálsamo restaurador x2, maleta de medicamentos."
+  },
+  {
+    "id": "deheon-amazona-de-hippion",
+    "name": "Deheon - Amazona de Hippion",
+    "power": "Amazona de Hippion",
+    "items": "Arma simples ou marcial, cavalo de guerra."
+  },
+  {
+    "id": "deheon-aspirante-a-heroi",
+    "name": "Deheon - Aspirante a Herói",
+    "power": "Aspirante a Herói",
+    "items": "Essência de mana, mochila de aventureiro."
+  },
+  {
+    "id": "doherimm-anao-de-armas",
+    "name": "Doherimm - Anão de Armas",
+    "power": "Anão de Armas",
+    "items": "Arma marcial tradicional anã, instrumentos de Ofício (armeiro)."
+  },
+  {
+    "id": "eremita",
+    "name": "Eremita",
+    "power": "Busca Interior",
+    "items": "Barraca, equipamento de viagem."
+  },
+  {
+    "id": "ermos-purpuras-amoque-purpura",
+    "name": "Ermos Púrpuras - Amoque Púrpura",
+    "power": "Amoque Púrpura",
+    "items": "Arma simples, estandarte da sua tribo."
+  },
+  {
+    "id": "ermos-purpuras-estandarte-vivo",
+    "name": "Ermos Púrpuras - Estandarte Vivo",
+    "power": "Estandarte Vivo",
+    "items": "Arma simples ou marcial, gibão de peles, fragmento do estandarte do seu povo (se vestido, fornece +1 em testes de Vontade)."
+  },
+  {
+    "id": "escravo",
+    "name": "Escravo",
+    "power": "Desejo de Liberdade",
+    "items": "Algemas, uma ferramenta pesada (mesmas estatísticas de uma maça)."
+  },
+  {
+    "id": "estudioso",
+    "name": "Estudioso",
+    "power": "Palpite Fundamentado",
+    "items": "Coleção de livros (+1 em Conhecimento, Guerra, Misticismo ou Nobreza, a sua escolha)."
+  },
+  {
+    "id": "eter-divino-de-outro-mundo",
+    "name": "Éter Divino - De Outro Mundo",
+    "power": "De Outro Mundo",
+    "items": "Trajes exóticos, um item qualquer de até T$ 100 do seu mundo natal."
+  },
+  {
+    "id": "fazendeiro",
+    "name": "Fazendeiro",
+    "power": "Água no Feijão",
+    "items": "Carroça, uma ferramenta agrícola (mesmas estatísticas de uma lança), 10 rações de viagem."
+  },
+  {
+    "id": "feudos-de-trebuck-barao-arruinado",
+    "name": "Feudos de Trebuck - Barão Arruinado",
+    "power": "Barão Arruinado",
+    "items": "Anel com símbolo da família (T$ 200), títulos de terras expirados (+2 em Diplomacia com nobres e burocratas), traje da corte."
+  },
+  {
+    "id": "feudos-de-trebuck-competidor-do-circuito",
+    "name": "Feudos de Trebuck - Competidor do Circuito",
+    "power": "Competidor do Circuito",
+    "items": "Arma marcial, T$ 100 (suas economias para comprar equipamentos de torneio)."
+  },
+  {
+    "id": "floresta-de-tollon-lenhador-de-tollon",
+    "name": "Floresta de Tollon - Lenhador de Tollon",
+    "power": "Lenhador de Tollon",
+    "items": "Item superior de madeira Tollon."
+  },
+  {
+    "id": "forasteiro",
+    "name": "Forasteiro",
+    "power": "Cultura Exótica",
+    "items": "Equipamento de viagem, instrumento musical exótico (+1 em uma perícia de Carisma aprovada pelo mestre)."
+  },
+  {
+    "id": "galrasia-aprendiz-de-drogadora",
+    "name": "Galrasia - Aprendiz de Drogadora",
+    "power": "Aprendiz de Drogadora",
+    "items": "Bálsamo restaurador x2, poção de curar ferimentos x2, maleta de medicamentos."
+  },
+  {
+    "id": "galrasia-criado-pelas-voracis",
+    "name": "Galrasia - Criado pelas Voracis",
+    "power": "Criado pelas Voracis",
+    "items": "Arma simples, armadura leve, lança."
+  },
+  {
+    "id": "gladiador",
+    "name": "Gladiador",
+    "power": "Pão e Circo",
+    "items": "Uma arma marcial ou exótica, um item sem valor recebido de um admirador."
+  },
+  {
+    "id": "guarda",
+    "name": "Guarda",
+    "power": "Detetive",
+    "items": "Apito, insígnia da milícia, uma arma marcial."
+  },
+  {
+    "id": "halak-tur-nomade-sar-allan",
+    "name": "Halak-Tûr - Nômade Sar-Allan",
+    "power": "Nômade Sar-Allan",
+    "items": "Arma simples ou marcial, corcel do deserto ou dromedário (veja Ameaças de Arton), manto camuflado (deserto)."
+  },
+  {
+    "id": "halak-tur-sabio-matematico",
+    "name": "Halak-Tûr - Sábio Matemático",
+    "power": "Sábio Matemático",
+    "items": "Coleção de livros, luneta."
+  },
+  {
+    "id": "herdeiro",
+    "name": "Herdeiro",
+    "power": "Herança",
+    "items": "Um símbolo de sua herança, como um anel de sinete ou manto cerimonial. Enquanto estiver com esse item, você pode ser reconhecido por sua descendência, o que pode ser bom... ou não!"
+  },
+  {
+    "id": "heroi-campones",
+    "name": "Herói Camponês",
+    "power": "Coração Heroico",
+    "items": "Instrumentos de ofício ou uma arma simples, traje de plebeu."
+  },
+  {
+    "id": "imperio-de-tauron-insurgente-tapistano",
+    "name": "Império de Tauron - Insurgente Tapistano",
+    "power": "Insurgente Tapistano",
+    "items": "Amuleto com um símbolo da resistência reconhecível por outros rebeldes, arma simples."
+  },
+  {
+    "id": "imperio-de-tauron-legionario",
+    "name": "Império de Tauron - Legionário",
+    "power": "Legionário",
+    "items": "Brunea com símbolo de sua legião, escudo pesado, gládio, ração de viagem x10."
+  },
+  {
+    "id": "khalifor-bandoleiro-da-fortaleza",
+    "name": "Khalifor - Bandoleiro da Fortaleza",
+    "power": "Bandoleiro da Fortaleza",
+    "items": "Adaga, gazua, manto camuflado (urbano)."
+  },
+  {
+    "id": "khubar-ginete-de-tumarkhan",
+    "name": "Khubar - Ginete de Tumarkhân",
+    "power": "Ginete de Tumarkhân",
+    "items": "Bálsamo restaurador, sela."
+  },
+  {
+    "id": "khubar-pescador-parrudo",
+    "name": "Khubar - Pescador Parrudo",
+    "power": "Pescador Parrudo",
+    "items": "Vara de pesca (pode usar Sobrevivência para sustento), peixes raros salgados para revenda (1 espaço, T$ 50)."
+  },
+  {
+    "id": "khubar-tamalu",
+    "name": "Khubar - Tamalu",
+    "power": "Tamalu",
+    "items": "Traje da corte."
+  },
+  {
+    "id": "lamnor-filhote-da-revoada",
+    "name": "Lamnor - Filhote da Revoada",
+    "power": "Filhote da Revoada",
+    "items": "Instrumentos de Ofício (artesão), T$ 100 (que você está juntando para fabricar seu primeiro veículo aéreo)."
+  },
+  {
+    "id": "lamnor-liricista-de-lenorienn",
+    "name": "Lamnor - Liricista de Lenórienn",
+    "power": "Liricista de Lenórienn",
+    "items": "Alaúde élfico, réplica de uma peça artística élfica (1 espaço, T$ 50)."
+  },
+  {
+    "id": "lamnor-profeta-do-akzath",
+    "name": "Lamnor - Profeta do Akzath",
+    "power": "Profeta do Akzath",
+    "items": "Arma simples ou marcial, bordão, pergaminho com diagrama do Akzath."
+  },
+  {
+    "id": "marujo",
+    "name": "Marujo",
+    "power": "Passagem de Navio",
+    "items": "T$ 2d6 (seu último salário), corda."
+  },
+  {
+    "id": "mateiro",
+    "name": "Mateiro",
+    "power": "Vendedor de Carcaças",
+    "items": "Arco curto, barraca, equipamento de viagem, 20 flechas."
+  },
+  {
+    "id": "membro-de-guilda",
+    "name": "Membro de Guilda",
+    "power": "Rede de Contatos",
+    "items": "Gazua ou instrumentos de ofício."
+  },
+  {
+    "id": "mercador",
+    "name": "Mercador",
+    "power": "Negociação",
+    "items": "Carroça, trobo, mercadorias para vender no valor de T$ 100."
+  },
+  {
+    "id": "minerador",
+    "name": "Minerador",
+    "power": "Escavador",
+    "items": "Gemas preciosas no valor de T$ 100, picareta."
+  },
+  {
+    "id": "montanhas-sanguinarias-iniciado-dos-caca-monstros",
+    "name": "Montanhas Sanguinárias - Iniciado dos Caça-Monstros",
+    "power": "Iniciado dos Caça-Monstros",
+    "items": "Arma simples ou marcial, gibão de peles."
+  },
+  {
+    "id": "montanhas-sanguinarias-selvagem-sanguinario",
+    "name": "Montanhas Sanguinárias - Selvagem Sanguinário",
+    "power": "Selvagem Sanguinário",
+    "items": "Arma marcial, gibão de peles."
+  },
+  {
+    "id": "montanhas-uivantes-guardiao-glacial",
+    "name": "Montanhas Uivantes - Guardião Glacial",
+    "power": "Guardião Glacial",
+    "items": "Casaco longo, cavalo glacial."
+  },
+  {
+    "id": "moreania-tocado-pela-dama-altiva",
+    "name": "Moreania - Tocado pela Dama Altiva",
+    "power": "Tocado pela Dama Altiva",
+    "items": "Bordão, ração de viagem x5."
+  },
+  {
+    "id": "moreania-tocado-pelo-indomavel",
+    "name": "Moreania - Tocado pelo Indomável",
+    "power": "Tocado pelo Indomável",
+    "items": "Trapos surrados, carcaça de couro de algum animal caçado por você (conta como um gibão de peles)."
+  },
+  {
+    "id": "namalkah-amazona-de-hippion",
+    "name": "Namalkah - Amazona de Hippion",
+    "power": "Amazona de Hippion",
+    "items": "Arma simples ou marcial, cavalo de guerra."
+  },
+  {
+    "id": "namalkah-irmao-sem-esporas",
+    "name": "Namalkah - Irmão sem Esporas",
+    "power": "Irmão sem Esporas",
+    "items": "Bálsamo restaurador, sela."
+  },
+  {
+    "id": "nomade",
+    "name": "Nômade",
+    "power": "Mochileiro",
+    "items": "Bordão, equipamento de viagem."
+  },
+  {
+    "id": "nova-malpetrim-catador-da-cidade-velha",
+    "name": "Nova Malpetrim - Catador da Cidade Velha",
+    "power": "Catador da Cidade Velha",
+    "items": "Luneta, luvas de pelica, tranqueiras resgatadas do mar (2 espaços, valor de venda T$ 100)."
+  },
+  {
+    "id": "nova-malpetrim-futura-lenda",
+    "name": "Nova Malpetrim - Futura Lenda",
+    "power": "Futura Lenda",
+    "items": "Arma simples ou marcial com nome pomposo (e nenhuma melhoria), essência de mana x2."
+  },
+  {
+    "id": "pivete",
+    "name": "Pivete",
+    "power": "Quebra-galho",
+    "items": "Gazua, traje de plebeu, um animal urbano (como um cão, gato, rato ou pombo)."
+  },
+  {
+    "id": "pondsmania-cativo-das-fadas",
+    "name": "Pondsmânia - Cativo das Fadas",
+    "power": "Cativo das Fadas",
+    "items": "Corda, ração de viagem x10, essência de mana."
+  },
+  {
+    "id": "pondsmania-duplo-feerico",
+    "name": "Pondsmânia - Duplo Feérico",
+    "power": "Duplo Feérico",
+    "items": "Essência de mana, marca no corpo ou característica física não possuída pela sua versão original."
+  },
+  {
+    "id": "refugiado",
+    "name": "Refugiado",
+    "power": "Estoico",
+    "items": "Um item estrangeiro de até T$ 100."
+  },
+  {
+    "id": "republicas-livres-de-samburdia-agricultor-sambur",
+    "name": "Repúblicas Livres de Sambúrdia - Agricultor Sambur",
+    "power": "Agricultor Sambur",
+    "items": "Ferramenta agrícola (mesmas estatísticas de uma lança), T$ 100 (um presente de despedida da sua família)."
+  },
+  {
+    "id": "republicas-livres-de-samburdia-membro-do-principado",
+    "name": "Repúblicas Livres de Sambúrdia - Membro do Principado",
+    "power": "Membro do Principado",
+    "items": "Carroça, mercadorias sortidas (8 espaços, T$ 400)."
+  },
+  {
+    "id": "ruinas-de-tyrondir-duyshidakk-infiltrado",
+    "name": "Ruínas de Tyrondir - Duyshidakk Infiltrado",
+    "power": "Duyshidakk Infiltrado",
+    "items": "Arma marcial, peças sobressalentes (T$ 100 para vender ou construir engenhocas)."
+  },
+  {
+    "id": "ruinas-de-tyrondir-explorador-de-ruinas",
+    "name": "Ruínas de Tyrondir - Explorador de Ruínas",
+    "power": "Explorador de Ruínas",
+    "items": "Mochila de aventureiro, tocha, vara de madeira (3m)."
+  },
+  {
+    "id": "salistick-assistente-forense",
+    "name": "Salistick - Assistente Forense",
+    "power": "Assistente Forense",
+    "items": "Lupa (conta como uma ferramenta que fornece +1 em Investigação)."
+  },
+  {
+    "id": "salistick-estudante-do-colegio-real",
+    "name": "Salistick - Estudante do Colégio Real",
+    "power": "Estudante do Colégio Real",
+    "items": "Bálsamo restaurador x3, maleta de medicamentos."
+  },
+  {
+    "id": "sckharshantallas-aprendiz-de-dragoeiro",
+    "name": "Sckharshantallas - Aprendiz de Dragoeiro",
+    "power": "Aprendiz de Dragoeiro",
+    "items": "Arma simples ou marcial à sua escolha, troféu de caça, treckod."
+  },
+  {
+    "id": "sckharshantallas-rebelde-agitador",
+    "name": "Sckharshantallas - Rebelde Agitador",
+    "power": "Rebelde Agitador",
+    "items": "Arma simples ou marcial, panfleto revolucionário, T$ 6d12 (impostos que você deixou de pagar)."
+  },
+  {
+    "id": "seguidor",
+    "name": "Seguidor",
+    "power": "Antigo Mestre",
+    "items": "Um item recebido de seu mestre de até T$ 100."
+  },
+  {
+    "id": "selvagem",
+    "name": "Selvagem",
+    "power": "Vida Rústica",
+    "items": "Uma arma simples, um pequeno animal de estimação como um pássaro ou esquilo."
+  },
+  {
+    "id": "smokestone-procurado-vivo-ou-morto",
+    "name": "Smokestone - Procurado: Vivo ou Morto",
+    "power": "Procurado: Vivo ou Morto",
+    "items": "Pistola, balas cruéis (20)."
+  },
+  {
+    "id": "soldado",
+    "name": "Soldado",
+    "power": "Influência Militar",
+    "items": "Uma arma marcial, um uniforme militar, uma insígnia de seu exército."
+  },
+  {
+    "id": "supremacia-purista-desertor-da-supremacia",
+    "name": "Supremacia Purista - Desertor da Supremacia",
+    "power": "Desertor da Supremacia",
+    "items": "Brunea com símbolo purista raspado, escudo pesado, espada bastarda, ração de viagem x10."
+  },
+  {
+    "id": "svalas-tradicionalista-svalano",
+    "name": "Svalas - Tradicionalista Svalano",
+    "power": "Tradicionalista Svalano",
+    "items": "Arma simples ou marcial, corda, mochila de aventureiro, vara de madeira (3 m)."
+  },
+  {
+    "id": "tamu-ra-aristocrata-dai-zenshi",
+    "name": "Tamu-ra - Aristocrata Dai’zenshi",
+    "power": "Aristocrata Dai’zenshi",
+    "items": "Traje da corte, katana superior com uma melhoria (exceto material especial)."
+  },
+  {
+    "id": "tamu-ra-um-com-os-kami",
+    "name": "Tamu-ra - Um com os Kami",
+    "power": "Um com os Kami",
+    "items": "Bálsamo restaurador, essência de mana."
+  },
+  {
+    "id": "taverneiro",
+    "name": "Taverneiro",
+    "power": "Gororoba",
+    "items": "Rolo de macarrão ou martelo de carne (mesmas estatísticas de uma clava), uma panela, um avental, uma caneca e um pano sujo."
+  },
+  {
+    "id": "trabalhador",
+    "name": "Trabalhador",
+    "power": "Esforçado",
+    "items": "Uma ferramenta pesada (mesmas estatísticas de uma maça ou lança, a sua escolha)."
+  },
+  {
+    "id": "tres-mares-grumete-pirata",
+    "name": "Três Mares - Grumete Pirata",
+    "power": "Grumete Pirata",
+    "items": "Adaga, corda, tatuagem de sua antiga tripulação (+1 em Intimidação)."
+  },
+  {
+    "id": "triunphus-recruta-da-fenix",
+    "name": "Triunphus - Recruta da Fênix",
+    "power": "Recruta da Fênix",
+    "items": "Arma marcial, brunea, grifo iniciante."
+  },
+  {
+    "id": "ubani-andarilho-ubaneri",
+    "name": "Ubani - Andarilho Ubaneri",
+    "power": "Andarilho Ubaneri",
+    "items": "Escudo pesado, lança."
+  },
+  {
+    "id": "ubani-emissario-ubaneri",
+    "name": "Ubani - Emissário Ubaneri",
+    "power": "Emissário Ubaneri",
+    "items": "Essência de mana, mochila de aventureiro."
+  },
+  {
+    "id": "valkaria-cosmopolita",
+    "name": "Valkaria - Cosmopolita",
+    "power": "Cosmopolita",
+    "items": "Equipamento de viagem, traje de viajante, um item artístico de origem cultural indefinida (½ espaço, T$ 100)."
+  },
+  {
+    "id": "valkaria-cria-da-favela",
+    "name": "Valkaria - Cria da Favela",
+    "power": "Cria da Favela",
+    "items": "Andrajos de aldeão, corda, vara de madeira."
+  },
+  {
+    "id": "valkaria-nitamuraniano",
+    "name": "Valkaria - Nitamuraniano",
+    "power": "Nitamuraniano",
+    "items": "Arco longo ou katana, camisa bufante ou traje de seda."
+  },
+  {
+    "id": "vectora-receptador-das-nuvens",
+    "name": "Vectora - Receptador das Nuvens",
+    "power": "Receptador das Nuvens",
+    "items": "Mercadorias raras e variadas (2 espaços, T$ 300)."
+  },
+  {
+    "id": "wynlla-plebeu-arcano",
+    "name": "Wynlla - Plebeu Arcano",
+    "power": "Plebeu Arcano",
+    "items": "Bandoleira de poções, gorro de ervas, poção arcana de 1° círculo."
+  },
+  {
+    "id": "wynlla-recruta-arcano",
+    "name": "Wynlla - Recruta Arcano",
+    "power": "Recruta Arcano",
+    "items": "Essência de mana x2, varinha arcana."
+  },
+  {
+    "id": "zakharov-armeiro-armado",
+    "name": "Zakharov - Armeiro Armado",
+    "power": "Armeiro Armado",
+    "items": "Arma marcial, instrumentos de Ofício (armeiro)."
+  },
+  {
+    "id": "zakharov-nobre-zakharoviano",
+    "name": "Zakharov - Nobre Zakharoviano",
+    "power": "Nobre Zakharoviano",
+    "items": "Traje da corte."
+  },
+  {
+    "id": "escriba",
+    "name": "Escriba",
+    "power": "Escriba de Pergaminhos",
+    "items": "Instrumentos de escriba, organizador de pergaminhos, uma coleção de livros a sua escolha."
+  },
+  {
+    "id": "escolhido-de-khalmyr",
+    "name": "Escolhido de Khalmyr",
+    "power": null,
+    "items": null
+  }
+]

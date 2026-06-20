@@ -1,0 +1,30 @@
+@import 'tailwindcss';
+
+/* Tema base — Tormenta T20 */
+@theme {
+  --color-tormenta-50: #fdf3f3;
+  --color-tormenta-100: #fbe5e5;
+  --color-tormenta-200: #f7cfcf;
+  --color-tormenta-300: #f0adad;
+  --color-tormenta-400: #e57d7d;
+  --color-tormenta-500: #d65151;
+  --color-tormenta-600: #c23434;
+  --color-tormenta-700: #a32828;
+  --color-tormenta-800: #872525;
+  --color-tormenta-900: #712525;
+  --color-tormenta-950: #3d0f0f;
+
+  --font-display: 'Cinzel', ui-serif, Georgia, serif;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: #1a1414;
+  color: #f5efe6;
+  font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+}

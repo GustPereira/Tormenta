@@ -1,0 +1,192 @@
+[
+  {
+    "id": "humano",
+    "name": "Humano",
+    "deslocamento": 9,
+    "visaoPenumbra": false,
+    "visaoEscuro": false,
+    "faro": false,
+    "tipo": "Humanóide",
+    "tamanho": "Médio"
+  },
+  {
+    "id": "anao",
+    "name": "Anão",
+    "deslocamento": 6,
+    "visaoPenumbra": false,
+    "visaoEscuro": true,
+    "faro": false,
+    "tipo": "Humanóide",
+    "tamanho": "Médio"
+  },
+  {
+    "id": "dahllan",
+    "name": "Dahllan",
+    "deslocamento": 9,
+    "visaoPenumbra": false,
+    "visaoEscuro": false,
+    "faro": false,
+    "tipo": "Humanóide",
+    "tamanho": "Médio"
+  },
+  {
+    "id": "elfo",
+    "name": "Elfo",
+    "deslocamento": 12,
+    "visaoPenumbra": true,
+    "visaoEscuro": false,
+    "faro": false,
+    "tipo": "Humanóide",
+    "tamanho": "Médio"
+  },
+  {
+    "id": "goblin",
+    "name": "Goblin",
+    "deslocamento": 6,
+    "visaoPenumbra": false,
+    "visaoEscuro": true,
+    "faro": false,
+    "tipo": "Humanóide",
+    "tamanho": "Pequeno"
+  },
+  {
+    "id": "lefou",
+    "name": "Lefou",
+    "deslocamento": 9,
+    "visaoPenumbra": false,
+    "visaoEscuro": false,
+    "faro": false,
+    "tipo": "Monstro",
+    "tamanho": "Médio"
+  },
+  {
+    "id": "minotauro",
+    "name": "Minotauro",
+    "deslocamento": 9,
+    "visaoPenumbra": false,
+    "visaoEscuro": false,
+    "faro": true,
+    "tipo": "Humanóide",
+    "tamanho": "Médio"
+  },
+  {
+    "id": "qareen",
+    "name": "Qareen",
+    "deslocamento": 9,
+    "visaoPenumbra": false,
+    "visaoEscuro": false,
+    "faro": false,
+    "tipo": "Humanóide",
+    "tamanho": "Médio"
+  },
+  {
+    "id": "golem",
+    "name": "Golem",
+    "deslocamento": 6,
+    "visaoPenumbra": false,
+    "visaoEscuro": true,
+    "faro": false,
+    "tipo": "Construto",
+    "tamanho": "Médio"
+  },
+  {
+    "id": "hynne",
+    "name": "Hynne",
+    "deslocamento": 6,
+    "visaoPenumbra": false,
+    "visaoEscuro": false,
+    "faro": false,
+    "tipo": "Humanóide",
+    "tamanho": "Pequeno"
+  },
+  {
+    "id": "kliren",
+    "name": "Kliren",
+    "deslocamento": 9,
+    "visaoPenumbra": false,
+    "visaoEscuro": false,
+    "faro": false,
+    "tipo": "Humanóide",
+    "tamanho": "Médio"
+  },
+  {
+    "id": "medusa",
+    "name": "Medusa",
+    "deslocamento": 9,
+    "visaoPenumbra": false,
+    "visaoEscuro": true,
+    "faro": false,
+    "tipo": "Monstro",
+    "tamanho": "Médio"
+  },
+  {
+    "id": "osteon",
+    "name": "Osteon",
+    "deslocamento": 9,
+    "visaoPenumbra": false,
+    "visaoEscuro": true,
+    "faro": false,
+    "tipo": "Morto-Vivo",
+    "tamanho": "Médio"
+  },
+  {
+    "id": "sereia-tritao",
+    "name": "Sereia/Tritão",
+    "deslocamento": 9,
+    "visaoPenumbra": false,
+    "visaoEscuro": false,
+    "faro": false,
+    "tipo": "Humanóide",
+    "tamanho": "Médio"
+  },
+  {
+    "id": "silfide",
+    "name": "Sílfide",
+    "deslocamento": 9,
+    "visaoPenumbra": true,
+    "visaoEscuro": false,
+    "faro": false,
+    "tipo": "Espírito",
+    "tamanho": "Minúsculo"
+  },
+  {
+    "id": "suraggel-aggelus",
+    "name": "Suraggel - Aggelus",
+    "deslocamento": 9,
+    "visaoPenumbra": false,
+    "visaoEscuro": true,
+    "faro": false,
+    "tipo": "Espírito",
+    "tamanho": "Médio"
+  },
+  {
+    "id": "suraggel-sulfure",
+    "name": "Suraggel - Sulfure",
+    "deslocamento": 9,
+    "visaoPenumbra": false,
+    "visaoEscuro": true,
+    "faro": false,
+    "tipo": "Espírito",
+    "tamanho": "Médio"
+  },
+  {
+    "id": "trog",
+    "name": "Trog",
+    "deslocamento": 9,
+    "visaoPenumbra": false,
+    "visaoEscuro": true,
+    "faro": false,
+    "tipo": "Monstro",
+    "tamanho": "Médio"
+  },
+  {
+    "id": "golem",
+    "name": "Golem",
+    "deslocamento": 6,
+    "visaoPenumbra": false,
+    "visaoEscuro": true,
+    "faro": false,
+    "tipo": "Construto",
+    "tamanho": "Médio"
+  }
+]
