@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from 'react'
+import { Check, Pencil, Trash2 } from 'lucide-react'
 import { Button } from './Button'
 
 interface EditableCardProps {
@@ -81,11 +82,17 @@ export function EditableCard({
         {editing && <span className="flex-1" />}
         {headerExtra}
         {!editing ? (
-          <Button variant="secondary" onClick={() => setEditing(true)}>Editar</Button>
+          <Button variant="secondary" onClick={() => setEditing(true)} aria-label="Editar" title="Editar">
+            <Pencil size={14} />
+          </Button>
         ) : (
           <>
-            <Button variant="secondary" onClick={() => setEditing(false)}>Concluir</Button>
-            <Button variant="danger" onClick={confirmDelete}>Excluir</Button>
+            <Button variant="secondary" onClick={() => setEditing(false)} aria-label="Concluir" title="Concluir">
+              <Check size={14} />
+            </Button>
+            <Button variant="danger" onClick={confirmDelete} aria-label="Excluir" title="Excluir">
+              <Trash2 size={14} />
+            </Button>
           </>
         )}
       </div>

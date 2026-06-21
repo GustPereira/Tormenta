@@ -1,3 +1,4 @@
+import { Star } from 'lucide-react'
 import { ATTRIBUTE_ABBR } from '../../data'
 import { Panel } from '../../components/Panel'
 import { signed } from '../../lib/format'
@@ -36,14 +37,17 @@ export function SkillsPanel({ character, update }: Props) {
               aria-label={`Treinar ${skill.name}`}
             />
             <span className="w-9 text-right font-display font-bold text-tormenta-300">
-              {signed(skill.total)}
+              {skill.unusable ? '—' : signed(skill.total)}
             </span>
             <span className={`flex-1 ${skill.unusable ? 'text-stone-500' : 'text-[var(--text)]'}`}>
               {skill.name}
               {skill.onlyTrained && (
-                <span className="ml-1 text-[10px] text-amber-500/80" title="Só treinada">
-                  ⚿
-                </span>
+                <Star
+                  size={12}
+                  fill="currentColor"
+                  className="ml-1 inline-block align-[-1px] text-amber-400"
+                  aria-label="Somente treinada"
+                />
               )}
             </span>
             <span className="text-[10px] uppercase text-stone-500">
