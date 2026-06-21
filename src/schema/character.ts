@@ -136,6 +136,12 @@ export const spellSchema = z.object({
   id: z.string(),
   name: z.string(),
   circle: z.number().int().min(1).max(5).default(1),
+  /** Custo em pontos de mana para conjurar (inclui aprimoramentos). */
+  pm: z.number().int().min(0).default(1),
+  /** Ação de execução (ex.: "Padrão", "Movimento", "Completa", "Reação", "Livre"). */
+  action: z.string().default('Padrão'),
+  /** Descrição do efeito da magia. */
+  effect: z.string().default(''),
   prepared: z.boolean().default(false),
   notes: z.string().default(''),
 })
