@@ -151,6 +151,8 @@ export type Spell = z.infer<typeof spellSchema>
 export const attackSchema = z.object({
   id: z.string(),
   name: z.string(),
+  /** Base de perícia/atributo somada ao bônus (ex.: 'luta-for', 'magico'). */
+  base: z.string().default(''),
   attackBonus: z.string().default(''),
   damage: z.string().default(''),
   critical: z.string().default(''),
