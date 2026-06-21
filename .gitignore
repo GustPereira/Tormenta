@@ -17,6 +17,9 @@ dist-ssr
 scripts/extracted/
 scripts/extracted-sheet/
 
+# Guia de contexto do projeto para o Claude (não versionar)
+CLAUDE.md
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
