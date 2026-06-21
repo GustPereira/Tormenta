@@ -12,6 +12,11 @@ dist
 dist-ssr
 *.local
 
+# Variáveis de ambiente locais (token de compartilhamento) — .env.example é versionado
+.env
+.env.*
+!.env.example
+
 # PDFs fonte e texto extraído (conteúdo protegido — não versionar)
 *.pdf
 scripts/extracted/

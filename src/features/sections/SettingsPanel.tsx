@@ -5,6 +5,13 @@ import { Panel } from '../../components/Panel'
 import { inputClass } from '../../components/ui'
 import { SKILLS } from '../../data'
 import { downloadCharacter } from '../../io'
+import {
+  deleteSharedCharacter,
+  isShareConfigured,
+  newShareId,
+  putSharedCharacter,
+  shareUrl,
+} from '../../share'
 import { fileToScaledDataUrl } from '../../lib/image'
 import { FONT_OPTIONS } from '../../lib/theme'
 import {
@@ -208,6 +215,8 @@ export function SettingsPanel({ character, update, onDelete }: Props) {
         </Button>
       </Panel>
 
+      <SharePanel character={character} update={update} />
+
       <Panel
         title="Origens personalizadas"
         action={<Button variant="ghost" className="text-xs" onClick={addOrigin}>+ origem</Button>}
@@ -293,6 +302,105 @@ export function SettingsPanel({ character, update, onDelete }: Props) {
         </Button>
       </Panel>
     </div>
+  )
+}
+
+/** Publicar/atualizar/despublicar a ficha como link só de leitura. */
+function SharePanel({
+  character,
+  update,
+}: {
+  character: Character
+  update: (updater: (c: Character) => Character) => void
+}) {
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [copied, setCopied] = useState(false)
+
+  if (!isShareConfigured()) {
+    return (
+      <Panel title="Compartilhar">
+        <p className="text-sm text-stone-500">
+          Compartilhamento não configurado neste ambiente.
+        </p>
+      </Panel>
+    )
+  }
+
+  const publish = async () => {
+    setBusy(true)
+    setError(null)
+    try {
+      const id = character.shareId ?? newShareId()
+      await putSharedCharacter(id, { ...character, shareId: id })
+      update((c) => ({ ...c, shareId: id }))
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Falha ao publicar.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const unpublish = async () => {
+    if (!character.shareId) return
+    if (!window.confirm('Despublicar esta ficha? O link deixará de funcionar.')) return
+    setBusy(true)
+    setError(null)
+    try {
+      await deleteSharedCharacter(character.shareId)
+      update((c) => ({ ...c, shareId: null }))
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Falha ao despublicar.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const url = character.shareId ? shareUrl(character.shareId) : ''
+  const copy = async () => {
+    await navigator.clipboard.writeText(url)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 1500)
+  }
+
+  return (
+    <Panel title="Compartilhar">
+      {!character.shareId ? (
+        <>
+          <p className="mb-2 text-sm text-stone-400">
+            Publique um link só de leitura desta ficha. Suas edições aparecem para quem abrir o link.
+          </p>
+          <Button variant="secondary" onClick={publish} disabled={busy}>
+            {busy ? 'Publicando…' : 'Publicar link'}
+          </Button>
+        </>
+      ) : (
+        <>
+          <p className="mb-2 text-sm text-stone-400">Link público (somente leitura):</p>
+          <div className="flex items-center gap-2">
+            <input
+              readOnly
+              value={url}
+              onFocus={(e) => e.target.select()}
+              className={inputClass + ' flex-1'}
+              aria-label="Link de compartilhamento"
+            />
+            <Button variant="secondary" onClick={copy}>
+              {copied ? 'Copiado ✓' : 'Copiar'}
+            </Button>
+          </div>
+          <div className="mt-2 flex gap-2">
+            <Button variant="ghost" className="text-xs" onClick={publish} disabled={busy}>
+              {busy ? 'Sincronizando…' : 'Atualizar agora'}
+            </Button>
+            <Button variant="danger" className="text-xs" onClick={unpublish} disabled={busy}>
+              Despublicar
+            </Button>
+          </div>
+        </>
+      )}
+      {error && <p className="mt-2 text-sm text-red-400">{error}</p>}
+    </Panel>
   )
 }
 

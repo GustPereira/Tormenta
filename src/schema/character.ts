@@ -283,6 +283,9 @@ export const characterSchema = z.object({
   resistances: z.string().default(''),
   notes: z.string().default(''),
 
+  /** Id de compartilhamento (arquivo no repo de dados). null = não publicada. */
+  shareId: z.string().nullable().default(null),
+
   theme: themeSchema.default(DEFAULT_THEME),
 })
 
@@ -328,6 +331,7 @@ export function createBlankCharacter(name = 'Nova Ficha'): Character {
     conditions: '',
     resistances: '',
     notes: '',
+    shareId: null,
     theme: { ...DEFAULT_THEME },
   }
 }

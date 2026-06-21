@@ -30,6 +30,11 @@ jobs:
       - run: npm ci
 
       - run: npm run build
+        env:
+          # Compartilhamento (opcional): secrets VITE_SHARE_REPO e VITE_SHARE_TOKEN
+          # nas configurações do repositório (Settings → Secrets and variables → Actions).
+          VITE_SHARE_REPO: ${{ secrets.VITE_SHARE_REPO }}
+          VITE_SHARE_TOKEN: ${{ secrets.VITE_SHARE_TOKEN }}
 
       - uses: actions/upload-pages-artifact@v3
         with:
