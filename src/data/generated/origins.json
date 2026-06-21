@@ -3,624 +3,960 @@
     "id": "academia-arcana-estudante-da-academia",
     "name": "Academia Arcana - Estudante da Academia",
     "power": "Estudante da Academia",
-    "items": "Coleção de livros (uma qualquer), essência de mana x2."
+    "items": "Coleção de livros (uma qualquer), essência de mana x2.",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "academia-arcana-turista-da-academia",
     "name": "Academia Arcana - Turista da Academia",
     "power": "Turista da Academia",
-    "items": "Três pergaminhos de magias arcanas de 1º círculo à sua escolha."
+    "items": "Três pergaminhos de magias arcanas de 1º círculo à sua escolha.",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "acolito",
     "name": "Acólito",
     "power": "Membro da Igreja",
-    "items": "Símbolo sagrado, traje de sacerdote."
+    "items": "Símbolo sagrado, traje de sacerdote.",
+    "pericasFixas": [
+      "cura",
+      "religiao",
+      "vontade"
+    ],
+    "pericasEscolha": 0
   },
   {
     "id": "ahlen-descendente-colleniano",
     "name": "Ahlen - Descendente Colleniano",
     "power": "Descendente Colleniano",
-    "items": "Arma simples, estojo de disfarces, ração de viagem x5."
+    "items": "Arma simples, estojo de disfarces, ração de viagem x5.",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "ahlen-trapaceiro-ahleniense",
     "name": "Ahlen - Trapaceiro Ahleniense",
     "power": "Trapaceiro Ahleniense",
-    "items": "Essência de sombra, gazua, estojo de disfarces."
+    "items": "Essência de sombra, gazua, estojo de disfarces.",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "amigo-dos-animais",
     "name": "Amigo dos Animais",
     "power": "Amigo Especial",
-    "items": "Cão de caça, cavalo, pônei ou trobo (escolha um)."
+    "items": "Cão de caça, cavalo, pônei ou trobo (escolha um).",
+    "pericasFixas": [
+      "adestramento",
+      "cavalgar"
+    ],
+    "pericasEscolha": 0
   },
   {
     "id": "amnesico",
     "name": "Amnésico",
     "power": "Lembranças Graduais",
-    "items": "Um item a escolha do mestre de até T$ 100, que pode ser uma pista da sua vida antiga."
+    "items": "Um item a escolha do mestre de até T$ 100, que pode ser uma pista da sua vida antiga.",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "aristocrata",
     "name": "Aristocrata",
     "power": "Sangue Azul",
-    "items": "Joia de família no valor de T$ 300, traje da corte."
+    "items": "Joia de família no valor de T$ 300, traje da corte.",
+    "pericasFixas": [
+      "diplomacia",
+      "enganacao",
+      "nobreza"
+    ],
+    "pericasEscolha": 0
   },
   {
     "id": "artesao",
     "name": "Artesão",
     "power": "Frutos do Trabalho",
-    "items": "Instrumentos de ofício (qualquer), um item que você possa fabricar de até T$ 50."
+    "items": "Instrumentos de ofício (qualquer), um item que você possa fabricar de até T$ 50.",
+    "pericasFixas": [
+      "oficio",
+      "vontade"
+    ],
+    "pericasEscolha": 0
   },
   {
     "id": "artista",
     "name": "Artista",
     "power": "Dom artístico",
-    "items": "Estojo de disfarces ou um instrumento musical a sua escolha."
+    "items": "Estojo de disfarces ou um instrumento musical a sua escolha.",
+    "pericasFixas": [
+      "atuacao",
+      "enganacao"
+    ],
+    "pericasEscolha": 0
   },
   {
     "id": "aslothia-querido-filho",
     "name": "Aslothia - Querido Filho",
     "power": "Querido Filho",
-    "items": "Essência de sombra, manto camuflado (urbano)."
+    "items": "Essência de sombra, manto camuflado (urbano).",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "assistente-de-laboratorio",
     "name": "Assistente de Laboratório",
     "power": "Esse Cheiro...",
-    "items": "Instrumentos de Ofício (alquimista)."
+    "items": "Instrumentos de Ofício (alquimista).",
+    "pericasFixas": [
+      "oficio",
+      "misticismo"
+    ],
+    "pericasEscolha": 0
   },
   {
     "id": "batedor",
     "name": "Batedor",
     "power": "À Prova de Tudo",
-    "items": "Barraca, equipamento de viagem, uma arma simples ou marcial de ataque à distância."
+    "items": "Barraca, equipamento de viagem, uma arma simples ou marcial de ataque à distância.",
+    "pericasFixas": [
+      "furtividade",
+      "percepcao",
+      "sobrevivencia"
+    ],
+    "pericasEscolha": 0
   },
   {
     "id": "bielefeld-escudeiro-da-luz",
     "name": "Bielefeld - Escudeiro da Luz",
     "power": "Escudeiro da Luz",
-    "items": "Cota de malha ou escudo pesado, enfeite de elmo com o símbolo da Ordem da Luz."
+    "items": "Cota de malha ou escudo pesado, enfeite de elmo com o símbolo da Ordem da Luz.",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "bielefeld-escudeiro-solitario",
     "name": "Bielefeld - Escudeiro Solitário",
     "power": "Escudeiro Solitário",
-    "items": "Cota de malha, escudo pesado, enfeite de elmo."
+    "items": "Cota de malha, escudo pesado, enfeite de elmo.",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "capanga",
     "name": "Capanga",
     "power": "Confissão",
-    "items": "Tatuagem ou outro adereço de sua gangue (+1 em Intimidação), uma arma simples corpo a corpo."
+    "items": "Tatuagem ou outro adereço de sua gangue (+1 em Intimidação), uma arma simples corpo a corpo.",
+    "pericasFixas": [
+      "luta",
+      "intimidacao"
+    ],
+    "pericasEscolha": 0
   },
   {
     "id": "catacumbas-de-leverick-prisioneiro-das-catacumbas",
     "name": "Catacumbas de Leverick - Prisioneiro das Catacumbas",
     "power": "Prisioneiro das Catacumbas",
-    "items": "Arma marcial encontrada no corpo de alguém que não sobreviveu às Catacumbas."
+    "items": "Arma marcial encontrada no corpo de alguém que não sobreviveu às Catacumbas.",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "charlatao",
     "name": "Charlatão",
     "power": "Alpinista Social",
-    "items": "Estojo de disfarces, joia falsificada (valor aparente de T$ 100, sem valor real)."
+    "items": "Estojo de disfarces, joia falsificada (valor aparente de T$ 100, sem valor real).",
+    "pericasFixas": [
+      "enganacao",
+      "jogatina"
+    ],
+    "pericasEscolha": 0
   },
   {
     "id": "circense",
     "name": "Circense",
     "power": "Truque de Mágica",
-    "items": "Três bolas coloridas para malabarismo (+1 em Atuação)."
+    "items": "Três bolas coloridas para malabarismo (+1 em Atuação).",
+    "pericasFixas": [
+      "acrobacia",
+      "atuacao",
+      "reflexos"
+    ],
+    "pericasEscolha": 0
   },
   {
     "id": "conflagracao-do-aco-sucateiro-de-batalhas",
     "name": "Conflagração do Aço - Sucateiro de Batalhas",
     "power": "Sucateiro de Batalhas",
-    "items": "Arma simples ou marcial, bálsamo restaurador, escudo leve ou pesado, essência de mana, ração de viagem x5, T$ 4d6."
+    "items": "Arma simples ou marcial, bálsamo restaurador, escudo leve ou pesado, essência de mana, ração de viagem x5, T$ 4d6.",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "criminoso",
     "name": "Criminoso",
     "power": "Punguista",
-    "items": "Estojo de disfarces ou gazua."
+    "items": "Estojo de disfarces ou gazua.",
+    "pericasFixas": [
+      "enganacao",
+      "furtividade",
+      "ladinagem"
+    ],
+    "pericasEscolha": 0
   },
   {
     "id": "curandeiro",
     "name": "Curandeiro",
     "power": "Médico de Campo",
-    "items": "Bálsamo restaurador x2, maleta de medicamentos."
+    "items": "Bálsamo restaurador x2, maleta de medicamentos.",
+    "pericasFixas": [
+      "cura",
+      "vontade"
+    ],
+    "pericasEscolha": 0
   },
   {
     "id": "deheon-amazona-de-hippion",
     "name": "Deheon - Amazona de Hippion",
     "power": "Amazona de Hippion",
-    "items": "Arma simples ou marcial, cavalo de guerra."
+    "items": "Arma simples ou marcial, cavalo de guerra.",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "deheon-aspirante-a-heroi",
     "name": "Deheon - Aspirante a Herói",
     "power": "Aspirante a Herói",
-    "items": "Essência de mana, mochila de aventureiro."
+    "items": "Essência de mana, mochila de aventureiro.",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "doherimm-anao-de-armas",
     "name": "Doherimm - Anão de Armas",
     "power": "Anão de Armas",
-    "items": "Arma marcial tradicional anã, instrumentos de Ofício (armeiro)."
+    "items": "Arma marcial tradicional anã, instrumentos de Ofício (armeiro).",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "eremita",
     "name": "Eremita",
     "power": "Busca Interior",
-    "items": "Barraca, equipamento de viagem."
+    "items": "Barraca, equipamento de viagem.",
+    "pericasFixas": [
+      "misticismo",
+      "religiao",
+      "sobrevivencia"
+    ],
+    "pericasEscolha": 0
   },
   {
     "id": "ermos-purpuras-amoque-purpura",
     "name": "Ermos Púrpuras - Amoque Púrpura",
     "power": "Amoque Púrpura",
-    "items": "Arma simples, estandarte da sua tribo."
+    "items": "Arma simples, estandarte da sua tribo.",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "ermos-purpuras-estandarte-vivo",
     "name": "Ermos Púrpuras - Estandarte Vivo",
     "power": "Estandarte Vivo",
-    "items": "Arma simples ou marcial, gibão de peles, fragmento do estandarte do seu povo (se vestido, fornece +1 em testes de Vontade)."
+    "items": "Arma simples ou marcial, gibão de peles, fragmento do estandarte do seu povo (se vestido, fornece +1 em testes de Vontade).",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "escravo",
     "name": "Escravo",
     "power": "Desejo de Liberdade",
-    "items": "Algemas, uma ferramenta pesada (mesmas estatísticas de uma maça)."
+    "items": "Algemas, uma ferramenta pesada (mesmas estatísticas de uma maça).",
+    "pericasFixas": [
+      "atletismo",
+      "fortitude",
+      "furtividade"
+    ],
+    "pericasEscolha": 0
   },
   {
     "id": "estudioso",
     "name": "Estudioso",
     "power": "Palpite Fundamentado",
-    "items": "Coleção de livros (+1 em Conhecimento, Guerra, Misticismo ou Nobreza, a sua escolha)."
+    "items": "Coleção de livros (+1 em Conhecimento, Guerra, Misticismo ou Nobreza, a sua escolha).",
+    "pericasFixas": [
+      "conhecimento",
+      "guerra",
+      "misticismo"
+    ],
+    "pericasEscolha": 0
   },
   {
     "id": "eter-divino-de-outro-mundo",
     "name": "Éter Divino - De Outro Mundo",
     "power": "De Outro Mundo",
-    "items": "Trajes exóticos, um item qualquer de até T$ 100 do seu mundo natal."
+    "items": "Trajes exóticos, um item qualquer de até T$ 100 do seu mundo natal.",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "fazendeiro",
     "name": "Fazendeiro",
     "power": "Água no Feijão",
-    "items": "Carroça, uma ferramenta agrícola (mesmas estatísticas de uma lança), 10 rações de viagem."
+    "items": "Carroça, uma ferramenta agrícola (mesmas estatísticas de uma lança), 10 rações de viagem.",
+    "pericasFixas": [
+      "adestramento",
+      "cavalgar",
+      "oficio",
+      "sobrevivencia"
+    ],
+    "pericasEscolha": 0
   },
   {
     "id": "feudos-de-trebuck-barao-arruinado",
     "name": "Feudos de Trebuck - Barão Arruinado",
     "power": "Barão Arruinado",
-    "items": "Anel com símbolo da família (T$ 200), títulos de terras expirados (+2 em Diplomacia com nobres e burocratas), traje da corte."
+    "items": "Anel com símbolo da família (T$ 200), títulos de terras expirados (+2 em Diplomacia com nobres e burocratas), traje da corte.",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "feudos-de-trebuck-competidor-do-circuito",
     "name": "Feudos de Trebuck - Competidor do Circuito",
     "power": "Competidor do Circuito",
-    "items": "Arma marcial, T$ 100 (suas economias para comprar equipamentos de torneio)."
+    "items": "Arma marcial, T$ 100 (suas economias para comprar equipamentos de torneio).",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "floresta-de-tollon-lenhador-de-tollon",
     "name": "Floresta de Tollon - Lenhador de Tollon",
     "power": "Lenhador de Tollon",
-    "items": "Item superior de madeira Tollon."
+    "items": "Item superior de madeira Tollon.",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "forasteiro",
     "name": "Forasteiro",
     "power": "Cultura Exótica",
-    "items": "Equipamento de viagem, instrumento musical exótico (+1 em uma perícia de Carisma aprovada pelo mestre)."
+    "items": "Equipamento de viagem, instrumento musical exótico (+1 em uma perícia de Carisma aprovada pelo mestre).",
+    "pericasFixas": [
+      "cavalgar",
+      "pilotagem",
+      "sobrevivencia"
+    ],
+    "pericasEscolha": 0
   },
   {
     "id": "galrasia-aprendiz-de-drogadora",
     "name": "Galrasia - Aprendiz de Drogadora",
     "power": "Aprendiz de Drogadora",
-    "items": "Bálsamo restaurador x2, poção de curar ferimentos x2, maleta de medicamentos."
+    "items": "Bálsamo restaurador x2, poção de curar ferimentos x2, maleta de medicamentos.",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "galrasia-criado-pelas-voracis",
     "name": "Galrasia - Criado pelas Voracis",
     "power": "Criado pelas Voracis",
-    "items": "Arma simples, armadura leve, lança."
+    "items": "Arma simples, armadura leve, lança.",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "gladiador",
     "name": "Gladiador",
     "power": "Pão e Circo",
-    "items": "Uma arma marcial ou exótica, um item sem valor recebido de um admirador."
+    "items": "Uma arma marcial ou exótica, um item sem valor recebido de um admirador.",
+    "pericasFixas": [
+      "atuacao",
+      "luta"
+    ],
+    "pericasEscolha": 0
   },
   {
     "id": "guarda",
     "name": "Guarda",
     "power": "Detetive",
-    "items": "Apito, insígnia da milícia, uma arma marcial."
+    "items": "Apito, insígnia da milícia, uma arma marcial.",
+    "pericasFixas": [
+      "investigacao",
+      "luta",
+      "percepcao"
+    ],
+    "pericasEscolha": 0
   },
   {
     "id": "halak-tur-nomade-sar-allan",
     "name": "Halak-Tûr - Nômade Sar-Allan",
     "power": "Nômade Sar-Allan",
-    "items": "Arma simples ou marcial, corcel do deserto ou dromedário (veja Ameaças de Arton), manto camuflado (deserto)."
+    "items": "Arma simples ou marcial, corcel do deserto ou dromedário (veja Ameaças de Arton), manto camuflado (deserto).",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "halak-tur-sabio-matematico",
     "name": "Halak-Tûr - Sábio Matemático",
     "power": "Sábio Matemático",
-    "items": "Coleção de livros, luneta."
+    "items": "Coleção de livros, luneta.",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "herdeiro",
     "name": "Herdeiro",
     "power": "Herança",
-    "items": "Um símbolo de sua herança, como um anel de sinete ou manto cerimonial. Enquanto estiver com esse item, você pode ser reconhecido por sua descendência, o que pode ser bom... ou não!"
+    "items": "Um símbolo de sua herança, como um anel de sinete ou manto cerimonial. Enquanto estiver com esse item, você pode ser reconhecido por sua descendência, o que pode ser bom... ou não!",
+    "pericasFixas": [
+      "misticismo",
+      "nobreza",
+      "oficio"
+    ],
+    "pericasEscolha": 0
   },
   {
     "id": "heroi-campones",
     "name": "Herói Camponês",
     "power": "Coração Heroico",
-    "items": "Instrumentos de ofício ou uma arma simples, traje de plebeu."
+    "items": "Instrumentos de ofício ou uma arma simples, traje de plebeu.",
+    "pericasFixas": [
+      "adestramento",
+      "oficio"
+    ],
+    "pericasEscolha": 0
   },
   {
     "id": "imperio-de-tauron-insurgente-tapistano",
     "name": "Império de Tauron - Insurgente Tapistano",
     "power": "Insurgente Tapistano",
-    "items": "Amuleto com um símbolo da resistência reconhecível por outros rebeldes, arma simples."
+    "items": "Amuleto com um símbolo da resistência reconhecível por outros rebeldes, arma simples.",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "imperio-de-tauron-legionario",
     "name": "Império de Tauron - Legionário",
     "power": "Legionário",
-    "items": "Brunea com símbolo de sua legião, escudo pesado, gládio, ração de viagem x10."
+    "items": "Brunea com símbolo de sua legião, escudo pesado, gládio, ração de viagem x10.",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "khalifor-bandoleiro-da-fortaleza",
     "name": "Khalifor - Bandoleiro da Fortaleza",
     "power": "Bandoleiro da Fortaleza",
-    "items": "Adaga, gazua, manto camuflado (urbano)."
+    "items": "Adaga, gazua, manto camuflado (urbano).",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "khubar-ginete-de-tumarkhan",
     "name": "Khubar - Ginete de Tumarkhân",
     "power": "Ginete de Tumarkhân",
-    "items": "Bálsamo restaurador, sela."
+    "items": "Bálsamo restaurador, sela.",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "khubar-pescador-parrudo",
     "name": "Khubar - Pescador Parrudo",
     "power": "Pescador Parrudo",
-    "items": "Vara de pesca (pode usar Sobrevivência para sustento), peixes raros salgados para revenda (1 espaço, T$ 50)."
+    "items": "Vara de pesca (pode usar Sobrevivência para sustento), peixes raros salgados para revenda (1 espaço, T$ 50).",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "khubar-tamalu",
     "name": "Khubar - Tamalu",
     "power": "Tamalu",
-    "items": "Traje da corte."
+    "items": "Traje da corte.",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "lamnor-filhote-da-revoada",
     "name": "Lamnor - Filhote da Revoada",
     "power": "Filhote da Revoada",
-    "items": "Instrumentos de Ofício (artesão), T$ 100 (que você está juntando para fabricar seu primeiro veículo aéreo)."
+    "items": "Instrumentos de Ofício (artesão), T$ 100 (que você está juntando para fabricar seu primeiro veículo aéreo).",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "lamnor-liricista-de-lenorienn",
     "name": "Lamnor - Liricista de Lenórienn",
     "power": "Liricista de Lenórienn",
-    "items": "Alaúde élfico, réplica de uma peça artística élfica (1 espaço, T$ 50)."
+    "items": "Alaúde élfico, réplica de uma peça artística élfica (1 espaço, T$ 50).",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "lamnor-profeta-do-akzath",
     "name": "Lamnor - Profeta do Akzath",
     "power": "Profeta do Akzath",
-    "items": "Arma simples ou marcial, bordão, pergaminho com diagrama do Akzath."
+    "items": "Arma simples ou marcial, bordão, pergaminho com diagrama do Akzath.",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "marujo",
     "name": "Marujo",
     "power": "Passagem de Navio",
-    "items": "T$ 2d6 (seu último salário), corda."
+    "items": "T$ 2d6 (seu último salário), corda.",
+    "pericasFixas": [
+      "atletismo",
+      "jogatina",
+      "pilotagem"
+    ],
+    "pericasEscolha": 0
   },
   {
     "id": "mateiro",
     "name": "Mateiro",
     "power": "Vendedor de Carcaças",
-    "items": "Arco curto, barraca, equipamento de viagem, 20 flechas."
+    "items": "Arco curto, barraca, equipamento de viagem, 20 flechas.",
+    "pericasFixas": [
+      "atletismo",
+      "furtividade",
+      "sobrevivencia"
+    ],
+    "pericasEscolha": 0
   },
   {
     "id": "membro-de-guilda",
     "name": "Membro de Guilda",
     "power": "Rede de Contatos",
-    "items": "Gazua ou instrumentos de ofício."
+    "items": "Gazua ou instrumentos de ofício.",
+    "pericasFixas": [
+      "diplomacia",
+      "enganacao",
+      "misticismo",
+      "oficio"
+    ],
+    "pericasEscolha": 0
   },
   {
     "id": "mercador",
     "name": "Mercador",
     "power": "Negociação",
-    "items": "Carroça, trobo, mercadorias para vender no valor de T$ 100."
+    "items": "Carroça, trobo, mercadorias para vender no valor de T$ 100.",
+    "pericasFixas": [
+      "diplomacia",
+      "intuicao",
+      "oficio"
+    ],
+    "pericasEscolha": 0
   },
   {
     "id": "minerador",
     "name": "Minerador",
     "power": "Escavador",
-    "items": "Gemas preciosas no valor de T$ 100, picareta."
+    "items": "Gemas preciosas no valor de T$ 100, picareta.",
+    "pericasFixas": [
+      "atletismo",
+      "fortitude",
+      "oficio"
+    ],
+    "pericasEscolha": 0
   },
   {
     "id": "montanhas-sanguinarias-iniciado-dos-caca-monstros",
     "name": "Montanhas Sanguinárias - Iniciado dos Caça-Monstros",
     "power": "Iniciado dos Caça-Monstros",
-    "items": "Arma simples ou marcial, gibão de peles."
+    "items": "Arma simples ou marcial, gibão de peles.",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "montanhas-sanguinarias-selvagem-sanguinario",
     "name": "Montanhas Sanguinárias - Selvagem Sanguinário",
     "power": "Selvagem Sanguinário",
-    "items": "Arma marcial, gibão de peles."
+    "items": "Arma marcial, gibão de peles.",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "montanhas-uivantes-guardiao-glacial",
     "name": "Montanhas Uivantes - Guardião Glacial",
     "power": "Guardião Glacial",
-    "items": "Casaco longo, cavalo glacial."
+    "items": "Casaco longo, cavalo glacial.",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "moreania-tocado-pela-dama-altiva",
     "name": "Moreania - Tocado pela Dama Altiva",
     "power": "Tocado pela Dama Altiva",
-    "items": "Bordão, ração de viagem x5."
+    "items": "Bordão, ração de viagem x5.",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "moreania-tocado-pelo-indomavel",
     "name": "Moreania - Tocado pelo Indomável",
     "power": "Tocado pelo Indomável",
-    "items": "Trapos surrados, carcaça de couro de algum animal caçado por você (conta como um gibão de peles)."
+    "items": "Trapos surrados, carcaça de couro de algum animal caçado por você (conta como um gibão de peles).",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "namalkah-amazona-de-hippion",
     "name": "Namalkah - Amazona de Hippion",
     "power": "Amazona de Hippion",
-    "items": "Arma simples ou marcial, cavalo de guerra."
+    "items": "Arma simples ou marcial, cavalo de guerra.",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "namalkah-irmao-sem-esporas",
     "name": "Namalkah - Irmão sem Esporas",
     "power": "Irmão sem Esporas",
-    "items": "Bálsamo restaurador, sela."
+    "items": "Bálsamo restaurador, sela.",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "nomade",
     "name": "Nômade",
     "power": "Mochileiro",
-    "items": "Bordão, equipamento de viagem."
+    "items": "Bordão, equipamento de viagem.",
+    "pericasFixas": [
+      "cavalgar",
+      "pilotagem",
+      "sobrevivencia"
+    ],
+    "pericasEscolha": 0
   },
   {
     "id": "nova-malpetrim-catador-da-cidade-velha",
     "name": "Nova Malpetrim - Catador da Cidade Velha",
     "power": "Catador da Cidade Velha",
-    "items": "Luneta, luvas de pelica, tranqueiras resgatadas do mar (2 espaços, valor de venda T$ 100)."
+    "items": "Luneta, luvas de pelica, tranqueiras resgatadas do mar (2 espaços, valor de venda T$ 100).",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "nova-malpetrim-futura-lenda",
     "name": "Nova Malpetrim - Futura Lenda",
     "power": "Futura Lenda",
-    "items": "Arma simples ou marcial com nome pomposo (e nenhuma melhoria), essência de mana x2."
+    "items": "Arma simples ou marcial com nome pomposo (e nenhuma melhoria), essência de mana x2.",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "pivete",
     "name": "Pivete",
     "power": "Quebra-galho",
-    "items": "Gazua, traje de plebeu, um animal urbano (como um cão, gato, rato ou pombo)."
+    "items": "Gazua, traje de plebeu, um animal urbano (como um cão, gato, rato ou pombo).",
+    "pericasFixas": [
+      "furtividade",
+      "iniciativa",
+      "ladinagem"
+    ],
+    "pericasEscolha": 0
   },
   {
     "id": "pondsmania-cativo-das-fadas",
     "name": "Pondsmânia - Cativo das Fadas",
     "power": "Cativo das Fadas",
-    "items": "Corda, ração de viagem x10, essência de mana."
+    "items": "Corda, ração de viagem x10, essência de mana.",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "pondsmania-duplo-feerico",
     "name": "Pondsmânia - Duplo Feérico",
     "power": "Duplo Feérico",
-    "items": "Essência de mana, marca no corpo ou característica física não possuída pela sua versão original."
+    "items": "Essência de mana, marca no corpo ou característica física não possuída pela sua versão original.",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "refugiado",
     "name": "Refugiado",
     "power": "Estoico",
-    "items": "Um item estrangeiro de até T$ 100."
+    "items": "Um item estrangeiro de até T$ 100.",
+    "pericasFixas": [
+      "fortitude",
+      "reflexos",
+      "vontade"
+    ],
+    "pericasEscolha": 0
   },
   {
     "id": "republicas-livres-de-samburdia-agricultor-sambur",
     "name": "Repúblicas Livres de Sambúrdia - Agricultor Sambur",
     "power": "Agricultor Sambur",
-    "items": "Ferramenta agrícola (mesmas estatísticas de uma lança), T$ 100 (um presente de despedida da sua família)."
+    "items": "Ferramenta agrícola (mesmas estatísticas de uma lança), T$ 100 (um presente de despedida da sua família).",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "republicas-livres-de-samburdia-membro-do-principado",
     "name": "Repúblicas Livres de Sambúrdia - Membro do Principado",
     "power": "Membro do Principado",
-    "items": "Carroça, mercadorias sortidas (8 espaços, T$ 400)."
+    "items": "Carroça, mercadorias sortidas (8 espaços, T$ 400).",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "ruinas-de-tyrondir-duyshidakk-infiltrado",
     "name": "Ruínas de Tyrondir - Duyshidakk Infiltrado",
     "power": "Duyshidakk Infiltrado",
-    "items": "Arma marcial, peças sobressalentes (T$ 100 para vender ou construir engenhocas)."
+    "items": "Arma marcial, peças sobressalentes (T$ 100 para vender ou construir engenhocas).",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "ruinas-de-tyrondir-explorador-de-ruinas",
     "name": "Ruínas de Tyrondir - Explorador de Ruínas",
     "power": "Explorador de Ruínas",
-    "items": "Mochila de aventureiro, tocha, vara de madeira (3m)."
+    "items": "Mochila de aventureiro, tocha, vara de madeira (3m).",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "salistick-assistente-forense",
     "name": "Salistick - Assistente Forense",
     "power": "Assistente Forense",
-    "items": "Lupa (conta como uma ferramenta que fornece +1 em Investigação)."
+    "items": "Lupa (conta como uma ferramenta que fornece +1 em Investigação).",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "salistick-estudante-do-colegio-real",
     "name": "Salistick - Estudante do Colégio Real",
     "power": "Estudante do Colégio Real",
-    "items": "Bálsamo restaurador x3, maleta de medicamentos."
+    "items": "Bálsamo restaurador x3, maleta de medicamentos.",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "sckharshantallas-aprendiz-de-dragoeiro",
     "name": "Sckharshantallas - Aprendiz de Dragoeiro",
     "power": "Aprendiz de Dragoeiro",
-    "items": "Arma simples ou marcial à sua escolha, troféu de caça, treckod."
+    "items": "Arma simples ou marcial à sua escolha, troféu de caça, treckod.",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "sckharshantallas-rebelde-agitador",
     "name": "Sckharshantallas - Rebelde Agitador",
     "power": "Rebelde Agitador",
-    "items": "Arma simples ou marcial, panfleto revolucionário, T$ 6d12 (impostos que você deixou de pagar)."
+    "items": "Arma simples ou marcial, panfleto revolucionário, T$ 6d12 (impostos que você deixou de pagar).",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "seguidor",
     "name": "Seguidor",
     "power": "Antigo Mestre",
-    "items": "Um item recebido de seu mestre de até T$ 100."
+    "items": "Um item recebido de seu mestre de até T$ 100.",
+    "pericasFixas": [
+      "adestramento",
+      "oficio"
+    ],
+    "pericasEscolha": 0
   },
   {
     "id": "selvagem",
     "name": "Selvagem",
     "power": "Vida Rústica",
-    "items": "Uma arma simples, um pequeno animal de estimação como um pássaro ou esquilo."
+    "items": "Uma arma simples, um pequeno animal de estimação como um pássaro ou esquilo.",
+    "pericasFixas": [
+      "percepcao",
+      "reflexos",
+      "sobrevivencia"
+    ],
+    "pericasEscolha": 0
   },
   {
     "id": "smokestone-procurado-vivo-ou-morto",
     "name": "Smokestone - Procurado: Vivo ou Morto",
     "power": "Procurado: Vivo ou Morto",
-    "items": "Pistola, balas cruéis (20)."
+    "items": "Pistola, balas cruéis (20).",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "soldado",
     "name": "Soldado",
     "power": "Influência Militar",
-    "items": "Uma arma marcial, um uniforme militar, uma insígnia de seu exército."
+    "items": "Uma arma marcial, um uniforme militar, uma insígnia de seu exército.",
+    "pericasFixas": [
+      "fortitude",
+      "guerra",
+      "luta",
+      "pontaria"
+    ],
+    "pericasEscolha": 0
   },
   {
     "id": "supremacia-purista-desertor-da-supremacia",
     "name": "Supremacia Purista - Desertor da Supremacia",
     "power": "Desertor da Supremacia",
-    "items": "Brunea com símbolo purista raspado, escudo pesado, espada bastarda, ração de viagem x10."
+    "items": "Brunea com símbolo purista raspado, escudo pesado, espada bastarda, ração de viagem x10.",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "svalas-tradicionalista-svalano",
     "name": "Svalas - Tradicionalista Svalano",
     "power": "Tradicionalista Svalano",
-    "items": "Arma simples ou marcial, corda, mochila de aventureiro, vara de madeira (3 m)."
+    "items": "Arma simples ou marcial, corda, mochila de aventureiro, vara de madeira (3 m).",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "tamu-ra-aristocrata-dai-zenshi",
     "name": "Tamu-ra - Aristocrata Dai’zenshi",
     "power": "Aristocrata Dai’zenshi",
-    "items": "Traje da corte, katana superior com uma melhoria (exceto material especial)."
+    "items": "Traje da corte, katana superior com uma melhoria (exceto material especial).",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "tamu-ra-um-com-os-kami",
     "name": "Tamu-ra - Um com os Kami",
     "power": "Um com os Kami",
-    "items": "Bálsamo restaurador, essência de mana."
+    "items": "Bálsamo restaurador, essência de mana.",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "taverneiro",
     "name": "Taverneiro",
     "power": "Gororoba",
-    "items": "Rolo de macarrão ou martelo de carne (mesmas estatísticas de uma clava), uma panela, um avental, uma caneca e um pano sujo."
+    "items": "Rolo de macarrão ou martelo de carne (mesmas estatísticas de uma clava), uma panela, um avental, uma caneca e um pano sujo.",
+    "pericasFixas": [
+      "diplomacia",
+      "jogatina",
+      "oficio"
+    ],
+    "pericasEscolha": 0
   },
   {
     "id": "trabalhador",
     "name": "Trabalhador",
     "power": "Esforçado",
-    "items": "Uma ferramenta pesada (mesmas estatísticas de uma maça ou lança, a sua escolha)."
+    "items": "Uma ferramenta pesada (mesmas estatísticas de uma maça ou lança, a sua escolha).",
+    "pericasFixas": [
+      "atletismo",
+      "fortitude"
+    ],
+    "pericasEscolha": 0
   },
   {
     "id": "tres-mares-grumete-pirata",
     "name": "Três Mares - Grumete Pirata",
     "power": "Grumete Pirata",
-    "items": "Adaga, corda, tatuagem de sua antiga tripulação (+1 em Intimidação)."
+    "items": "Adaga, corda, tatuagem de sua antiga tripulação (+1 em Intimidação).",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "triunphus-recruta-da-fenix",
     "name": "Triunphus - Recruta da Fênix",
     "power": "Recruta da Fênix",
-    "items": "Arma marcial, brunea, grifo iniciante."
+    "items": "Arma marcial, brunea, grifo iniciante.",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "ubani-andarilho-ubaneri",
     "name": "Ubani - Andarilho Ubaneri",
     "power": "Andarilho Ubaneri",
-    "items": "Escudo pesado, lança."
+    "items": "Escudo pesado, lança.",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "ubani-emissario-ubaneri",
     "name": "Ubani - Emissário Ubaneri",
     "power": "Emissário Ubaneri",
-    "items": "Essência de mana, mochila de aventureiro."
+    "items": "Essência de mana, mochila de aventureiro.",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "valkaria-cosmopolita",
     "name": "Valkaria - Cosmopolita",
     "power": "Cosmopolita",
-    "items": "Equipamento de viagem, traje de viajante, um item artístico de origem cultural indefinida (½ espaço, T$ 100)."
+    "items": "Equipamento de viagem, traje de viajante, um item artístico de origem cultural indefinida (½ espaço, T$ 100).",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "valkaria-cria-da-favela",
     "name": "Valkaria - Cria da Favela",
     "power": "Cria da Favela",
-    "items": "Andrajos de aldeão, corda, vara de madeira."
+    "items": "Andrajos de aldeão, corda, vara de madeira.",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "valkaria-nitamuraniano",
     "name": "Valkaria - Nitamuraniano",
     "power": "Nitamuraniano",
-    "items": "Arco longo ou katana, camisa bufante ou traje de seda."
+    "items": "Arco longo ou katana, camisa bufante ou traje de seda.",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "vectora-receptador-das-nuvens",
     "name": "Vectora - Receptador das Nuvens",
     "power": "Receptador das Nuvens",
-    "items": "Mercadorias raras e variadas (2 espaços, T$ 300)."
+    "items": "Mercadorias raras e variadas (2 espaços, T$ 300).",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "wynlla-plebeu-arcano",
     "name": "Wynlla - Plebeu Arcano",
     "power": "Plebeu Arcano",
-    "items": "Bandoleira de poções, gorro de ervas, poção arcana de 1° círculo."
+    "items": "Bandoleira de poções, gorro de ervas, poção arcana de 1° círculo.",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "wynlla-recruta-arcano",
     "name": "Wynlla - Recruta Arcano",
     "power": "Recruta Arcano",
-    "items": "Essência de mana x2, varinha arcana."
+    "items": "Essência de mana x2, varinha arcana.",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "zakharov-armeiro-armado",
     "name": "Zakharov - Armeiro Armado",
     "power": "Armeiro Armado",
-    "items": "Arma marcial, instrumentos de Ofício (armeiro)."
+    "items": "Arma marcial, instrumentos de Ofício (armeiro).",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "zakharov-nobre-zakharoviano",
     "name": "Zakharov - Nobre Zakharoviano",
     "power": "Nobre Zakharoviano",
-    "items": "Traje da corte."
+    "items": "Traje da corte.",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "escriba",
     "name": "Escriba",
     "power": "Escriba de Pergaminhos",
-    "items": "Instrumentos de escriba, organizador de pergaminhos, uma coleção de livros a sua escolha."
+    "items": "Instrumentos de escriba, organizador de pergaminhos, uma coleção de livros a sua escolha.",
+    "pericasFixas": [],
+    "pericasEscolha": 0
   },
   {
     "id": "escolhido-de-khalmyr",
     "name": "Escolhido de Khalmyr",
     "power": null,
-    "items": null
+    "items": null,
+    "pericasFixas": [],
+    "pericasEscolha": 0
   }
 ]

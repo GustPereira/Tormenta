@@ -116,6 +116,15 @@ export function IdentityHeader({ character, update }: Props) {
             className={inputClass + ' w-full'}
           >
             <option value="">— Sem origem —</option>
+            {character.customOrigins.length > 0 && (
+              <optgroup label="Personalizadas">
+                {character.customOrigins.map((o) => (
+                  <option key={o.id} value={o.id}>
+                    {o.name || 'Origem sem nome'}
+                  </option>
+                ))}
+              </optgroup>
+            )}
             {ORIGINS.map((o) => (
               <option key={o.id} value={o.id}>
                 {o.name}

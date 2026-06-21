@@ -1,6 +1,7 @@
 import {
   CLASSES_BY_ID,
   CLASS_PROFICIENCIES_BY_ID,
+  ORIGINS_BY_ID,
   RACES_BY_ID,
   RACE_TRAITS_BY_ID,
   SKILLS,
@@ -22,6 +23,8 @@ export interface DerivedSkill {
   attribute: AttributeKey
   attributeMod: number
   trained: boolean
+  /** Treinada automaticamente por ser perícia fixa da classe (não pode desmarcar). */
+  granted: boolean
   onlyTrained: boolean
   /** Se a perícia sofre penalidade de armadura. */
   armorPenalty: boolean
@@ -56,6 +59,20 @@ export interface DerivedCharacter {
 /** Soma os níveis de todas as classes (nível de personagem). */
 export function totalLevel(character: Character): number {
   return character.classes.reduce((sum, c) => sum + c.level, 0)
+}
+
+export interface ResolvedOrigin {
+  pericasFixas: string[]
+  pericasEscolha: number
+}
+
+/** Resolve a origem selecionada (catálogo ou personalizada). */
+export function resolveOrigin(character: Character): ResolvedOrigin | undefined {
+  if (!character.originId) return undefined
+  return (
+    ORIGINS_BY_ID[character.originId] ??
+    character.customOrigins.find((o) => o.id === character.originId)
+  )
 }
 
 /** Calcula os atributos finais aplicando os modificadores da raça e as escolhas livres. */
@@ -109,8 +126,16 @@ export function deriveCharacter(character: Character): DerivedCharacter {
     level: entry.level,
   }))
 
+  // Perícias treinadas fixas concedidas pelas classes e pela origem.
+  const grantedSkills = new Set<string>()
+  for (const entry of character.classes) {
+    CLASSES_BY_ID[entry.classId]?.pericasFixas.forEach((id) => grantedSkills.add(id))
+  }
+  resolveOrigin(character)?.pericasFixas.forEach((id) => grantedSkills.add(id))
+
   const skills: DerivedSkill[] = SKILLS.map((skill) => {
-    const trained = character.trainedSkills.includes(skill.id)
+    const granted = grantedSkills.has(skill.id)
+    const trained = granted || character.trainedSkills.includes(skill.id)
     const attributeMod = attrs[skill.attribute]
     // Perícias com penalidade de armadura recebem a penalidade somada dos itens/efeitos ativos.
     const otherBonus = (mods.skills[skill.id] ?? 0) + (skill.armorPenalty ? mods.penalty : 0)
@@ -120,6 +145,7 @@ export function deriveCharacter(character: Character): DerivedCharacter {
       attribute: skill.attribute,
       attributeMod,
       trained,
+      granted,
       onlyTrained: skill.onlyTrained,
       armorPenalty: skill.armorPenalty,
       total: skillBonus({ level, attributeMod, trained, otherBonus }),

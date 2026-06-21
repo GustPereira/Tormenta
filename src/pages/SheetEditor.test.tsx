@@ -49,9 +49,11 @@ describe('SheetEditor (página única)', () => {
     const user = userEvent.setup()
     renderAt(c.id)
 
+    await user.click(await screen.findByRole('button', { name: /editar perícias/i }))
     const checkbox = await screen.findByLabelText(/treinar atletismo/i)
     const row = checkbox.closest('li')!
-    expect(within(row).getByText('+4')).toBeInTheDocument()
+    // O valor principal da perícia (primeiro "+4"; o tooltip também lista partes).
+    expect(within(row).getAllByText('+4').length).toBeGreaterThan(0)
 
     await user.click(checkbox)
     await waitFor(() => expect(within(row).getByText('+6')).toBeInTheDocument())

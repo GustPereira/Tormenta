@@ -1,11 +1,18 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { Button } from '../../components/Button'
+import { EditableCard } from '../../components/EditableCard'
 import { Panel } from '../../components/Panel'
 import { inputClass } from '../../components/ui'
+import { SKILLS } from '../../data'
 import { downloadCharacter } from '../../io'
 import { fileToScaledDataUrl } from '../../lib/image'
 import { FONT_OPTIONS } from '../../lib/theme'
-import { DEFAULT_THEME, type Character, type Theme } from '../../schema'
+import {
+  DEFAULT_THEME,
+  type Character,
+  type CustomOrigin,
+  type Theme,
+} from '../../schema'
 
 interface Props {
   character: Character
@@ -26,6 +33,36 @@ export function SettingsPanel({ character, update, onDelete }: Props) {
       // ignora arquivo inválido
     }
   }
+
+  const [lastOriginId, setLastOriginId] = useState<string | null>(null)
+  const setOrigin = (id: string, patch: Partial<CustomOrigin>) =>
+    update((c) => ({
+      ...c,
+      customOrigins: c.customOrigins.map((o) => (o.id === id ? { ...o, ...patch } : o)),
+    }))
+  const addOrigin = () => {
+    const id = crypto.randomUUID()
+    setLastOriginId(id)
+    update((c) => ({
+      ...c,
+      customOrigins: [
+        ...c.customOrigins,
+        { id, name: '', pericasFixas: [], pericasEscolha: 0, power: null },
+      ],
+    }))
+  }
+  const removeOrigin = (id: string) =>
+    update((c) => ({
+      ...c,
+      customOrigins: c.customOrigins.filter((o) => o.id !== id),
+      originId: c.originId === id ? null : c.originId,
+    }))
+  const toggleOriginSkill = (o: CustomOrigin, skillId: string) =>
+    setOrigin(o.id, {
+      pericasFixas: o.pericasFixas.includes(skillId)
+        ? o.pericasFixas.filter((s) => s !== skillId)
+        : [...o.pericasFixas, skillId],
+    })
 
   return (
     <div className="mx-auto max-w-2xl space-y-4">
@@ -169,6 +206,82 @@ export function SettingsPanel({ character, update, onDelete }: Props) {
         <Button variant="secondary" onClick={() => downloadCharacter(character)}>
           Exportar JSON
         </Button>
+      </Panel>
+
+      <Panel
+        title="Origens personalizadas"
+        action={<Button variant="ghost" className="text-xs" onClick={addOrigin}>+ origem</Button>}
+      >
+        {character.customOrigins.length === 0 ? (
+          <p className="text-sm text-stone-500">
+            Crie uma origem própria (nome, perícias treinadas e poder). Ela aparece no seletor de Origem.
+          </p>
+        ) : (
+          <ul className="space-y-2">
+            {character.customOrigins.map((o) => (
+              <EditableCard
+                key={o.id}
+                title={o.name || 'Origem sem nome'}
+                summary={o.pericasFixas.map((s) => SKILLS.find((k) => k.id === s)?.name ?? s).join(', ') || 'sem perícias'}
+                onDelete={() => removeOrigin(o.id)}
+                deleteName={o.name}
+                startEditing={o.id === lastOriginId}
+              >
+                <div className="space-y-2">
+                  <input
+                    type="text"
+                    value={o.name}
+                    placeholder="Nome da origem"
+                    onChange={(e) => setOrigin(o.id, { name: e.target.value })}
+                    className={inputClass + ' w-full font-medium'}
+                    aria-label="Nome da origem"
+                  />
+                  <label className="flex items-center gap-2 text-xs text-stone-400">
+                    Poder concedido
+                    <input
+                      type="text"
+                      value={o.power ?? ''}
+                      onChange={(e) => setOrigin(o.id, { power: e.target.value || null })}
+                      className={inputClass + ' flex-1'}
+                      aria-label="Poder da origem"
+                    />
+                  </label>
+                  <label className="flex items-center gap-2 text-xs text-stone-400">
+                    Perícias à escolha
+                    <input
+                      type="number"
+                      min={0}
+                      value={o.pericasEscolha}
+                      onChange={(e) => setOrigin(o.id, { pericasEscolha: Math.max(0, Number(e.target.value) || 0) })}
+                      className={inputClass + ' w-16 text-center'}
+                      aria-label="Perícias à escolha"
+                    />
+                  </label>
+                  <div>
+                    <span className="mb-1 block text-xs text-stone-400">Perícias treinadas</span>
+                    <div className="flex flex-wrap gap-1">
+                      {SKILLS.map((s) => {
+                        const selected = o.pericasFixas.includes(s.id)
+                        return (
+                          <button
+                            key={s.id}
+                            type="button"
+                            onClick={() => toggleOriginSkill(o, s.id)}
+                            className={`rounded-full px-2 py-0.5 text-xs transition-colors ${
+                              selected ? 'bg-tormenta-600 text-white' : 'bg-stone-800 text-stone-300 hover:bg-stone-700'
+                            }`}
+                          >
+                            {s.name}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+                </div>
+              </EditableCard>
+            ))}
+          </ul>
+        )}
       </Panel>
 
       <Panel title="Zona de perigo" className="border-red-900/60">

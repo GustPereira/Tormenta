@@ -7,7 +7,7 @@
  *
  * Uso: npm run build-data
  */
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs'
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 
@@ -87,7 +87,37 @@ function main() {
   const g = parseCSV(readFileSync(csvPath, 'utf8'))
   const at = (r, c) => (g[r] && g[r][c] != null ? g[r][c].trim() : '')
 
-  // ----- ORIGENS (c135 nome, c137 poder, c146 itens) -----
+  // Perícias treinadas concedidas por cada origem, lidas da Tabela 1-19 do PDF
+  // (texto antes do ";"). Cobre as origens do Livro Básico.
+  const SKILL_IDS = new Set([
+    'acrobacia', 'adestramento', 'atletismo', 'atuacao', 'cavalgar', 'conhecimento',
+    'cura', 'diplomacia', 'enganacao', 'fortitude', 'furtividade', 'guerra', 'iniciativa',
+    'intimidacao', 'intuicao', 'investigacao', 'jogatina', 'ladinagem', 'luta', 'misticismo',
+    'nobreza', 'oficio', 'percepcao', 'pilotagem', 'pontaria', 'reflexos', 'religiao',
+    'sobrevivencia', 'vontade',
+  ])
+  let pdfText = ''
+  for (const p of ['0093', '0094']) {
+    const fp = join(__dirname, '..', 'extracted', 'pages', `page-${p}.txt`)
+    if (existsSync(fp)) pdfText += ' ' + readFileSync(fp, 'utf8')
+  }
+  pdfText = pdfText.replace(/\s+/g, ' ')
+  const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  function originSkills(name) {
+    if (!pdfText) return []
+    const m = new RegExp(escapeRe(name) + '\\s+([^;]*?);').exec(pdfText)
+    if (!m) return []
+    const skills = []
+    for (const tok of m[1].split(',')) {
+      const id = slug(tok.replace(/\(.*?\)/g, ''))
+      if (SKILL_IDS.has(id)) {
+        if (!skills.includes(id)) skills.push(id)
+      } else break
+    }
+    return skills
+  }
+
+  // ----- ORIGENS (c135 nome, c137 poder, c146 itens; perícias do PDF) -----
   const origins = []
   for (let r = 1; r < g.length; r++) {
     const name = at(r, 135)
@@ -97,6 +127,8 @@ function main() {
       name,
       power: at(r, 137) || null,
       items: at(r, 146) || null,
+      pericasFixas: originSkills(name),
+      pericasEscolha: 0,
     })
   }
 

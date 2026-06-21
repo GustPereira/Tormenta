@@ -97,6 +97,16 @@ export const effectSchema = z.object({
 })
 export type EffectData = z.infer<typeof effectSchema>
 
+/** Origem personalizada cadastrada pelo jogador. */
+export const customOriginSchema = z.object({
+  id: z.string(),
+  name: z.string().default(''),
+  pericasFixas: z.array(z.string()).default([]),
+  pericasEscolha: z.number().int().default(0),
+  power: z.string().nullable().default(null),
+})
+export type CustomOrigin = z.infer<typeof customOriginSchema>
+
 export const inventoryItemSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -221,8 +231,10 @@ export const characterSchema = z.object({
   /** Atributos escolhidos para o bônus livre da raça ("+1 em N atributos diferentes"). */
   attributeChoices: z.array(attributeKeySchema).default([]),
   race: raceSchema.nullable().default(null),
-  /** Id da origem escolhida (catálogo de origens). */
+  /** Id da origem escolhida (catálogo de origens ou personalizada). */
   originId: z.string().nullable().default(null),
+  /** Origens personalizadas cadastradas pelo jogador. */
+  customOrigins: z.array(customOriginSchema).default([]),
   classes: z.array(classEntrySchema).default([]),
   /** IDs das perícias treinadas pelo jogador. */
   trainedSkills: z.array(z.string()).default([]),
@@ -275,6 +287,7 @@ export function createBlankCharacter(name = 'Nova Ficha'): Character {
     attributeChoices: [],
     race: null,
     originId: null,
+    customOrigins: [],
     classes: [],
     trainedSkills: [],
     abilities: [],

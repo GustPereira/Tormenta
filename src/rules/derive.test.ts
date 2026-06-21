@@ -151,6 +151,14 @@ describe('deriveCharacter', () => {
     expect(d.deslocamento).toBe(6)
   })
 
+  it('a origem concede perícias treinadas (granted)', () => {
+    const c = build({ originId: 'acolito', classes: [{ classId: 'clerigo', level: 1 }] })
+    const d = deriveCharacter(c)
+    const cura = d.skills.find((s) => s.id === 'cura')!
+    expect(cura.granted).toBe(true)
+    expect(cura.trained).toBe(true)
+  })
+
   it('calcula o bônus de perícia treinada com atributo final da raça', () => {
     const c = build({
       attributes: { forca: 2, destreza: 0, constituicao: 0, inteligencia: 0, sabedoria: 0, carisma: 0 },
