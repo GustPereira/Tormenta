@@ -10,6 +10,7 @@ import {
   effectContributions,
   halfLevel,
   resolveOrigin,
+  resolveValue,
   trainingBonus,
 } from '../../rules'
 import type { Character } from '../../schema'
@@ -41,6 +42,8 @@ export function SkillsPanel({ character, update }: Props) {
 
   const chooseLimit = fromClasses + intBonus + (origin?.pericasEscolha ?? 0) + duplicateBonus
   const chosen = derived.skills.filter((s) => s.trained && !s.granted).length
+
+  const ctx = { attributes: derived.finalAttributes, level: derived.totalLevel }
 
   // De onde vem o limite (para o tooltip).
   const limitSources = [
@@ -97,7 +100,8 @@ export function SkillsPanel({ character, update }: Props) {
                   : []),
                 ...effectContributions(
                   character,
-                  (m) => (m.skills[skill.id] ?? 0) + (skill.armorPenalty ? m.penalty : 0),
+                  (m) => resolveValue(m.skills[skill.id] ?? 0, ctx) + (skill.armorPenalty ? resolveValue(m.penalty, ctx) : 0),
+                  ctx,
                 ),
               ].filter((c) => c.value !== 0)
           return (

@@ -52,24 +52,32 @@ export const raceSchema = z.object({
 export type Race = z.infer<typeof raceSchema>
 
 /**
+ * Valor de um modificador: número fixo ou fórmula em texto (ex.: "@car + 2").
+ * As fórmulas usam tokens (@for, @nivel…) resolvidos pelo motor de regras.
+ */
+export const modValueSchema = z.union([z.number().int(), z.string()])
+export type ModValue = z.infer<typeof modValueSchema>
+
+/**
  * Modificadores que um item pode conceder. Aplicados aos valores derivados
  * quando o item está com o efeito ativo. Chaves de `attributes` são ids de
- * atributo; de `skills`, ids de perícia.
+ * atributo; de `skills`, ids de perícia. Todo valor pode ser número fixo ou
+ * fórmula (ex.: "@car + 2").
  */
 export const itemModifiersSchema = z.object({
-  attributes: z.record(z.string(), z.number().int()).default({}),
-  skills: z.record(z.string(), z.number().int()).default({}),
+  attributes: z.record(z.string(), modValueSchema).default({}),
+  skills: z.record(z.string(), modValueSchema).default({}),
   /** Soma ao PV máximo. */
-  hitPoints: z.number().int().default(0),
+  hitPoints: modValueSchema.default(0),
   /** Soma ao PM máximo. */
-  mana: z.number().int().default(0),
-  defense: z.number().int().default(0),
+  mana: modValueSchema.default(0),
+  defense: modValueSchema.default(0),
   /** Penalidade de armadura: aplicada às perícias com penalidade de armadura. */
-  penalty: z.number().int().default(0),
+  penalty: modValueSchema.default(0),
   /** Alteração de deslocamento (em metros), somada ao deslocamento base. */
-  movement: z.number().int().default(0),
+  movement: modValueSchema.default(0),
   /** Redução de dano. */
-  damageReduction: z.number().int().default(0),
+  damageReduction: modValueSchema.default(0),
 })
 export type ItemModifiers = z.infer<typeof itemModifiersSchema>
 

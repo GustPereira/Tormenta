@@ -2,11 +2,18 @@ import { ATTRIBUTE_ABBR, SKILLS_BY_ID } from '../data'
 import {
   ATTRIBUTE_KEYS,
   type Ability,
+  type Attributes,
   type Character,
   type EffectData,
   type InventoryItem,
   type ItemModifiers,
 } from '../schema'
+import { isFormula, resolveValue, type FormulaContext } from './formula'
+
+const ZERO_ATTRS: Attributes = {
+  forca: 0, destreza: 0, constituicao: 0, inteligencia: 0, sabedoria: 0, carisma: 0,
+}
+const ZERO_CTX: FormulaContext = { attributes: ZERO_ATTRS, level: 0 }
 
 /**
  * Um efeito nomeado e ativável que altera valores derivados.
@@ -105,19 +112,22 @@ export function collectEffects(character: Character): Effect[] {
 }
 
 /** Soma os modificadores de todos os efeitos ativos. */
-export function aggregateActiveModifiers(effects: Effect[]): AggregatedModifiers {
+export function aggregateActiveModifiers(
+  effects: Effect[],
+  ctx: FormulaContext = ZERO_CTX,
+): AggregatedModifiers {
   const acc: AggregatedModifiers = { attributes: {}, skills: {}, hitPoints: 0, mana: 0, defense: 0, penalty: 0, movement: 0, damageReduction: 0 }
   for (const effect of effects) {
     if (!effect.isActive()) continue
     const m = effect.modifiers
-    for (const [k, v] of Object.entries(m.attributes)) acc.attributes[k] = (acc.attributes[k] ?? 0) + v
-    for (const [k, v] of Object.entries(m.skills)) acc.skills[k] = (acc.skills[k] ?? 0) + v
-    acc.hitPoints += m.hitPoints
-    acc.mana += m.mana
-    acc.defense += m.defense
-    acc.penalty += m.penalty ?? 0
-    acc.movement += m.movement ?? 0
-    acc.damageReduction += m.damageReduction ?? 0
+    for (const [k, v] of Object.entries(m.attributes)) acc.attributes[k] = (acc.attributes[k] ?? 0) + resolveValue(v, ctx)
+    for (const [k, v] of Object.entries(m.skills)) acc.skills[k] = (acc.skills[k] ?? 0) + resolveValue(v, ctx)
+    acc.hitPoints += resolveValue(m.hitPoints, ctx)
+    acc.mana += resolveValue(m.mana, ctx)
+    acc.defense += resolveValue(m.defense, ctx)
+    acc.penalty += resolveValue(m.penalty ?? 0, ctx)
+    acc.movement += resolveValue(m.movement ?? 0, ctx)
+    acc.damageReduction += resolveValue(m.damageReduction ?? 0, ctx)
   }
   return acc
 }
@@ -134,29 +144,46 @@ export interface EffectContribution {
  */
 export function effectContributions(
   character: Character,
-  selector: (m: ItemModifiers) => number,
+  selector: (m: ItemModifiers) => number | string,
+  ctx: FormulaContext = ZERO_CTX,
 ): EffectContribution[] {
   return collectEffects(character)
     .filter((e) => e.isActive())
-    .map((e) => ({ name: e.name, value: selector(e.modifiers) }))
+    .map((e) => ({ name: e.name, value: resolveValue(selector(e.modifiers), ctx) }))
     .filter((c) => c.value !== 0)
+}
+
+/**
+ * Formata um valor de modificador para o resumo: número com sinal (ex.: "+2") ou
+ * a fórmula como texto (ex.: "@car + 2"). Retorna `null` quando vazio/zero.
+ */
+function formatModValue(value: number | string): string | null {
+  if (isFormula(value)) return value.trim() ? value : null
+  return value ? `${value >= 0 ? '+' : ''}${value}` : null
 }
 
 /** Resumo textual curto dos modificadores de um efeito (ex.: "For +2, Defesa +1, PV +5"). */
 export function describeModifiers(m: ItemModifiers): string {
   const parts: string[] = []
   for (const key of ATTRIBUTE_KEYS) {
-    const v = m.attributes[key]
-    if (v) parts.push(`${ATTRIBUTE_ABBR[key]} ${v >= 0 ? '+' : ''}${v}`)
+    const s = formatModValue(m.attributes[key] ?? 0)
+    if (s) parts.push(`${ATTRIBUTE_ABBR[key]} ${s}`)
   }
-  if (m.hitPoints) parts.push(`PV ${m.hitPoints >= 0 ? '+' : ''}${m.hitPoints}`)
-  if (m.mana) parts.push(`PM ${m.mana >= 0 ? '+' : ''}${m.mana}`)
-  if (m.defense) parts.push(`Defesa ${m.defense >= 0 ? '+' : ''}${m.defense}`)
-  if (m.penalty) parts.push(`Penal. ${m.penalty >= 0 ? '+' : ''}${m.penalty}`)
-  if (m.movement) parts.push(`Desloc. ${m.movement >= 0 ? '+' : ''}${m.movement}m`)
-  if (m.damageReduction) parts.push(`RD ${m.damageReduction >= 0 ? '+' : ''}${m.damageReduction}`)
+  const hp = formatModValue(m.hitPoints)
+  if (hp) parts.push(`PV ${hp}`)
+  const pm = formatModValue(m.mana)
+  if (pm) parts.push(`PM ${pm}`)
+  const def = formatModValue(m.defense)
+  if (def) parts.push(`Defesa ${def}`)
+  const pen = formatModValue(m.penalty ?? 0)
+  if (pen) parts.push(`Penal. ${pen}`)
+  const mov = formatModValue(m.movement ?? 0)
+  if (mov) parts.push(`Desloc. ${mov}${isFormula(m.movement ?? 0) ? '' : 'm'}`)
+  const rd = formatModValue(m.damageReduction ?? 0)
+  if (rd) parts.push(`RD ${rd}`)
   for (const [id, v] of Object.entries(m.skills)) {
-    if (v) parts.push(`${SKILLS_BY_ID[id]?.name ?? id} ${v >= 0 ? '+' : ''}${v}`)
+    const s = formatModValue(v)
+    if (s) parts.push(`${SKILLS_BY_ID[id]?.name ?? id} ${s}`)
   }
   return parts.join(', ') || 'sem modificadores'
 }

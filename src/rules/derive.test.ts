@@ -1,9 +1,13 @@
 import { describe, expect, it } from 'vitest'
-import { createBlankCharacter, type Character } from '../schema'
+import { createBlankCharacter, type Character, type ItemModifiers } from '../schema'
 import { deriveCharacter, finalAttributes, totalLevel } from './derive'
 
 function build(overrides: Partial<Character>): Character {
   return { ...createBlankCharacter(), ...overrides }
+}
+
+const ZERO_MODS: ItemModifiers = {
+  attributes: {}, skills: {}, hitPoints: 0, mana: 0, defense: 0, penalty: 0, movement: 0, damageReduction: 0,
 }
 
 describe('totalLevel', () => {
@@ -149,6 +153,60 @@ describe('deriveCharacter', () => {
     expect(d.skills.find((s) => s.id === 'atletismo')!.total).toBe(0)
     // Deslocamento base 9 (sem raça) com -3 da armadura → 6
     expect(d.deslocamento).toBe(6)
+  })
+
+  it('resolve fórmula de perícia (@car) contra o atributo final', () => {
+    const c = build({
+      attributes: { forca: 0, destreza: 0, constituicao: 0, inteligencia: 0, sabedoria: 0, carisma: 3 },
+      classes: [{ classId: 'guerreiro', level: 1 }],
+      effects: [
+        {
+          id: 'e',
+          name: 'Inspiração',
+          active: true,
+          modifiers: { attributes: {}, skills: { atletismo: '@car' }, hitPoints: 0, mana: 0, defense: 0, penalty: 0, movement: 0, damageReduction: 0 },
+        },
+      ],
+    })
+    const d = deriveCharacter(c)
+    // Atletismo: ½ nível 0 + Força 0 + @car (3) = 3
+    expect(d.skills.find((s) => s.id === 'atletismo')!.total).toBe(3)
+  })
+
+  it('fórmula em atributo (@nivel) resolve contra os atributos base', () => {
+    const c = build({
+      classes: [{ classId: 'guerreiro', level: 3 }],
+      effects: [{ id: 'e', name: 'Crescimento', active: true, modifiers: { ...ZERO_MODS, attributes: { forca: '@nivel' } } }],
+    })
+    const d = deriveCharacter(c)
+    expect(d.finalAttributes.forca).toBe(3)
+  })
+
+  it('fórmula em defesa (@meionivel) soma à defesa', () => {
+    const classes = [{ classId: 'guerreiro', level: 8 }]
+    const base = deriveCharacter(build({ classes }))
+    const withEffect = deriveCharacter(
+      build({
+        classes,
+        effects: [{ id: 'e', name: 'Postura', active: true, modifiers: { ...ZERO_MODS, defense: '@meionivel' } }],
+      }),
+    )
+    expect(withEffect.defense - base.defense).toBe(4)
+  })
+
+  it('fórmulas em PV e deslocamento são resolvidas', () => {
+    const classes = [{ classId: 'guerreiro', level: 5 }]
+    const base = deriveCharacter(build({ classes }))
+    const withEffect = deriveCharacter(
+      build({
+        classes,
+        effects: [
+          { id: 'e', name: 'Vigor', active: true, modifiers: { ...ZERO_MODS, hitPoints: '@nivel', movement: '@meionivel' } },
+        ],
+      }),
+    )
+    expect(withEffect.maxHitPoints - base.maxHitPoints).toBe(5)
+    expect(withEffect.deslocamento - base.deslocamento).toBe(2)
   })
 
   it('a origem concede perícias treinadas (granted)', () => {

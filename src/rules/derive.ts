@@ -94,9 +94,24 @@ export function finalAttributes(character: Character): Attributes {
   return result
 }
 
-/** Soma os modificadores de todos os efeitos ativos (de itens e avulsos). */
+/**
+ * Soma os modificadores de todos os efeitos ativos (itens, habilidades e avulsos),
+ * resolvendo as fórmulas (ex.: @car, @nivel). Faz dois passes para evitar
+ * dependência circular: as fórmulas de **atributo** resolvem contra os atributos
+ * base (raça + escolhas); as demais (perícias, defesa, PV…), contra os atributos
+ * finais (já com os bônus de atributo dos efeitos aplicados).
+ */
 export function activeModifiers(character: Character) {
-  return aggregateActiveModifiers(collectEffects(character))
+  const effects = collectEffects(character)
+  const level = totalLevel(character)
+  const baseAttrs = finalAttributes(character)
+  // Passe 1: fórmulas de atributo resolvidas contra os atributos base.
+  const pass1 = aggregateActiveModifiers(effects, { attributes: baseAttrs, level })
+  const attrs = { ...baseAttrs }
+  for (const key of ATTRIBUTE_KEYS) attrs[key] += pass1.attributes[key] ?? 0
+  // Passe 2: demais fórmulas resolvidas contra os atributos finais.
+  const pass2 = aggregateActiveModifiers(effects, { attributes: attrs, level })
+  return { ...pass2, attributes: pass1.attributes }
 }
 
 /**

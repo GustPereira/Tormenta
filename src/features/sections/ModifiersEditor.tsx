@@ -8,15 +8,25 @@ interface Props {
   onChange: (modifiers: ItemModifiers) => void
 }
 
+/** Converte o texto de um campo em número (se for inteiro) ou fórmula (texto). */
+function parseModValue(input: string): number | string {
+  const t = input.trim()
+  if (t === '') return 0
+  if (/^-?\d+$/.test(t)) return Number(t)
+  return t
+}
+
+const FORMULA_HINT = 'Número fixo ou fórmula: @for @des @con @int @sab @car @nivel @meionivel (ex.: @car+2)'
+
 /**
  * Editor reutilizável dos modificadores de um efeito/item: atributos, vitais &
- * defesa e perícias.
+ * defesa e perícias. Todo campo aceita número fixo ou fórmula (ex.: @car+2).
  */
 export function ModifiersEditor({ modifiers, onChange }: Props) {
-  const setAttr = (key: string, value: number) =>
+  const setAttr = (key: string, value: number | string) =>
     onChange({ ...modifiers, attributes: { ...modifiers.attributes, [key]: value } })
 
-  const setSkill = (skillId: string, value: number) =>
+  const setSkill = (skillId: string, value: number | string) =>
     onChange({ ...modifiers, skills: { ...modifiers.skills, [skillId]: value } })
 
   const removeSkill = (skillId: string) => {
@@ -27,6 +37,7 @@ export function ModifiersEditor({ modifiers, onChange }: Props) {
 
   return (
     <div className="space-y-3">
+      <p className="text-[11px] text-stone-500">{FORMULA_HINT}</p>
       <Group label="Atributos">
         {ATTRIBUTE_KEYS.map((key) => (
           <ModInput
@@ -55,7 +66,13 @@ export function ModifiersEditor({ modifiers, onChange }: Props) {
               <span className="flex-1 text-sm text-[var(--text)]">
                 {SKILLS_BY_ID[skillId]?.name ?? skillId}
               </span>
-              <ModInput label="" value={value} onChange={(v) => setSkill(skillId, v)} />
+              <input
+                type="text"
+                value={String(value)}
+                onChange={(e) => setSkill(skillId, parseModValue(e.target.value))}
+                className={inputClass + ' w-24 text-center'}
+                aria-label={`Valor de ${SKILLS_BY_ID[skillId]?.name ?? skillId}`}
+              />
               <Button variant="ghost" onClick={() => removeSkill(skillId)} aria-label="Remover perícia">✕</Button>
             </div>
           ))}
@@ -93,17 +110,17 @@ function ModInput({
   onChange,
 }: {
   label: string
-  value: number
-  onChange: (v: number) => void
+  value: number | string
+  onChange: (v: number | string) => void
 }) {
   return (
     <label className="flex items-center gap-1 text-xs text-stone-400">
       {label}
       <input
-        type="number"
-        value={value}
-        onChange={(e) => onChange(Number(e.target.value) || 0)}
-        className={inputClass + ' w-14 text-center'}
+        type="text"
+        value={String(value)}
+        onChange={(e) => onChange(parseModValue(e.target.value))}
+        className={inputClass + ' w-16 text-center'}
         aria-label={label || 'modificador'}
       />
     </label>

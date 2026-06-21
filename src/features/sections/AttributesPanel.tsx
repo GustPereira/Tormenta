@@ -15,6 +15,7 @@ interface Props {
 
 export function AttributesPanel({ character, update }: Props) {
   const derived = deriveCharacter(character)
+  const ctx = { attributes: derived.finalAttributes, level: derived.totalLevel }
   const race = character.race ? RACES_BY_ID[character.race.raceId] : undefined
   const freeChoice = race?.freeChoice
   const [editing, setEditing] = useState(false)
@@ -54,7 +55,7 @@ export function AttributesPanel({ character, update }: Props) {
             className="flex flex-col items-center rounded-md border border-[var(--card-border)] bg-[var(--card-bg)] p-2"
           >
             <span className="text-xs uppercase text-stone-400">{ATTRIBUTE_ABBR[key]}</span>
-            <EffectsTooltip contributions={effectContributions(character, (m) => m.attributes[key] ?? 0)}>
+            <EffectsTooltip contributions={effectContributions(character, (m) => m.attributes[key] ?? 0, ctx)}>
               <span className="font-display text-2xl font-bold text-tormenta-400">
                 {signed(derived.finalAttributes[key])}
               </span>

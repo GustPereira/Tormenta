@@ -12,6 +12,7 @@ interface Props {
 
 export function VitalsPanel({ character, update }: Props) {
   const d = deriveCharacter(character)
+  const ctx = { attributes: d.finalAttributes, level: d.totalLevel }
   const traits = character.race ? RACE_TRAITS_BY_ID[character.race.raceId] : undefined
 
   const senses = [
@@ -34,7 +35,7 @@ export function VitalsPanel({ character, update }: Props) {
           current={character.currentHitPoints}
           max={d.maxHitPoints}
           temp={character.temporaryHitPoints}
-          contributions={effectContributions(character, (m) => m.hitPoints)}
+          contributions={effectContributions(character, (m) => m.hitPoints, ctx)}
           onChange={(v) => update((c) => ({ ...c, currentHitPoints: v }))}
           onTempChange={(v) => update((c) => ({ ...c, temporaryHitPoints: v }))}
         />
@@ -43,13 +44,13 @@ export function VitalsPanel({ character, update }: Props) {
           current={character.currentMana}
           max={d.maxMana}
           temp={character.temporaryMana}
-          contributions={effectContributions(character, (m) => m.mana)}
+          contributions={effectContributions(character, (m) => m.mana, ctx)}
           onChange={(v) => update((c) => ({ ...c, currentMana: v }))}
           onTempChange={(v) => update((c) => ({ ...c, temporaryMana: v }))}
         />
-        <Big label="Defesa" value={d.defense} contributions={effectContributions(character, (m) => m.defense)} />
-        <Big label="Red. de Dano" value={d.damageReduction} contributions={effectContributions(character, (m) => m.damageReduction)} />
-        <Big label="Deslocamento" value={`${d.deslocamento}m`} contributions={effectContributions(character, (m) => m.movement)} />
+        <Big label="Defesa" value={d.defense} contributions={effectContributions(character, (m) => m.defense, ctx)} />
+        <Big label="Red. de Dano" value={d.damageReduction} contributions={effectContributions(character, (m) => m.damageReduction, ctx)} />
+        <Big label="Deslocamento" value={`${d.deslocamento}m`} contributions={effectContributions(character, (m) => m.movement, ctx)} />
       </div>
 
       <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
