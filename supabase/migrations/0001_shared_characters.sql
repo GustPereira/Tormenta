@@ -1,8 +1,6 @@
 -- Compartilhamento de fichas: leitura pública por id; escrita só via funções
 -- RPC que validam um owner_token secreto (guardado em tabela separada, nunca
--- exposto). Sem login (uso entre amigos).
-
-create extension if not exists pgcrypto;
+-- exposto). Sem login (uso entre amigos). Idempotente — pode reaplicar.
 
 -- Dados públicos da ficha compartilhada (lidos por qualquer um com o id).
 create table if not exists public.shared_characters (
@@ -27,13 +25,13 @@ create policy "public read" on public.shared_characters for select using (true);
 
 -- shared_secrets: sem nenhuma policy => totalmente inacessível ao anon.
 
--- Publica: gera id + token, insere, devolve ambos.
+-- Token de dono: dois UUIDs concatenados (64 hex), sem depender de pgcrypto.
 create or replace function public.publish_character(p_data jsonb)
 returns table(id uuid, owner_token text)
 language plpgsql security definer set search_path = public as $$
 declare
   v_id uuid := gen_random_uuid();
-  v_token text := encode(gen_random_bytes(16), 'hex');
+  v_token text := replace(gen_random_uuid()::text, '-', '') || replace(gen_random_uuid()::text, '-', '');
 begin
   insert into public.shared_characters(id, data) values (v_id, p_data);
   insert into public.shared_secrets(id, owner_token) values (v_id, v_token);
@@ -66,5 +64,13 @@ grant execute on function public.publish_character(jsonb) to anon, authenticated
 grant execute on function public.update_character(uuid, text, jsonb) to anon, authenticated;
 grant execute on function public.unpublish_character(uuid, text) to anon, authenticated;
 
--- Realtime: emite mudanças de shared_characters para os assinantes.
-alter publication supabase_realtime add table public.shared_characters;
+-- Realtime: emite mudanças de shared_characters para os assinantes (idempotente).
+do $$
+begin
+  if not exists (
+    select 1 from pg_publication_tables
+    where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'shared_characters'
+  ) then
+    alter publication supabase_realtime add table public.shared_characters;
+  end if;
+end $$;
