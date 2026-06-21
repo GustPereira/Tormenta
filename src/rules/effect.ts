@@ -122,6 +122,26 @@ export function aggregateActiveModifiers(effects: Effect[]): AggregatedModifiers
   return acc
 }
 
+export interface EffectContribution {
+  name: string
+  value: number
+}
+
+/**
+ * Lista os efeitos ativos que contribuem para um valor (atributo, perícia,
+ * defesa, etc.), com o valor de cada um. `selector` extrai a contribuição do
+ * efeito a partir de seus modificadores.
+ */
+export function effectContributions(
+  character: Character,
+  selector: (m: ItemModifiers) => number,
+): EffectContribution[] {
+  return collectEffects(character)
+    .filter((e) => e.isActive())
+    .map((e) => ({ name: e.name, value: selector(e.modifiers) }))
+    .filter((c) => c.value !== 0)
+}
+
 /** Resumo textual curto dos modificadores de um efeito (ex.: "For +2, Defesa +1, PV +5"). */
 export function describeModifiers(m: ItemModifiers): string {
   const parts: string[] = []

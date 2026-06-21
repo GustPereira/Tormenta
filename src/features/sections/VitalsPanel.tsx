@@ -1,7 +1,8 @@
 import { RACE_TRAITS_BY_ID } from '../../data'
+import { EffectsTooltip } from '../../components/EffectsTooltip'
 import { Panel } from '../../components/Panel'
 import { inputClass } from '../../components/ui'
-import { deriveCharacter } from '../../rules'
+import { deriveCharacter, effectContributions, type EffectContribution } from '../../rules'
 import type { Character } from '../../schema'
 
 interface Props {
@@ -33,6 +34,7 @@ export function VitalsPanel({ character, update }: Props) {
           current={character.currentHitPoints}
           max={d.maxHitPoints}
           temp={character.temporaryHitPoints}
+          contributions={effectContributions(character, (m) => m.hitPoints)}
           onChange={(v) => update((c) => ({ ...c, currentHitPoints: v }))}
           onTempChange={(v) => update((c) => ({ ...c, temporaryHitPoints: v }))}
         />
@@ -41,12 +43,13 @@ export function VitalsPanel({ character, update }: Props) {
           current={character.currentMana}
           max={d.maxMana}
           temp={character.temporaryMana}
+          contributions={effectContributions(character, (m) => m.mana)}
           onChange={(v) => update((c) => ({ ...c, currentMana: v }))}
           onTempChange={(v) => update((c) => ({ ...c, temporaryMana: v }))}
         />
-        <Big label="Defesa" value={d.defense} />
-        <Big label="Red. de Dano" value={d.damageReduction} />
-        <Big label="Deslocamento" value={`${d.deslocamento}m`} />
+        <Big label="Defesa" value={d.defense} contributions={effectContributions(character, (m) => m.defense)} />
+        <Big label="Red. de Dano" value={d.damageReduction} contributions={effectContributions(character, (m) => m.damageReduction)} />
+        <Big label="Deslocamento" value={`${d.deslocamento}m`} contributions={effectContributions(character, (m) => m.movement)} />
       </div>
 
       <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
@@ -64,6 +67,7 @@ function Pool({
   current,
   max,
   temp,
+  contributions,
   onChange,
   onTempChange,
 }: {
@@ -71,6 +75,7 @@ function Pool({
   current: number | null
   max: number
   temp: number
+  contributions: EffectContribution[]
   onChange: (v: number | null) => void
   onTempChange: (v: number) => void
 }) {
@@ -85,7 +90,9 @@ function Pool({
           className={inputClass + ' w-14 text-center text-lg font-bold'}
           aria-label={`${label} atual`}
         />
-        <span className="text-stone-500">/ {max}</span>
+        <EffectsTooltip contributions={contributions}>
+          <span className="text-stone-500">/ {max}</span>
+        </EffectsTooltip>
       </div>
       <label className="mt-1 flex items-center justify-center gap-1 text-[11px] text-stone-400">
         Temp
@@ -101,11 +108,21 @@ function Pool({
   )
 }
 
-function Big({ label, value }: { label: string; value: number | string }) {
+function Big({
+  label,
+  value,
+  contributions = [],
+}: {
+  label: string
+  value: number | string
+  contributions?: EffectContribution[]
+}) {
   return (
     <div className="rounded-md border border-[var(--card-border)] bg-[var(--card-bg)] p-2 text-center">
       <div className="text-[11px] uppercase text-stone-400">{label}</div>
-      <div className="font-display text-2xl font-bold text-tormenta-300">{value}</div>
+      <EffectsTooltip contributions={contributions}>
+        <span className="font-display text-2xl font-bold text-tormenta-300">{value}</span>
+      </EffectsTooltip>
     </div>
   )
 }

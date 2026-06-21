@@ -1,8 +1,9 @@
 import { Star } from 'lucide-react'
 import { ATTRIBUTE_ABBR } from '../../data'
+import { EffectsTooltip } from '../../components/EffectsTooltip'
 import { Panel } from '../../components/Panel'
 import { signed } from '../../lib/format'
-import { deriveCharacter } from '../../rules'
+import { deriveCharacter, effectContributions } from '../../rules'
 import type { Character } from '../../schema'
 
 interface Props {
@@ -36,9 +37,16 @@ export function SkillsPanel({ character, update }: Props) {
               className="h-3.5 w-3.5 accent-tormenta-500"
               aria-label={`Treinar ${skill.name}`}
             />
-            <span className="w-9 text-right font-display font-bold text-tormenta-300">
-              {skill.unusable ? '—' : signed(skill.total)}
-            </span>
+            <EffectsTooltip
+              contributions={effectContributions(
+                character,
+                (m) => (m.skills[skill.id] ?? 0) + (skill.armorPenalty ? m.penalty : 0),
+              )}
+            >
+              <span className="w-9 text-right font-display font-bold text-tormenta-300">
+                {skill.unusable ? '—' : signed(skill.total)}
+              </span>
+            </EffectsTooltip>
             <span className={`flex-1 ${skill.unusable ? 'text-stone-500' : 'text-[var(--text)]'}`}>
               {skill.name}
               {skill.onlyTrained && (

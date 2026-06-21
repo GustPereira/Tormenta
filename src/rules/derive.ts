@@ -23,6 +23,8 @@ export interface DerivedSkill {
   attributeMod: number
   trained: boolean
   onlyTrained: boolean
+  /** Se a perícia sofre penalidade de armadura. */
+  armorPenalty: boolean
   /** Bônus total da perícia. */
   total: number
   /** Verdadeiro quando a perícia só pode ser usada treinada e não está treinada. */
@@ -119,6 +121,7 @@ export function deriveCharacter(character: Character): DerivedCharacter {
       attributeMod,
       trained,
       onlyTrained: skill.onlyTrained,
+      armorPenalty: skill.armorPenalty,
       total: skillBonus({ level, attributeMod, trained, otherBonus }),
       unusable: skill.onlyTrained && !trained,
     }
