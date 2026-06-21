@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Button } from '../../components/Button'
 import { EditableCard } from '../../components/EditableCard'
 import { Panel } from '../../components/Panel'
@@ -14,11 +15,15 @@ const PM_BY_CIRCLE: Record<number, number> = { 1: 1, 2: 3, 3: 6, 4: 10, 5: 15 }
 const CIRCLES = [1, 2, 3, 4, 5]
 
 export function SpellsPanel({ character, update }: Props) {
-  const add = (circle: number) =>
+  const [lastAddedId, setLastAddedId] = useState<string | null>(null)
+  const add = (circle: number) => {
+    const id = crypto.randomUUID()
+    setLastAddedId(id)
     update((c) => ({
       ...c,
-      spells: [...c.spells, { id: crypto.randomUUID(), name: '', circle, prepared: false, notes: '' }],
+      spells: [...c.spells, { id, name: '', circle, prepared: false, notes: '' }],
     }))
+  }
   const setField = (id: string, patch: Partial<Spell>) =>
     update((c) => ({
       ...c,
@@ -54,7 +59,7 @@ export function SpellsPanel({ character, update }: Props) {
                       summary={s.notes || 'sem anotações'}
                       onDelete={() => remove(s.id)}
                       deleteName={s.name}
-                      startEditing={!s.name}
+                      startEditing={s.id === lastAddedId}
                     >
                       <input
                         type="text"

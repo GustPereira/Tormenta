@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Button } from '../../components/Button'
 import { EditableCard } from '../../components/EditableCard'
 import { Panel } from '../../components/Panel'
@@ -29,6 +30,7 @@ function summarize(item: InventoryItem): string {
 }
 
 export function InventoryPanel({ character, update }: Props) {
+  const [lastAddedId, setLastAddedId] = useState<string | null>(null)
   const setItem = (id: string, patch: Partial<InventoryItem>) =>
     update((c) => ({
       ...c,
@@ -37,13 +39,15 @@ export function InventoryPanel({ character, update }: Props) {
 
   const setModifiers = (id: string, modifiers: ItemModifiers) => setItem(id, { modifiers })
 
-  const add = () =>
+  const add = () => {
+    const id = crypto.randomUUID()
+    setLastAddedId(id)
     update((c) => ({
       ...c,
       inventory: [
         ...c.inventory,
         {
-          id: crypto.randomUUID(),
+          id,
           name: '',
           quantity: 1,
           spaces: 0,
@@ -54,6 +58,7 @@ export function InventoryPanel({ character, update }: Props) {
         },
       ],
     }))
+  }
 
   const remove = (id: string) =>
     update((c) => ({ ...c, inventory: c.inventory.filter((it) => it.id !== id) }))
@@ -92,11 +97,23 @@ export function InventoryPanel({ character, update }: Props) {
               active={item.activeEffect}
               onActiveChange={(v) => setItem(item.id, { activeEffect: v })}
               activeLabel="Efeito ativo"
+              headerExtra={
+                <label className="flex items-center gap-1 text-xs text-stone-400">
+                  <input
+                    type="checkbox"
+                    checked={item.equipped}
+                    onChange={(e) => setItem(item.id, { equipped: e.target.checked })}
+                    className="h-4 w-4 accent-tormenta-500"
+                  />
+                  Equipado
+                </label>
+              }
               title={`${item.quantity}× ${item.name || 'Item sem nome'}`}
               summary={summarize(item)}
+              details={item.notes || 'Sem descrição.'}
               onDelete={() => remove(item.id)}
               deleteName={item.name}
-              startEditing={!item.name}
+              startEditing={item.id === lastAddedId}
             >
               <div className="space-y-2">
                 <div className="flex flex-wrap items-center gap-2">
@@ -131,16 +148,15 @@ export function InventoryPanel({ character, update }: Props) {
                       aria-label="Espaços"
                     />
                   </label>
-                  <label className="flex items-center gap-1 text-xs text-stone-400">
-                    <input
-                      type="checkbox"
-                      checked={item.equipped}
-                      onChange={(e) => setItem(item.id, { equipped: e.target.checked })}
-                      className="h-4 w-4 accent-tormenta-500"
-                    />
-                    Equipado
-                  </label>
                 </div>
+                <textarea
+                  value={item.notes}
+                  placeholder="Descrição"
+                  onChange={(e) => setItem(item.id, { notes: e.target.value })}
+                  className={inputClass + ' w-full resize-y text-sm'}
+                  rows={3}
+                  aria-label="Descrição do item"
+                />
                 <div className="border-t border-stone-800 pt-2">
                   <ModifiersEditor
                     modifiers={item.modifiers}

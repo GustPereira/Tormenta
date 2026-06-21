@@ -1,9 +1,10 @@
+import { useState } from 'react'
 import { Button } from '../../components/Button'
 import { EditableCard } from '../../components/EditableCard'
 import { Panel } from '../../components/Panel'
 import { inputClass } from '../../components/ui'
 import { ORIGINS_BY_ID } from '../../data'
-import { ACTION_KEYS, type Ability, type Character } from '../../schema'
+import { ACTION_KEYS, type Ability, type ActionKey, type Character } from '../../schema'
 
 interface Props {
   character: Character
@@ -11,19 +12,22 @@ interface Props {
 }
 
 function summarize(a: Ability): string {
-  const parts = [a.acao.join(', '), a.mp ? `${a.mp} PM` : null].filter(Boolean)
-  return parts.join(' · ') || 'sem detalhes'
+  return `Nível ${a.level} · ${a.mp} PM · ${a.acao[0] ?? 'Ação Padrão'}`
 }
 
 export function AbilitiesPanel({ character, update }: Props) {
-  const add = (group: Ability['group']) =>
+  const [lastAddedId, setLastAddedId] = useState<string | null>(null)
+  const add = (group: Ability['group']) => {
+    const id = crypto.randomUUID()
+    setLastAddedId(id)
     update((c) => ({
       ...c,
       abilities: [
         ...c.abilities,
-        { id: crypto.randomUUID(), name: '', group, notes: '', mp: 0, acao: ['Ação Padrão'] },
+        { id, name: '', group, notes: '', level: 1, mp: 0, acao: ['Ação Padrão'] },
       ],
     }))
+  }
   const setAbility = (id: string, patch: Partial<Ability>) =>
     update((c) => ({
       ...c,
@@ -42,8 +46,8 @@ export function AbilitiesPanel({ character, update }: Props) {
         </p>
       )}
       <div className="space-y-4">
-        <Group label="Racial & Origem" group="racial" character={character} setAbility={setAbility} remove={remove} add={add} />
-        <Group label="Classe & Geral" group="classe" character={character} setAbility={setAbility} remove={remove} add={add} />
+        <Group label="Racial & Origem" group="racial" character={character} setAbility={setAbility} remove={remove} add={add} lastAddedId={lastAddedId} />
+        <Group label="Classe & Geral" group="classe" character={character} setAbility={setAbility} remove={remove} add={add} lastAddedId={lastAddedId} />
       </div>
     </Panel>
   )
@@ -56,6 +60,7 @@ function Group({
   setAbility,
   remove,
   add,
+  lastAddedId,
 }: {
   label: string
   group: Ability['group']
@@ -63,15 +68,9 @@ function Group({
   setAbility: (id: string, patch: Partial<Ability>) => void
   remove: (id: string) => void
   add: (group: Ability['group']) => void
+  lastAddedId: string | null
 }) {
   const items = character.abilities.filter((a) => a.group === group)
-
-  const toggleAcao = (a: Ability, action: (typeof ACTION_KEYS)[number]) =>
-    setAbility(a.id, {
-      acao: a.acao.includes(action)
-        ? a.acao.filter((x) => x !== action)
-        : [...a.acao, action],
-    })
 
   return (
     <div>
@@ -88,9 +87,10 @@ function Group({
               key={a.id}
               title={a.name || 'Poder sem nome'}
               summary={summarize(a)}
+              details={a.notes || 'Sem descrição.'}
               onDelete={() => remove(a.id)}
               deleteName={a.name}
-              startEditing={!a.name}
+              startEditing={a.id === lastAddedId}
             >
               <div className="flex flex-col gap-2">
                 <input
@@ -101,38 +101,41 @@ function Group({
                   className={inputClass + ' w-full font-medium'}
                   aria-label="Nome do poder"
                 />
-                <label className="flex items-center gap-2 text-xs text-stone-400">
-                  Custo em PM
-                  <input
-                    type="number"
-                    value={a.mp}
-                    onChange={(e) => setAbility(a.id, { mp: Number(e.target.value) || 0 })}
-                    className={inputClass + ' w-16 text-center'}
-                    aria-label="Custo em PM"
-                  />
-                </label>
-                <div>
-                  <span className="mb-1 block text-xs text-stone-400">Ação</span>
-                  <div className="flex flex-wrap gap-1">
-                    {ACTION_KEYS.map((action) => {
-                      const selected = a.acao.includes(action)
-                      return (
-                        <button
-                          key={action}
-                          type="button"
-                          onClick={() => toggleAcao(a, action)}
-                          className={`rounded-full px-2 py-0.5 text-xs transition-colors ${
-                            selected
-                              ? 'bg-tormenta-600 text-white'
-                              : 'bg-stone-800 text-stone-300 hover:bg-stone-700'
-                          }`}
-                        >
-                          {action}
-                        </button>
-                      )
-                    })}
-                  </div>
+                <div className="flex flex-wrap gap-3">
+                  <label className="flex items-center gap-2 text-xs text-stone-400">
+                    Nível
+                    <input
+                      type="number"
+                      value={a.level}
+                      onChange={(e) => setAbility(a.id, { level: Number(e.target.value) || 0 })}
+                      className={inputClass + ' w-16 text-center'}
+                      aria-label="Nível"
+                    />
+                  </label>
+                  <label className="flex items-center gap-2 text-xs text-stone-400">
+                    Custo em PM
+                    <input
+                      type="number"
+                      value={a.mp}
+                      onChange={(e) => setAbility(a.id, { mp: Number(e.target.value) || 0 })}
+                      className={inputClass + ' w-16 text-center'}
+                      aria-label="Custo em PM"
+                    />
+                  </label>
                 </div>
+                <label className="flex items-center gap-2 text-xs text-stone-400">
+                  Ação
+                  <select
+                    value={a.acao[0] ?? 'Ação Padrão'}
+                    onChange={(e) => setAbility(a.id, { acao: [e.target.value as ActionKey] })}
+                    className={inputClass}
+                    aria-label="Ação"
+                  >
+                    {ACTION_KEYS.map((action) => (
+                      <option key={action} value={action}>{action}</option>
+                    ))}
+                  </select>
+                </label>
                 <textarea
                   value={a.notes}
                   placeholder="Descrição / efeito"

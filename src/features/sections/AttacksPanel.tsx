@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Button } from '../../components/Button'
 import { EditableCard } from '../../components/EditableCard'
 import { Panel } from '../../components/Panel'
@@ -29,14 +30,18 @@ function summarize(a: Attack): string {
 }
 
 export function AttacksPanel({ character, update }: Props) {
-  const add = () =>
+  const [lastAddedId, setLastAddedId] = useState<string | null>(null)
+  const add = () => {
+    const id = crypto.randomUUID()
+    setLastAddedId(id)
     update((c) => ({
       ...c,
       attacks: [
         ...c.attacks,
-        { id: crypto.randomUUID(), name: '', attackBonus: '', damage: '', critical: '', damageType: '', range: '' },
+        { id, name: '', attackBonus: '', damage: '', critical: '', damageType: '', range: '' },
       ],
     }))
+  }
   const setField = (id: string, key: keyof Attack, value: string) =>
     update((c) => ({
       ...c,
@@ -61,7 +66,7 @@ export function AttacksPanel({ character, update }: Props) {
               summary={summarize(a)}
               onDelete={() => remove(a.id)}
               deleteName={a.name}
-              startEditing={!a.name}
+              startEditing={a.id === lastAddedId}
             >
               <div className="space-y-2">
                 <input

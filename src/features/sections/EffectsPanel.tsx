@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Button } from '../../components/Button'
 import { EditableCard } from '../../components/EditableCard'
 import { Panel } from '../../components/Panel'
@@ -17,6 +18,7 @@ interface Props {
 }
 
 export function EffectsPanel({ character, update }: Props) {
+  const [lastAddedId, setLastAddedId] = useState<string | null>(null)
   const activeItemEffects = character.inventory.filter((i) => i.activeEffect)
 
   const setEffect = (id: string, patch: Partial<EffectData>) =>
@@ -27,19 +29,17 @@ export function EffectsPanel({ character, update }: Props) {
 
   const setModifiers = (id: string, modifiers: ItemModifiers) => setEffect(id, { modifiers })
 
-  const add = () =>
+  const add = () => {
+    const id = crypto.randomUUID()
+    setLastAddedId(id)
     update((c) => ({
       ...c,
       effects: [
         ...c.effects,
-        {
-          id: crypto.randomUUID(),
-          name: '',
-          active: true,
-          modifiers: { ...EMPTY_ITEM_MODIFIERS, attributes: {}, skills: {} },
-        },
+        { id, name: '', active: true, modifiers: { ...EMPTY_ITEM_MODIFIERS, attributes: {}, skills: {} } },
       ],
     }))
+  }
 
   const remove = (id: string) =>
     update((c) => ({ ...c, effects: c.effects.filter((e) => e.id !== id) }))
@@ -89,7 +89,7 @@ export function EffectsPanel({ character, update }: Props) {
                 summary={describeModifiers(effect.modifiers)}
                 onDelete={() => remove(effect.id)}
                 deleteName={effect.name}
-                startEditing={!effect.name}
+                startEditing={effect.id === lastAddedId}
               >
                 <input
                   type="text"

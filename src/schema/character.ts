@@ -128,6 +128,8 @@ export type Attack = z.infer<typeof attackSchema>
 export const abilitySchema = z.object({
   id: z.string(),
   name: z.string(),
+  /** Nível em que a habilidade é obtida. */
+  level: z.number().int().default(1),
   mp: z.number().default(0),
   acao: z.array(actionKeySchema).default(['Ação Padrão']),
   group: z.enum(['racial', 'classe']).default('classe'),
