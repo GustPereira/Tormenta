@@ -1,15 +1,15 @@
-import { HashRouter, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { SheetList } from './pages/SheetList'
 import { SheetEditor } from './pages/SheetEditor'
 
 function App() {
   return (
-    <HashRouter>
+    <BrowserRouter>
       <Routes>
         <Route path="/" element={<SheetList />} />
         <Route path="/ficha/:id" element={<SheetEditor />} />
       </Routes>
-    </HashRouter>
+    </BrowserRouter>
   )
 }
 

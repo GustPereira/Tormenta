@@ -95,14 +95,22 @@ export function IdentityHeader({ character, update }: Props) {
         </div>
 
         <div className="flex-1">
-          <input
-            type="text"
-            value={character.name}
-            onChange={(e) => set('name', e.target.value)}
-            className="w-full bg-transparent font-display text-3xl font-bold text-[var(--text)] focus:outline-none"
-            aria-label="Nome do personagem"
-            placeholder="Nome do personagem"
-          />
+          <div className="flex items-center gap-3">
+            <input
+              type="text"
+              value={character.name}
+              onChange={(e) => set('name', e.target.value)}
+              className="min-w-0 flex-1 bg-transparent font-display text-3xl font-bold text-[var(--text)] focus:outline-none"
+              aria-label="Nome do personagem"
+              placeholder="Nome do personagem"
+            />
+            <div className="flex shrink-0 flex-col items-center rounded-md border border-[var(--card-border)] bg-[var(--card-bg)] px-3 py-1">
+              <span className="text-[11px] uppercase text-stone-400">Nível</span>
+              <span className="font-display text-2xl font-bold text-tormenta-300">
+                {totalLevel(character)}
+              </span>
+            </div>
+          </div>
 
           <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
             <Labeled label="Raça">
@@ -163,18 +171,11 @@ export function IdentityHeader({ character, update }: Props) {
                 className={inputClass + ' w-full'}
               />
             </Labeled>
+          </div>
 
-            <Labeled label="Tendência">
-              <input
-                type="text"
-                value={character.alignment}
-                onChange={(e) => set('alignment', e.target.value)}
-                className={inputClass + ' w-full'}
-              />
-            </Labeled>
-
+          <div className="mt-3">
             <Labeled label={`Classes (nível ${totalLevel(character)})`}>
-              <div className="space-y-1">
+              <div className="grid grid-cols-1 gap-1 sm:grid-cols-2">
                 {character.classes.map((entry, i) => (
                   <div key={i} className="flex gap-1">
                     <select
@@ -203,10 +204,10 @@ export function IdentityHeader({ character, update }: Props) {
                     </Button>
                   </div>
                 ))}
-                <Button variant="ghost" onClick={addClass} className="text-xs">
-                  + classe
-                </Button>
               </div>
+              <Button variant="ghost" onClick={addClass} className="text-xs">
+                + classe
+              </Button>
             </Labeled>
           </div>
           <dl className="mt-4 flex flex-row gap-4 w-full">
