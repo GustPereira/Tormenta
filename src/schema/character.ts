@@ -67,6 +67,10 @@ export type ModValue = z.infer<typeof modValueSchema>
 export const itemModifiersSchema = z.object({
   attributes: z.record(z.string(), modValueSchema).default({}),
   skills: z.record(z.string(), modValueSchema).default({}),
+  /** Soma a TODOS os ataques (bônus de ataque geral). */
+  attack: modValueSchema.default(0),
+  /** Soma a TODAS as perícias (bônus de perícia geral). */
+  allSkills: modValueSchema.default(0),
   /** Soma ao PV máximo. */
   hitPoints: modValueSchema.default(0),
   /** Soma ao PM máximo. */
@@ -84,6 +88,8 @@ export type ItemModifiers = z.infer<typeof itemModifiersSchema>
 export const EMPTY_ITEM_MODIFIERS: ItemModifiers = {
   attributes: {},
   skills: {},
+  attack: 0,
+  allSkills: 0,
   hitPoints: 0,
   mana: 0,
   defense: 0,

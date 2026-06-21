@@ -52,3 +52,43 @@ export function resolveValue(value: number | string, ctx: FormulaContext): numbe
 export function isFormula(value: number | string): value is string {
   return typeof value === 'string'
 }
+
+/**
+ * Resolve a parte numérica de uma expressão de **dano**, preservando os dados.
+ * Os termos de dado (`NdM`, ex.: `1d8`, `2d6`) são mantidos; tokens (`@for`) e
+ * números são resolvidos e somados num único modificador final.
+ * Ex.: `"1d8+@for+3"` com Força 2 → `"1d8+5"`. `"@des+1"` → `"3"` (sem dados).
+ */
+export function resolveDamage(expr: string, ctx: FormulaContext): string {
+  const trimmed = expr.trim()
+  if (!trimmed) return ''
+  const chunks = trimmed.match(/[+-]?\s*[^+-]+/g)
+  if (!chunks) return trimmed
+
+  const kept: string[] = []
+  let numeric = 0
+  let sawNumeric = false
+  for (const chunk of chunks) {
+    const sign = chunk.trim().startsWith('-') ? -1 : 1
+    const body = chunk.replace(/^\s*[+-]\s*/, '').trim()
+    if (!body) continue
+    if (/^\d*d\d+$/i.test(body)) {
+      // Termo de dado: mantém literal.
+      kept.push((sign < 0 ? '-' : kept.length ? '+' : '') + body)
+    } else if (/^@?[a-zA-ZÀ-ú]+$/.test(body) || /^\d+(?:\.\d+)?$/.test(body)) {
+      // Token (@for) ou número: entra no modificador somado.
+      numeric += sign * resolveValue(body, ctx)
+      sawNumeric = true
+    } else {
+      // Termo desconhecido: mantém literal.
+      kept.push((sign < 0 ? '-' : kept.length ? '+' : '') + body)
+    }
+  }
+
+  let result = kept.join('')
+  if (!result) return sawNumeric ? String(numeric) : trimmed
+  if (sawNumeric && numeric !== 0) {
+    result += numeric > 0 ? `+${numeric}` : `-${Math.abs(numeric)}`
+  }
+  return result
+}

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { resolveValue, type FormulaContext } from './formula'
+import { resolveDamage, resolveValue, type FormulaContext } from './formula'
 
 const ctx: FormulaContext = {
   attributes: { forca: 1, destreza: 2, constituicao: 0, inteligencia: 4, sabedoria: 0, carisma: 3 },
@@ -32,5 +32,29 @@ describe('resolveValue', () => {
     expect(resolveValue('@xyz', ctx)).toBe(0)
     expect(resolveValue('', ctx)).toBe(0)
     expect(resolveValue('abc', ctx)).toBe(0)
+  })
+})
+
+describe('resolveDamage', () => {
+  const dmgCtx: FormulaContext = {
+    attributes: { forca: 2, destreza: 1, constituicao: 0, inteligencia: 0, sabedoria: 0, carisma: 3 },
+    level: 4,
+  }
+
+  it('mantém os dados e soma tokens/números num modificador', () => {
+    expect(resolveDamage('1d8+@for+3', dmgCtx)).toBe('1d8+5') // For 2 + 3
+    expect(resolveDamage('2d6+@for', dmgCtx)).toBe('2d6+2')
+    expect(resolveDamage('1d12', dmgCtx)).toBe('1d12')
+  })
+
+  it('subtração e modificador zero', () => {
+    expect(resolveDamage('1d8-1', dmgCtx)).toBe('1d8-1')
+    expect(resolveDamage('1d8+@for-2', dmgCtx)).toBe('1d8') // 2 - 2 = 0, sem modificador
+  })
+
+  it('vários dados e fórmula só numérica', () => {
+    expect(resolveDamage('1d6+1d4+@des', dmgCtx)).toBe('1d6+1d4+1')
+    expect(resolveDamage('@for+3', dmgCtx)).toBe('5') // sem dados → número
+    expect(resolveDamage('', dmgCtx)).toBe('')
   })
 })

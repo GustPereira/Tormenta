@@ -53,6 +53,10 @@ export interface DerivedCharacter {
   damageReduction: number
   /** União das proficiências de armadura/escudo das classes do personagem. */
   proficiencies: Proficiencies
+  /** Bônus global resolvido somado a todas as perícias (já incluso em cada `total`). */
+  globalSkillBonus: number
+  /** Bônus global resolvido somado a todos os ataques. */
+  globalAttackBonus: number
   skills: DerivedSkill[]
 }
 
@@ -141,19 +145,27 @@ export function deriveCharacter(character: Character): DerivedCharacter {
     level: entry.level,
   }))
 
-  // Perícias treinadas fixas concedidas pelas classes e pela origem.
+  // Perícias treinadas fixas concedidas pela 1ª classe e pela origem.
+  // Multiclasse (T20): ao ganhar o 1º nível numa nova classe você NÃO recebe as
+  // perícias treinadas dela — só a classe inicial concede.
+  const firstClass = character.classes[0]
   const grantedSkills = new Set<string>()
-  for (const entry of character.classes) {
-    CLASSES_BY_ID[entry.classId]?.pericasFixas.forEach((id) => grantedSkills.add(id))
+  if (firstClass) {
+    CLASSES_BY_ID[firstClass.classId]?.pericasFixas.forEach((id) => grantedSkills.add(id))
   }
   resolveOrigin(character)?.pericasFixas.forEach((id) => grantedSkills.add(id))
+
+  // Bônus gerais (de efeitos/itens/habilidades) somados a todas as perícias e ataques.
+  const globalSkillBonus = mods.allSkills
+  const globalAttackBonus = mods.attack
 
   const skills: DerivedSkill[] = SKILLS.map((skill) => {
     const granted = grantedSkills.has(skill.id)
     const trained = granted || character.trainedSkills.includes(skill.id)
     const attributeMod = attrs[skill.attribute]
     // Perícias com penalidade de armadura recebem a penalidade somada dos itens/efeitos ativos.
-    const otherBonus = (mods.skills[skill.id] ?? 0) + (skill.armorPenalty ? mods.penalty : 0)
+    // O bônus global de perícia entra em todas.
+    const otherBonus = (mods.skills[skill.id] ?? 0) + (skill.armorPenalty ? mods.penalty : 0) + globalSkillBonus
     return {
       id: skill.id,
       name: skill.name,
@@ -168,13 +180,13 @@ export function deriveCharacter(character: Character): DerivedCharacter {
     }
   })
 
+  // Proficiências: também só da 1ª classe (multiclasse não concede as da nova classe).
   const proficiencies: Proficiencies = { armaduraMarcial: false, armaduraPesada: false, escudo: false }
-  for (const entry of character.classes) {
-    const prof = CLASS_PROFICIENCIES_BY_ID[entry.classId]
-    if (!prof) continue
-    proficiencies.armaduraMarcial ||= prof.armaduraMarcial
-    proficiencies.armaduraPesada ||= prof.armaduraPesada
-    proficiencies.escudo ||= prof.escudo
+  const firstProf = firstClass ? CLASS_PROFICIENCIES_BY_ID[firstClass.classId] : undefined
+  if (firstProf) {
+    proficiencies.armaduraMarcial = firstProf.armaduraMarcial
+    proficiencies.armaduraPesada = firstProf.armaduraPesada
+    proficiencies.escudo = firstProf.escudo
   }
 
   const traits = character.race ? RACE_TRAITS_BY_ID[character.race.raceId] : undefined
@@ -188,6 +200,8 @@ export function deriveCharacter(character: Character): DerivedCharacter {
     deslocamento: Math.max(0, (traits?.deslocamento ?? 9) + mods.movement),
     damageReduction: mods.damageReduction,
     proficiencies,
+    globalSkillBonus,
+    globalAttackBonus,
     skills,
   }
 }

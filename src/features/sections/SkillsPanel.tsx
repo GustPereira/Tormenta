@@ -24,18 +24,17 @@ export function SkillsPanel({ character, update }: Props) {
   const [editing, setEditing] = useState(false)
   const derived = deriveCharacter(character)
 
-  // Quantas perícias o jogador pode escolher: as "à escolha" das classes + Inteligência.
-  const fromClasses = character.classes.reduce(
-    (sum, c) => sum + (CLASSES_BY_ID[c.classId]?.pericasEscolha ?? 0),
-    0,
-  )
+  // Quantas perícias o jogador pode escolher: as "à escolha" da 1ª classe +
+  // Inteligência. Multiclasse (T20): a nova classe não concede perícias.
+  const firstClass = character.classes[0]
+  const fromClasses = firstClass ? (CLASSES_BY_ID[firstClass.classId]?.pericasEscolha ?? 0) : 0
   const intBonus = Math.max(0, derived.finalAttributes.inteligencia)
   const origin = resolveOrigin(character)
 
-  // Perícias fixas concedidas (com repetição) por classes + origem. Cada
+  // Perícias fixas concedidas (com repetição) pela 1ª classe + origem. Cada
   // repetição vira uma escolha extra (a perícia já treinada por outra fonte).
   const grantedList = [
-    ...character.classes.flatMap((c) => CLASSES_BY_ID[c.classId]?.pericasFixas ?? []),
+    ...(firstClass ? (CLASSES_BY_ID[firstClass.classId]?.pericasFixas ?? []) : []),
     ...(origin?.pericasFixas ?? []),
   ]
   const duplicateBonus = grantedList.length - new Set(grantedList).size
@@ -47,10 +46,12 @@ export function SkillsPanel({ character, update }: Props) {
 
   // De onde vem o limite (para o tooltip).
   const limitSources = [
-    ...character.classes.map((c) => ({
-      name: `${CLASSES_BY_ID[c.classId]?.name ?? 'Classe'} (classe)`,
-      value: CLASSES_BY_ID[c.classId]?.pericasEscolha ?? 0,
-    })),
+    ...(firstClass
+      ? [{
+          name: `${CLASSES_BY_ID[firstClass.classId]?.name ?? 'Classe'} (classe)`,
+          value: CLASSES_BY_ID[firstClass.classId]?.pericasEscolha ?? 0,
+        }]
+      : []),
     { name: 'Origem', value: origin?.pericasEscolha ?? 0 },
     { name: 'Inteligência', value: intBonus },
     { name: 'Perícias fixas repetidas', value: duplicateBonus },
@@ -100,7 +101,10 @@ export function SkillsPanel({ character, update }: Props) {
                   : []),
                 ...effectContributions(
                   character,
-                  (m) => resolveValue(m.skills[skill.id] ?? 0, ctx) + (skill.armorPenalty ? resolveValue(m.penalty, ctx) : 0),
+                  (m) =>
+                    resolveValue(m.skills[skill.id] ?? 0, ctx) +
+                    resolveValue(m.allSkills ?? 0, ctx) +
+                    (skill.armorPenalty ? resolveValue(m.penalty, ctx) : 0),
                   ctx,
                 ),
               ].filter((c) => c.value !== 0)

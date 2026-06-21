@@ -7,7 +7,7 @@ function build(overrides: Partial<Character>): Character {
 }
 
 const ZERO_MODS: ItemModifiers = {
-  attributes: {}, skills: {}, hitPoints: 0, mana: 0, defense: 0, penalty: 0, movement: 0, damageReduction: 0,
+  attributes: {}, skills: {}, attack: 0, allSkills: 0, hitPoints: 0, mana: 0, defense: 0, penalty: 0, movement: 0, damageReduction: 0,
 }
 
 describe('totalLevel', () => {
@@ -97,7 +97,7 @@ describe('deriveCharacter', () => {
           proficiency: '',
           activeEffect: true,
           notes: '',
-          modifiers: { attributes: { forca: 2 }, skills: { atletismo: 3 }, hitPoints: 5, mana: 2, defense: 1, penalty: 0, movement: 0, damageReduction: 2 },
+          modifiers: { attributes: { forca: 2 }, skills: { atletismo: 3 }, attack: 0, allSkills: 0, hitPoints: 5, mana: 2, defense: 1, penalty: 0, movement: 0, damageReduction: 2 },
         },
         {
           id: 'i2',
@@ -108,7 +108,7 @@ describe('deriveCharacter', () => {
           proficiency: '',
           activeEffect: false,
           notes: '',
-          modifiers: { attributes: { forca: 99 }, skills: {}, hitPoints: 999, mana: 0, defense: 0, penalty: 0, movement: 0, damageReduction: 0 },
+          modifiers: { attributes: { forca: 99 }, skills: {}, attack: 0, allSkills: 0, hitPoints: 999, mana: 0, defense: 0, penalty: 0, movement: 0, damageReduction: 0 },
         },
       ],
     })
@@ -142,7 +142,7 @@ describe('deriveCharacter', () => {
           proficiency: 'Pesadas',
           activeEffect: true,
           notes: '',
-          modifiers: { attributes: {}, skills: {}, hitPoints: 0, mana: 0, defense: 10, penalty: -5, movement: -3, damageReduction: 0 },
+          modifiers: { attributes: {}, skills: {}, attack: 0, allSkills: 0, hitPoints: 0, mana: 0, defense: 10, penalty: -5, movement: -3, damageReduction: 0 },
         },
       ],
     })
@@ -164,7 +164,7 @@ describe('deriveCharacter', () => {
           id: 'e',
           name: 'Inspiração',
           active: true,
-          modifiers: { attributes: {}, skills: { atletismo: '@car' }, hitPoints: 0, mana: 0, defense: 0, penalty: 0, movement: 0, damageReduction: 0 },
+          modifiers: { attributes: {}, skills: { atletismo: '@car' }, attack: 0, allSkills: 0, hitPoints: 0, mana: 0, defense: 0, penalty: 0, movement: 0, damageReduction: 0 },
         },
       ],
     })
@@ -215,6 +215,71 @@ describe('deriveCharacter', () => {
     const cura = d.skills.find((s) => s.id === 'cura')!
     expect(cura.granted).toBe(true)
     expect(cura.trained).toBe(true)
+  })
+
+  it('multiclasse: só a 1ª classe concede perícias treinadas fixas', () => {
+    const c = build({
+      classes: [
+        { classId: 'ladino', level: 2 }, // fixas: ladinagem, reflexos
+        { classId: 'guerreiro', level: 1 }, // fixas: luta, pontaria, fortitude
+      ],
+    })
+    const d = deriveCharacter(c)
+    const granted = (id: string) => d.skills.find((s) => s.id === id)!.granted
+    // Da 1ª classe (ladino): concedidas.
+    expect(granted('ladinagem')).toBe(true)
+    expect(granted('reflexos')).toBe(true)
+    // Da 2ª classe (guerreiro): NÃO concedidas.
+    expect(granted('luta')).toBe(false)
+    expect(granted('pontaria')).toBe(false)
+    expect(granted('fortitude')).toBe(false)
+  })
+
+  it('multiclasse: só a 1ª classe concede proficiências', () => {
+    const c = build({
+      classes: [
+        { classId: 'ladino', level: 2 }, // sem proficiências
+        { classId: 'guerreiro', level: 1 }, // marcial + pesada + escudo
+      ],
+    })
+    const d = deriveCharacter(c)
+    expect(d.proficiencies).toEqual({ armaduraMarcial: false, armaduraPesada: false, escudo: false })
+  })
+
+  it('modificador geral de perícia (allSkills) de um efeito soma em todas as perícias', () => {
+    const c = build({
+      classes: [{ classId: 'guerreiro', level: 1 }],
+      effects: [{ id: 'e', name: 'Bênção', active: true, modifiers: { ...ZERO_MODS, allSkills: 2 } }],
+    })
+    const d = deriveCharacter(c)
+    expect(d.globalSkillBonus).toBe(2)
+    // Atletismo (não treinada): ½ nível 0 + For 0 + geral 2 = 2
+    expect(d.skills.find((s) => s.id === 'atletismo')!.total).toBe(2)
+  })
+
+  it('modificador geral aceita fórmula (resolvido contra atributos finais)', () => {
+    const c = build({
+      attributes: { forca: 0, destreza: 0, constituicao: 0, inteligencia: 0, sabedoria: 0, carisma: 3 },
+      classes: [{ classId: 'guerreiro', level: 4 }],
+      effects: [{ id: 'e', name: 'Foco', active: true, modifiers: { ...ZERO_MODS, attack: '@car', allSkills: '@meionivel' } }],
+    })
+    const d = deriveCharacter(c)
+    expect(d.globalAttackBonus).toBe(3) // @car = 3
+    expect(d.globalSkillBonus).toBe(2) // @meionivel de 4 = 2
+  })
+
+  it('modificadores de ataque de vários efeitos somam (3 + (1+@car) = 4+car)', () => {
+    const c = build({
+      attributes: { forca: 0, destreza: 0, constituicao: 0, inteligencia: 0, sabedoria: 0, carisma: 2 },
+      classes: [{ classId: 'guerreiro', level: 1 }],
+      effects: [
+        { id: 'a', name: 'A', active: true, modifiers: { ...ZERO_MODS, attack: 3 } },
+        { id: 'b', name: 'B', active: true, modifiers: { ...ZERO_MODS, attack: '1+@car' } },
+      ],
+    })
+    const d = deriveCharacter(c)
+    // 3 + (1 + car 2) = 6
+    expect(d.globalAttackBonus).toBe(6)
   })
 
   it('calcula o bônus de perícia treinada com atributo final da raça', () => {

@@ -49,6 +49,11 @@ export function ModifiersEditor({ modifiers, onChange }: Props) {
         ))}
       </Group>
 
+      <Group label="Ataque & Perícias (geral)">
+        <ModInput label="Ataque" value={modifiers.attack ?? 0} onChange={(v) => onChange({ ...modifiers, attack: v })} />
+        <ModInput label="Perícias" value={modifiers.allSkills ?? 0} onChange={(v) => onChange({ ...modifiers, allSkills: v })} />
+      </Group>
+
       <Group label="Vitais & Defesa">
         <ModInput label="PV" value={modifiers.hitPoints} onChange={(v) => onChange({ ...modifiers, hitPoints: v })} />
         <ModInput label="PM" value={modifiers.mana} onChange={(v) => onChange({ ...modifiers, mana: v })} />

@@ -10,6 +10,7 @@ import {
   deriveCharacter,
   effectContributions,
   halfLevel,
+  resolveDamage,
   resolveValue,
   trainingBonus,
   type DerivedCharacter,
@@ -45,10 +46,6 @@ const ATTACK_BASES: { key: string; label: string }[] = [
   { key: 'atuacao', label: 'Atuação' },
   { key: 'magico', label: 'B. Mágico' },
 ]
-
-const BASE_LABELS: Record<string, string> = Object.fromEntries(
-  ATTACK_BASES.map((b) => [b.key, b.label]),
-)
 
 const SKILL_BASES: Record<string, { skillId: string; skillName: string; attribute: AttributeKey }> = {
   'luta-for': { skillId: 'luta', skillName: 'Luta', attribute: 'forca' },
@@ -102,6 +99,7 @@ function attackContributions(
   return [
     ...baseContributions(a.base, derived, character, ctx),
     ...(manual !== 0 ? [{ name: 'Bônus', value: manual }] : []),
+    ...effectContributions(character, (m) => m.attack ?? 0, ctx),
   ]
 }
 
@@ -144,7 +142,14 @@ export function AttacksPanel({ character, update }: Props) {
               <EditableCard
                 key={a.id}
                 title={a.name || 'Ataque sem nome'}
-                summary={<AttackBoxes attack={a} total={total} contributions={contribs} />}
+                summary={
+                  <AttackBoxes
+                    attack={a}
+                    total={total}
+                    contributions={contribs}
+                    damageText={resolveDamage(a.damage, ctx)}
+                  />
+                }
                 onDelete={() => remove(a.id)}
                 deleteName={a.name}
                 startEditing={a.id === lastAddedId}
@@ -246,22 +251,23 @@ function AttackBoxes({
   attack,
   total,
   contributions,
+  damageText,
 }: {
   attack: Attack
   total: number
   contributions: EffectContribution[]
+  damageText: string
 }) {
-  const baseLabel = attack.base ? BASE_LABELS[attack.base] : undefined
   const boxes: { label: string; value: ReactNode }[] = [
     {
-      label: baseLabel ? `Ataque (${baseLabel})` : 'Ataque',
+      label: 'Ataque',
       value: (
         <EffectsTooltip contributions={contributions}>
           <span>{signed(total)}</span>
         </EffectsTooltip>
       ),
     },
-    { label: 'Dano', value: attack.damage || '—' },
+    { label: 'Dano', value: damageText || '—' },
     { label: 'Crítico', value: attack.critical || '—' },
     { label: 'Tipo', value: attack.damageType || '—' },
     { label: 'Alcance', value: attack.range || '—' },
