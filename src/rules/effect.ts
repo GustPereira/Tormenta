@@ -66,6 +66,10 @@ export interface AggregatedModifiers {
   hitPoints: number
   mana: number
   defense: number
+  /** Penalidade de armadura total (aplicada às perícias com penalidade de armadura). */
+  penalty: number
+  /** Alteração total de deslocamento (em metros). */
+  movement: number
 }
 
 /** Coleta todos os efeitos da ficha: os dos itens (ItemEffect) e os avulsos (Effect). */
@@ -78,7 +82,7 @@ export function collectEffects(character: Character): Effect[] {
 
 /** Soma os modificadores de todos os efeitos ativos. */
 export function aggregateActiveModifiers(effects: Effect[]): AggregatedModifiers {
-  const acc: AggregatedModifiers = { attributes: {}, skills: {}, hitPoints: 0, mana: 0, defense: 0 }
+  const acc: AggregatedModifiers = { attributes: {}, skills: {}, hitPoints: 0, mana: 0, defense: 0, penalty: 0, movement: 0 }
   for (const effect of effects) {
     if (!effect.isActive()) continue
     const m = effect.modifiers
@@ -87,6 +91,8 @@ export function aggregateActiveModifiers(effects: Effect[]): AggregatedModifiers
     acc.hitPoints += m.hitPoints
     acc.mana += m.mana
     acc.defense += m.defense
+    acc.penalty += m.penalty ?? 0
+    acc.movement += m.movement ?? 0
   }
   return acc
 }
@@ -101,6 +107,8 @@ export function describeModifiers(m: ItemModifiers): string {
   if (m.hitPoints) parts.push(`PV ${m.hitPoints >= 0 ? '+' : ''}${m.hitPoints}`)
   if (m.mana) parts.push(`PM ${m.mana >= 0 ? '+' : ''}${m.mana}`)
   if (m.defense) parts.push(`Defesa ${m.defense >= 0 ? '+' : ''}${m.defense}`)
+  if (m.penalty) parts.push(`Penal. ${m.penalty >= 0 ? '+' : ''}${m.penalty}`)
+  if (m.movement) parts.push(`Desloc. ${m.movement >= 0 ? '+' : ''}${m.movement}m`)
   for (const [id, v] of Object.entries(m.skills)) {
     if (v) parts.push(`${SKILLS_BY_ID[id]?.name ?? id} ${v >= 0 ? '+' : ''}${v}`)
   }

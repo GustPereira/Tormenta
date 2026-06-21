@@ -64,6 +64,10 @@ export const itemModifiersSchema = z.object({
   /** Soma ao PM máximo. */
   mana: z.number().int().default(0),
   defense: z.number().int().default(0),
+  /** Penalidade de armadura: aplicada às perícias com penalidade de armadura. */
+  penalty: z.number().int().default(0),
+  /** Alteração de deslocamento (em metros), somada ao deslocamento base. */
+  movement: z.number().int().default(0),
 })
 export type ItemModifiers = z.infer<typeof itemModifiersSchema>
 
@@ -73,6 +77,8 @@ export const EMPTY_ITEM_MODIFIERS: ItemModifiers = {
   hitPoints: 0,
   mana: 0,
   defense: 0,
+  penalty: 0,
+  movement: 0,
 }
 
 /**
@@ -95,6 +101,8 @@ export const inventoryItemSchema = z.object({
   /** Peso em espaços (sistema de carga do T20). */
   spaces: z.number().min(0).default(0),
   equipped: z.boolean().default(false),
+  /** Proficiência exigida (ex.: Leves, Pesadas, Escudos). Informativo. */
+  proficiency: z.string().default(''),
   /** Se verdadeiro, os modificadores do item são aplicados aos valores derivados. */
   activeEffect: z.boolean().default(false),
   modifiers: itemModifiersSchema.default(EMPTY_ITEM_MODIFIERS),

@@ -90,9 +90,10 @@ describe('deriveCharacter', () => {
           quantity: 1,
           spaces: 1,
           equipped: true,
+          proficiency: '',
           activeEffect: true,
           notes: '',
-          modifiers: { attributes: { forca: 2 }, skills: { atletismo: 3 }, hitPoints: 5, mana: 2, defense: 1 },
+          modifiers: { attributes: { forca: 2 }, skills: { atletismo: 3 }, hitPoints: 5, mana: 2, defense: 1, penalty: 0, movement: 0 },
         },
         {
           id: 'i2',
@@ -100,9 +101,10 @@ describe('deriveCharacter', () => {
           quantity: 1,
           spaces: 0,
           equipped: false,
+          proficiency: '',
           activeEffect: false,
           notes: '',
-          modifiers: { attributes: { forca: 99 }, skills: {}, hitPoints: 999, mana: 0, defense: 0 },
+          modifiers: { attributes: { forca: 99 }, skills: {}, hitPoints: 999, mana: 0, defense: 0, penalty: 0, movement: 0 },
         },
       ],
     })
@@ -118,6 +120,33 @@ describe('deriveCharacter', () => {
     // Atletismo: For final 4 + meio nível 0 + item 3 = 7 (não treinada)
     const atletismo = d.skills.find((s) => s.id === 'atletismo')!
     expect(atletismo.total).toBe(7)
+  })
+
+  it('aplica penalidade de armadura só nas perícias com penalidade de armadura', () => {
+    const c = build({
+      attributes: { forca: 0, destreza: 0, constituicao: 0, inteligencia: 0, sabedoria: 0, carisma: 0 },
+      classes: [{ classId: 'guerreiro', level: 1 }],
+      inventory: [
+        {
+          id: 'arm',
+          name: 'Completa',
+          quantity: 1,
+          spaces: 0,
+          equipped: true,
+          proficiency: 'Pesadas',
+          activeEffect: true,
+          notes: '',
+          modifiers: { attributes: {}, skills: {}, hitPoints: 0, mana: 0, defense: 10, penalty: -5, movement: -3 },
+        },
+      ],
+    })
+    const d = deriveCharacter(c)
+    // Acrobacia tem penalidade de armadura → recebe -5
+    expect(d.skills.find((s) => s.id === 'acrobacia')!.total).toBe(-5)
+    // Atletismo não tem penalidade de armadura → 0
+    expect(d.skills.find((s) => s.id === 'atletismo')!.total).toBe(0)
+    // Deslocamento base 9 (sem raça) com -3 da armadura → 6
+    expect(d.deslocamento).toBe(6)
   })
 
   it('calcula o bônus de perícia treinada com atributo final da raça', () => {

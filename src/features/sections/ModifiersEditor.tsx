@@ -42,6 +42,8 @@ export function ModifiersEditor({ modifiers, onChange }: Props) {
         <ModInput label="PV" value={modifiers.hitPoints} onChange={(v) => onChange({ ...modifiers, hitPoints: v })} />
         <ModInput label="PM" value={modifiers.mana} onChange={(v) => onChange({ ...modifiers, mana: v })} />
         <ModInput label="Defesa" value={modifiers.defense} onChange={(v) => onChange({ ...modifiers, defense: v })} />
+        <ModInput label="Penal." value={modifiers.penalty} onChange={(v) => onChange({ ...modifiers, penalty: v })} />
+        <ModInput label="Desloc." value={modifiers.movement} onChange={(v) => onChange({ ...modifiers, movement: v })} />
       </Group>
 
       <div>

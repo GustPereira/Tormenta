@@ -108,6 +108,8 @@ export function deriveCharacter(character: Character): DerivedCharacter {
   const skills: DerivedSkill[] = SKILLS.map((skill) => {
     const trained = character.trainedSkills.includes(skill.id)
     const attributeMod = attrs[skill.attribute]
+    // Perícias com penalidade de armadura recebem a penalidade somada dos itens/efeitos ativos.
+    const otherBonus = (mods.skills[skill.id] ?? 0) + (skill.armorPenalty ? mods.penalty : 0)
     return {
       id: skill.id,
       name: skill.name,
@@ -115,7 +117,7 @@ export function deriveCharacter(character: Character): DerivedCharacter {
       attributeMod,
       trained,
       onlyTrained: skill.onlyTrained,
-      total: skillBonus({ level, attributeMod, trained, otherBonus: mods.skills[skill.id] ?? 0 }),
+      total: skillBonus({ level, attributeMod, trained, otherBonus }),
       unusable: skill.onlyTrained && !trained,
     }
   })
@@ -137,7 +139,7 @@ export function deriveCharacter(character: Character): DerivedCharacter {
     maxHitPoints: maxHitPoints(hpClasses, attrs.constituicao) + mods.hitPoints,
     maxMana: maxMana(mpClasses) + mods.mana,
     defense: defense({ level, dexMod: attrs.destreza, otherBonus: mods.defense }),
-    deslocamento: traits?.deslocamento ?? 9,
+    deslocamento: Math.max(0, (traits?.deslocamento ?? 9) + mods.movement),
     proficiencies,
     skills,
   }

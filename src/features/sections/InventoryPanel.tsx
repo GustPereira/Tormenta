@@ -3,6 +3,7 @@ import { Button } from '../../components/Button'
 import { EditableCard } from '../../components/EditableCard'
 import { Panel } from '../../components/Panel'
 import { inputClass } from '../../components/ui'
+import { ITEM_CATALOG, ITEM_CATALOG_CATEGORIES, type CatalogItem } from '../../data'
 import { describeModifiers } from '../../rules'
 import {
   EMPTY_ITEM_MODIFIERS,
@@ -11,6 +12,21 @@ import {
   type ItemModifiers,
 } from '../../schema'
 import { ModifiersEditor } from './ModifiersEditor'
+
+/** Converte uma entrada do catálogo em um item de inventário novo (cópia). */
+function fromCatalog(c: CatalogItem): InventoryItem {
+  return {
+    id: crypto.randomUUID(),
+    name: c.name,
+    quantity: 1,
+    spaces: c.spaces ?? 0,
+    equipped: false,
+    proficiency: c.proficiency ?? '',
+    activeEffect: false,
+    modifiers: { ...EMPTY_ITEM_MODIFIERS, attributes: {}, skills: {}, ...c.modifiers },
+    notes: c.description ?? '',
+  }
+}
 
 interface Props {
   character: Character
@@ -31,6 +47,7 @@ function summarize(item: InventoryItem): string {
 
 export function InventoryPanel({ character, update }: Props) {
   const [lastAddedId, setLastAddedId] = useState<string | null>(null)
+  const [showCatalog, setShowCatalog] = useState(false)
   const setItem = (id: string, patch: Partial<InventoryItem>) =>
     update((c) => ({
       ...c,
@@ -52,6 +69,7 @@ export function InventoryPanel({ character, update }: Props) {
           quantity: 1,
           spaces: 0,
           equipped: false,
+          proficiency: '',
           activeEffect: false,
           modifiers: { ...EMPTY_ITEM_MODIFIERS, attributes: {}, skills: {} },
           notes: '',
@@ -59,6 +77,9 @@ export function InventoryPanel({ character, update }: Props) {
       ],
     }))
   }
+
+  const addFromCatalog = (cat: CatalogItem) =>
+    update((c) => ({ ...c, inventory: [...c.inventory, fromCatalog(cat)] }))
 
   const remove = (id: string) =>
     update((c) => ({ ...c, inventory: c.inventory.filter((it) => it.id !== id) }))
@@ -68,8 +89,41 @@ export function InventoryPanel({ character, update }: Props) {
   return (
     <Panel
       title="Inventário"
-      action={<Button variant="ghost" className="text-xs" onClick={add}>+ item</Button>}
+      action={
+        <div className="flex gap-1">
+          <Button variant="ghost" className="text-xs" onClick={() => setShowCatalog((s) => !s)}>
+            {showCatalog ? '▾ Catálogo' : '▸ Catálogo'}
+          </Button>
+          <Button variant="ghost" className="text-xs" onClick={add}>+ item</Button>
+        </div>
+      }
     >
+      {showCatalog && (
+        <div className="mb-3 rounded-md border border-[var(--card-border)] bg-[var(--card-bg)] p-2">
+          <p className="mb-2 text-xs text-stone-400">
+            Itens prontos — clique para adicionar uma cópia ao inventário.
+          </p>
+          {ITEM_CATALOG_CATEGORIES.map((cat) => (
+            <div key={cat} className="mb-2">
+              <h4 className="mb-1 text-xs font-semibold uppercase text-tormenta-300">{cat}</h4>
+              <ul className="flex flex-col gap-1">
+                {ITEM_CATALOG.filter((i) => i.category === cat).map((item) => (
+                  <li key={item.id} className="flex items-center gap-2">
+                    <Button variant="secondary" className="text-xs" onClick={() => addFromCatalog(item)}>
+                      + Adicionar
+                    </Button>
+                    <span className="text-sm text-[var(--text)]">{item.name}</span>
+                    {item.modifiers?.defense ? (
+                      <span className="text-xs text-stone-500">Defesa +{item.modifiers.defense}</span>
+                    ) : null}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      )}
+
       <div className="mb-3 flex flex-wrap items-center gap-4 text-sm">
         <label className="flex items-center gap-1">
           <span className="text-stone-400">T$</span>
@@ -146,6 +200,16 @@ export function InventoryPanel({ character, update }: Props) {
                       onChange={(e) => setItem(item.id, { spaces: Math.max(0, Number(e.target.value) || 0) })}
                       className={numClass}
                       aria-label="Espaços"
+                    />
+                  </label>
+                  <label className="flex items-center gap-1 text-xs text-stone-400">
+                    Proficiência
+                    <input
+                      type="text"
+                      value={item.proficiency}
+                      onChange={(e) => setItem(item.id, { proficiency: e.target.value })}
+                      className={inputClass + ' w-28'}
+                      aria-label="Proficiência"
                     />
                   </label>
                 </div>
