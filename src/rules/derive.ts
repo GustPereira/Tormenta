@@ -12,6 +12,7 @@ import {
   type Character,
 } from '../schema'
 import { defense } from './defense'
+import { aggregateActiveModifiers, collectEffects } from './effect'
 import { maxHitPoints, maxMana } from './health'
 import { skillBonus } from './skills'
 
@@ -72,6 +73,11 @@ export function finalAttributes(character: Character): Attributes {
   return result
 }
 
+/** Soma os modificadores de todos os efeitos ativos (de itens e avulsos). */
+export function activeModifiers(character: Character) {
+  return aggregateActiveModifiers(collectEffects(character))
+}
+
 /**
  * Calcula todos os valores derivados de uma ficha (read-only na UI).
  * Bônus de armadura/escudo serão somados quando o catálogo de equipamentos
@@ -79,7 +85,11 @@ export function finalAttributes(character: Character): Attributes {
  */
 export function deriveCharacter(character: Character): DerivedCharacter {
   const level = totalLevel(character)
+  const mods = activeModifiers(character)
+
+  // Atributos finais = raça + escolhas livres + modificadores de itens ativos.
   const attrs = finalAttributes(character)
+  for (const key of ATTRIBUTE_KEYS) attrs[key] += mods.attributes[key] ?? 0
 
   const hpClasses = character.classes.map((entry) => {
     const def = CLASSES_BY_ID[entry.classId]
@@ -105,7 +115,7 @@ export function deriveCharacter(character: Character): DerivedCharacter {
       attributeMod,
       trained,
       onlyTrained: skill.onlyTrained,
-      total: skillBonus({ level, attributeMod, trained }),
+      total: skillBonus({ level, attributeMod, trained, otherBonus: mods.skills[skill.id] ?? 0 }),
       unusable: skill.onlyTrained && !trained,
     }
   })
@@ -124,9 +134,9 @@ export function deriveCharacter(character: Character): DerivedCharacter {
   return {
     totalLevel: level,
     finalAttributes: attrs,
-    maxHitPoints: maxHitPoints(hpClasses, attrs.constituicao),
-    maxMana: maxMana(mpClasses),
-    defense: defense({ level, dexMod: attrs.destreza }),
+    maxHitPoints: maxHitPoints(hpClasses, attrs.constituicao) + mods.hitPoints,
+    maxMana: maxMana(mpClasses) + mods.mana,
+    defense: defense({ level, dexMod: attrs.destreza, otherBonus: mods.defense }),
     deslocamento: traits?.deslocamento ?? 9,
     proficiencies,
     skills,

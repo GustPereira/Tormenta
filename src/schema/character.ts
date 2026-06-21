@@ -16,9 +16,18 @@ export const ATTRIBUTE_KEYS = [
   'carisma',
 ] as const
 
+export const ACTION_KEYS = [
+  'Ação Padrão',
+  'Reação',
+  'Movimento',
+  'Completa',
+] as const
+
 export type AttributeKey = (typeof ATTRIBUTE_KEYS)[number]
+export type ActionKey = (typeof ACTION_KEYS)[number]
 
 export const attributeKeySchema = z.enum(ATTRIBUTE_KEYS)
+export const actionKeySchema = z.enum(ACTION_KEYS)
 
 export const attributesSchema = z.object({
   forca: z.number().int(),
@@ -42,6 +51,43 @@ export const raceSchema = z.object({
 })
 export type Race = z.infer<typeof raceSchema>
 
+/**
+ * Modificadores que um item pode conceder. Aplicados aos valores derivados
+ * quando o item está com o efeito ativo. Chaves de `attributes` são ids de
+ * atributo; de `skills`, ids de perícia.
+ */
+export const itemModifiersSchema = z.object({
+  attributes: z.record(z.string(), z.number().int()).default({}),
+  skills: z.record(z.string(), z.number().int()).default({}),
+  /** Soma ao PV máximo. */
+  hitPoints: z.number().int().default(0),
+  /** Soma ao PM máximo. */
+  mana: z.number().int().default(0),
+  defense: z.number().int().default(0),
+})
+export type ItemModifiers = z.infer<typeof itemModifiersSchema>
+
+export const EMPTY_ITEM_MODIFIERS: ItemModifiers = {
+  attributes: {},
+  skills: {},
+  hitPoints: 0,
+  mana: 0,
+  defense: 0,
+}
+
+/**
+ * Efeito nomeado e ativável que altera valores derivados (atributos, perícias,
+ * vitais, defesa). É a forma persistida; a classe `Effect` (rules/effect.ts)
+ * adiciona o comportamento sobre estes dados.
+ */
+export const effectSchema = z.object({
+  id: z.string(),
+  name: z.string().default(''),
+  active: z.boolean().default(true),
+  modifiers: itemModifiersSchema.default(EMPTY_ITEM_MODIFIERS),
+})
+export type EffectData = z.infer<typeof effectSchema>
+
 export const inventoryItemSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -49,6 +95,9 @@ export const inventoryItemSchema = z.object({
   /** Peso em espaços (sistema de carga do T20). */
   spaces: z.number().min(0).default(0),
   equipped: z.boolean().default(false),
+  /** Se verdadeiro, os modificadores do item são aplicados aos valores derivados. */
+  activeEffect: z.boolean().default(false),
+  modifiers: itemModifiersSchema.default(EMPTY_ITEM_MODIFIERS),
   notes: z.string().default(''),
 })
 export type InventoryItem = z.infer<typeof inventoryItemSchema>
@@ -79,6 +128,8 @@ export type Attack = z.infer<typeof attackSchema>
 export const abilitySchema = z.object({
   id: z.string(),
   name: z.string(),
+  mp: z.number().default(0),
+  acao: z.array(actionKeySchema).default(['Ação Padrão']),
   group: z.enum(['racial', 'classe']).default('classe'),
   notes: z.string().default(''),
 })
@@ -153,6 +204,8 @@ export const characterSchema = z.object({
   spells: z.array(spellSchema).default([]),
   attacks: z.array(attackSchema).default([]),
   inventory: z.array(inventoryItemSchema).default([]),
+  /** Efeitos avulsos (não vindos de itens), editáveis pelo jogador. */
+  effects: z.array(effectSchema).default([]),
   /** Dinheiro em Tibares (T$). */
   money: z.number().min(0).default(0),
 
@@ -198,6 +251,7 @@ export function createBlankCharacter(name = 'Nova Ficha'): Character {
     spells: [],
     attacks: [],
     inventory: [],
+    effects: [],
     money: 0,
     currentHitPoints: null,
     currentMana: null,

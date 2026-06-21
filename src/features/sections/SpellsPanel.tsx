@@ -1,4 +1,5 @@
 import { Button } from '../../components/Button'
+import { EditableCard } from '../../components/EditableCard'
 import { Panel } from '../../components/Panel'
 import { inputClass } from '../../components/ui'
 import type { Character, Spell } from '../../schema'
@@ -42,27 +43,36 @@ export function SpellsPanel({ character, update }: Props) {
               {spells.length === 0 ? (
                 <p className="text-xs text-stone-600">—</p>
               ) : (
-                <ul className="space-y-1">
+                <ul className="space-y-2">
                   {spells.map((s) => (
-                    <li key={s.id} className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={s.prepared}
-                        onChange={(e) => setField(s.id, { prepared: e.target.checked })}
-                        className="h-3.5 w-3.5 accent-tormenta-500"
-                        aria-label="Preparada"
-                        title="Preparada"
-                      />
+                    <EditableCard
+                      key={s.id}
+                      active={s.prepared}
+                      onActiveChange={(v) => setField(s.id, { prepared: v })}
+                      activeLabel="Preparada"
+                      title={s.name || 'Magia sem nome'}
+                      summary={s.notes || 'sem anotações'}
+                      onDelete={() => remove(s.id)}
+                      deleteName={s.name}
+                      startEditing={!s.name}
+                    >
                       <input
                         type="text"
                         value={s.name}
                         placeholder="Nome da magia"
                         onChange={(e) => setField(s.id, { name: e.target.value })}
-                        className={inputClass + ' flex-1'}
+                        className={inputClass + ' mb-2 w-full font-medium'}
                         aria-label="Nome da magia"
                       />
-                      <Button variant="ghost" onClick={() => remove(s.id)} aria-label="Remover magia">✕</Button>
-                    </li>
+                      <textarea
+                        value={s.notes}
+                        placeholder="Anotações / efeito"
+                        onChange={(e) => setField(s.id, { notes: e.target.value })}
+                        className={inputClass + ' w-full resize-y text-sm'}
+                        rows={3}
+                        aria-label="Anotações da magia"
+                      />
+                    </EditableCard>
                   ))}
                 </ul>
               )}

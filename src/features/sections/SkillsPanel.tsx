@@ -22,7 +22,7 @@ export function SkillsPanel({ character, update }: Props) {
 
   return (
     <Panel title="Perícias">
-      <ul className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
+      <ul className="grid grid-cols-1 gap-x-4">
         {derived.skills.map((skill) => (
           <li
             key={skill.id}

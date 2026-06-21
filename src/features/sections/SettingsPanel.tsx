@@ -12,9 +12,6 @@ interface Props {
 }
 
 export function SettingsPanel({ character, update, onDelete }: Props) {
-  const restoreVitals = () =>
-    update((c) => ({ ...c, currentHitPoints: null, currentMana: null }))
-
   const setTheme = (patch: Partial<Theme>) =>
     update((c) => ({ ...c, theme: { ...c.theme, ...patch } }))
 
@@ -107,29 +104,6 @@ export function SettingsPanel({ character, update, onDelete }: Props) {
           </select>
         </div>
       </Panel>
-      <Panel title="Identidade">
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <Field
-            label="Nome do personagem"
-            value={character.name}
-            onChange={(v) => update((c) => ({ ...c, name: v }))}
-          />
-          <Field
-            label="Jogador"
-            value={character.player}
-            onChange={(v) => update((c) => ({ ...c, player: v }))}
-          />
-        </div>
-      </Panel>
-
-      <Panel title="Vida & Mana">
-        <p className="mb-2 text-sm text-stone-400">
-          Restaura os pontos de vida e mana atuais para o máximo calculado.
-        </p>
-        <Button variant="secondary" onClick={restoreVitals}>
-          Restaurar PV/PM ao máximo
-        </Button>
-      </Panel>
 
       <Panel title="Backup">
         <p className="mb-2 text-sm text-stone-400">
@@ -175,29 +149,5 @@ function ColorField({
         />
       </div>
     </div>
-  )
-}
-
-function Field({
-  label,
-  value,
-  onChange,
-}: {
-  label: string
-  value: string
-  onChange: (v: string) => void
-}) {
-  return (
-    <label className="block space-y-1">
-      <span className="text-xs font-medium uppercase tracking-wide text-stone-400">
-        {label}
-      </span>
-      <input
-        type="text"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className={inputClass + ' w-full'}
-      />
-    </label>
   )
 }

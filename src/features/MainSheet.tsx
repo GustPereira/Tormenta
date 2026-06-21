@@ -2,7 +2,6 @@ import { AbilitiesPanel } from './sections/AbilitiesPanel'
 import { AttacksPanel } from './sections/AttacksPanel'
 import { AttributesPanel } from './sections/AttributesPanel'
 import { IdentityHeader } from './sections/IdentityHeader'
-import { InventoryPanel } from './sections/InventoryPanel'
 import { NotesPanel } from './sections/NotesPanel'
 import { SkillsPanel } from './sections/SkillsPanel'
 import { SpellsPanel } from './sections/SpellsPanel'
@@ -26,16 +25,13 @@ export function MainSheet({ character, update }: Props) {
           <AttributesPanel {...props} />
           <VitalsPanel {...props} />
           <AttacksPanel {...props} />
+          <AbilitiesPanel {...props} />
         </div>
         <SkillsPanel {...props} />
       </div>
 
-      <AbilitiesPanel {...props} />
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <SpellsPanel {...props} />
-        <InventoryPanel {...props} />
-      </div>
+      <SpellsPanel {...props} />
 
       <NotesPanel {...props} />
     </div>

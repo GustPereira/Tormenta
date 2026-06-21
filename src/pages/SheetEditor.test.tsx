@@ -64,8 +64,31 @@ describe('SheetEditor (página única)', () => {
     renderAt(c.id)
 
     await user.click(await screen.findByRole('tab', { name: /configurações/i }))
-    expect(screen.getByRole('button', { name: /restaurar pv\/pm/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /exportar json/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /excluir ficha/i })).toBeInTheDocument()
+  })
+
+  it('abre a aba Inventário e permite adicionar item', async () => {
+    const c = createBlankCharacter('Inv Teste')
+    await saveCharacter(c)
+    const user = userEvent.setup()
+    renderAt(c.id)
+
+    await user.click(await screen.findByRole('tab', { name: /inventário/i }))
+    const addBtn = screen.getByRole('button', { name: /\+ item/i })
+    await user.click(addBtn)
+    expect(screen.getByPlaceholderText(/nome do item/i)).toBeInTheDocument()
+  })
+
+  it('abre a aba Efeitos e permite adicionar um efeito avulso', async () => {
+    const c = createBlankCharacter('Efeito Teste')
+    await saveCharacter(c)
+    const user = userEvent.setup()
+    renderAt(c.id)
+
+    await user.click(await screen.findByRole('tab', { name: /efeitos/i }))
+    await user.click(screen.getByRole('button', { name: /\+ efeito/i }))
+    expect(screen.getByPlaceholderText(/nome do efeito/i)).toBeInTheDocument()
   })
 
   it('permite selecionar uma origem do catálogo', async () => {

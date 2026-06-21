@@ -1,4 +1,5 @@
 import { Button } from '../../components/Button'
+import { EditableCard } from '../../components/EditableCard'
 import { Panel } from '../../components/Panel'
 import { inputClass } from '../../components/ui'
 import type { Attack, Character } from '../../schema'
@@ -8,14 +9,24 @@ interface Props {
   update: (updater: (c: Character) => Character) => void
 }
 
-const COLS: { key: keyof Attack; label: string; w: string }[] = [
-  { key: 'name', label: 'Nome', w: 'w-40' },
-  { key: 'attackBonus', label: 'Bônus', w: 'w-16' },
-  { key: 'damage', label: 'Dano', w: 'w-24' },
-  { key: 'critical', label: 'Crítico', w: 'w-20' },
-  { key: 'damageType', label: 'Tipo', w: 'w-24' },
-  { key: 'range', label: 'Alcance', w: 'w-24' },
+const FIELDS: { key: keyof Attack; label: string }[] = [
+  { key: 'attackBonus', label: 'Bônus' },
+  { key: 'damage', label: 'Dano' },
+  { key: 'critical', label: 'Crítico' },
+  { key: 'damageType', label: 'Tipo' },
+  { key: 'range', label: 'Alcance' },
 ]
+
+function summarize(a: Attack): string {
+  const parts = [
+    a.attackBonus && `Bônus ${a.attackBonus}`,
+    a.damage && `Dano ${a.damage}`,
+    a.critical && `Crít. ${a.critical}`,
+    a.damageType,
+    a.range,
+  ].filter(Boolean)
+  return parts.join(' · ') || 'sem detalhes'
+}
 
 export function AttacksPanel({ character, update }: Props) {
   const add = () =>
@@ -42,38 +53,43 @@ export function AttacksPanel({ character, update }: Props) {
       {character.attacks.length === 0 ? (
         <p className="text-sm text-stone-500">Nenhum ataque.</p>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-left text-xs uppercase text-stone-400">
-                {COLS.map((col) => (
-                  <th key={col.key} className="px-1 pb-1 font-medium">{col.label}</th>
-                ))}
-                <th />
-              </tr>
-            </thead>
-            <tbody>
-              {character.attacks.map((a) => (
-                <tr key={a.id}>
-                  {COLS.map((col) => (
-                    <td key={col.key} className="px-1 py-0.5">
+        <ul className="space-y-2">
+          {character.attacks.map((a) => (
+            <EditableCard
+              key={a.id}
+              title={a.name || 'Ataque sem nome'}
+              summary={summarize(a)}
+              onDelete={() => remove(a.id)}
+              deleteName={a.name}
+              startEditing={!a.name}
+            >
+              <div className="space-y-2">
+                <input
+                  type="text"
+                  value={a.name}
+                  placeholder="Nome do ataque"
+                  onChange={(e) => setField(a.id, 'name', e.target.value)}
+                  className={inputClass + ' w-full font-medium'}
+                  aria-label="Nome do ataque"
+                />
+                <div className="flex flex-wrap gap-3">
+                  {FIELDS.map((f) => (
+                    <label key={f.key} className="flex items-center gap-1 text-xs text-stone-400">
+                      {f.label}
                       <input
                         type="text"
-                        value={a[col.key]}
-                        onChange={(e) => setField(a.id, col.key, e.target.value)}
-                        className={`${inputClass} ${col.w} max-w-full`}
-                        aria-label={`${col.label} do ataque`}
+                        value={a[f.key]}
+                        onChange={(e) => setField(a.id, f.key, e.target.value)}
+                        className={inputClass + ' w-24'}
+                        aria-label={`${f.label} do ataque`}
                       />
-                    </td>
+                    </label>
                   ))}
-                  <td className="px-1">
-                    <Button variant="ghost" onClick={() => remove(a.id)} aria-label="Remover ataque">✕</Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                </div>
+              </div>
+            </EditableCard>
+          ))}
+        </ul>
       )}
     </Panel>
   )

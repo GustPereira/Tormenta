@@ -79,6 +79,47 @@ describe('deriveCharacter', () => {
     expect(atletismo.unusable).toBe(false)
   })
 
+  it('aplica modificadores de itens com efeito ativo (e ignora inativos)', () => {
+    const c = build({
+      attributes: { forca: 2, destreza: 1, constituicao: 0, inteligencia: 0, sabedoria: 0, carisma: 0 },
+      classes: [{ classId: 'guerreiro', level: 1 }],
+      inventory: [
+        {
+          id: 'i1',
+          name: 'Espada encantada',
+          quantity: 1,
+          spaces: 1,
+          equipped: true,
+          activeEffect: true,
+          notes: '',
+          modifiers: { attributes: { forca: 2 }, skills: { atletismo: 3 }, hitPoints: 5, mana: 2, defense: 1 },
+        },
+        {
+          id: 'i2',
+          name: 'Anel guardado (inativo)',
+          quantity: 1,
+          spaces: 0,
+          equipped: false,
+          activeEffect: false,
+          notes: '',
+          modifiers: { attributes: { forca: 99 }, skills: {}, hitPoints: 999, mana: 0, defense: 0 },
+        },
+      ],
+    })
+    const d = deriveCharacter(c)
+    // Força 2 + item 2 = 4 (item inativo não conta)
+    expect(d.finalAttributes.forca).toBe(4)
+    // PV guerreiro nv1: 20 + Con(0) = 20, + item 5 = 25
+    expect(d.maxHitPoints).toBe(25)
+    // PM: 3 + item 2 = 5
+    expect(d.maxMana).toBe(5)
+    // Defesa: 10 + 0 (meio nível) + Des 1 + item 1 = 12
+    expect(d.defense).toBe(12)
+    // Atletismo: For final 4 + meio nível 0 + item 3 = 7 (não treinada)
+    const atletismo = d.skills.find((s) => s.id === 'atletismo')!
+    expect(atletismo.total).toBe(7)
+  })
+
   it('calcula o bônus de perícia treinada com atributo final da raça', () => {
     const c = build({
       attributes: { forca: 2, destreza: 0, constituicao: 0, inteligencia: 0, sabedoria: 0, carisma: 0 },
