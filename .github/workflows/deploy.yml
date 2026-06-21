@@ -31,10 +31,10 @@ jobs:
 
       - run: npm run build
         env:
-          # Compartilhamento (opcional): secrets VITE_SHARE_REPO e VITE_SHARE_TOKEN
-          # nas configurações do repositório (Settings → Secrets and variables → Actions).
-          VITE_SHARE_REPO: ${{ secrets.VITE_SHARE_REPO }}
-          VITE_SHARE_TOKEN: ${{ secrets.VITE_SHARE_TOKEN }}
+          # Compartilhamento (opcional): secrets nas configurações do repositório
+          # (Settings → Secrets and variables → Actions). A anon key é pública por design.
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
 
       - uses: actions/upload-pages-artifact@v3
         with:

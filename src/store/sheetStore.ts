@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { getCharacter, saveCharacter } from '../db'
-import { isShareConfigured, putSharedCharacter } from '../share'
+import { isShareConfigured, updateSharedCharacter } from '../share'
 import type { Character } from '../schema'
 
 export type SheetStatus = 'idle' | 'loading' | 'notfound' | 'saving' | 'saved'
@@ -49,13 +49,13 @@ export const useSheetStore = create<SheetState>((set, get) => ({
       })
     }, SAVE_DEBOUNCE_MS)
 
-    // Link vivo: se a ficha está publicada, sincroniza (debounce maior para não floodar commits).
-    if (next.shareId && isShareConfigured()) {
+    // Link vivo: se a ficha está publicada, sincroniza (debounce para não floodar a API).
+    if (next.shareId && next.shareToken && isShareConfigured()) {
       if (shareTimer) clearTimeout(shareTimer)
       set({ shareSync: 'syncing' })
-      const shareId = next.shareId
+      const { shareId, shareToken } = next
       shareTimer = setTimeout(() => {
-        void putSharedCharacter(shareId, next)
+        void updateSharedCharacter(shareId, shareToken, next)
           .then(() => {
             if (get().character?.id === next.id) set({ shareSync: 'synced' })
           })

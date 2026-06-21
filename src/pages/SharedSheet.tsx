@@ -1,15 +1,22 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { Button } from '../components/Button'
+import { Tabs } from '../components/Tabs'
 import { MainSheet } from '../features/MainSheet'
+import { EffectsPanel } from '../features/sections/EffectsPanel'
+import { InventoryPanel } from '../features/sections/InventoryPanel'
 import { saveCharacter } from '../db'
 import { buildThemeStyle } from '../lib/theme'
-import { getSharedCharacter } from '../share'
+import { getSharedCharacter, subscribeSharedCharacter } from '../share'
 import type { Character } from '../schema'
 
-/** Intervalo de atualização ("link vivo" via polling). */
-const POLL_MS = 20000
 const noop = () => {}
+
+const TABS = [
+  { id: 'principal', label: 'Principal' },
+  { id: 'inventario', label: 'Inventário' },
+  { id: 'efeitos', label: 'Efeitos' },
+]
 
 export function SharedSheet() {
   const { shareId } = useParams<{ shareId: string }>()
@@ -17,29 +24,32 @@ export function SharedSheet() {
   const [character, setCharacter] = useState<Character | null>(null)
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
   const [errorMsg, setErrorMsg] = useState('')
-  const loaded = useRef(false)
-
-  const fetchOnce = useCallback(async () => {
-    if (!shareId) return
-    try {
-      const c = await getSharedCharacter(shareId)
-      setCharacter(c)
-      setStatus('ready')
-      loaded.current = true
-    } catch (e) {
-      // Erros depois de já ter carregado (poll) são ignorados — mantém o último estado bom.
-      if (!loaded.current) {
-        setErrorMsg(e instanceof Error ? e.message : 'Falha ao carregar a ficha compartilhada.')
-        setStatus('error')
-      }
-    }
-  }, [shareId])
+  const [tab, setTab] = useState('principal')
 
   useEffect(() => {
-    void fetchOnce()
-    const timer = setInterval(() => void fetchOnce(), POLL_MS)
-    return () => clearInterval(timer)
-  }, [fetchOnce])
+    if (!shareId) return
+    let active = true
+    // Carga inicial.
+    getSharedCharacter(shareId)
+      .then((c) => {
+        if (!active) return
+        setCharacter(c)
+        setStatus('ready')
+      })
+      .catch((e: unknown) => {
+        if (!active) return
+        setErrorMsg(e instanceof Error ? e.message : 'Falha ao carregar a ficha compartilhada.')
+        setStatus('error')
+      })
+    // Atualizações em tempo real (link vivo).
+    const unsubscribe = subscribeSharedCharacter(shareId, (c) => {
+      if (active) setCharacter(c)
+    })
+    return () => {
+      active = false
+      unsubscribe()
+    }
+  }, [shareId])
 
   async function importCopy() {
     if (!character) return
@@ -86,9 +96,13 @@ export function SharedSheet() {
           </div>
         </header>
 
+        <Tabs tabs={TABS} active={tab} onChange={setTab} />
+
         {/* fieldset disabled desabilita nativamente todos os campos/botões internos. */}
-        <fieldset disabled className="m-0 min-w-0 border-0 p-0">
-          <MainSheet character={character} update={noop} />
+        <fieldset disabled className="m-0 min-w-0 border-0 p-0 py-6">
+          {tab === 'principal' && <MainSheet character={character} update={noop} />}
+          {tab === 'inventario' && <InventoryPanel character={character} update={noop} />}
+          {tab === 'efeitos' && <EffectsPanel character={character} update={noop} />}
         </fieldset>
       </div>
     </div>

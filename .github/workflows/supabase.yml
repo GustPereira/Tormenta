@@ -1,0 +1,26 @@
+name: Supabase migrations
+
+# CI/CD do schema do Supabase: aplica as migrations em supabase/migrations/
+# ao dar push na main. Requer o secret SUPABASE_DB_URL (Project Settings →
+# Database → Connection string, formato URI, com a senha).
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'supabase/migrations/**'
+  workflow_dispatch:
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Aplica migrations
+        run: supabase db push --db-url "$SUPABASE_DB_URL"
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}

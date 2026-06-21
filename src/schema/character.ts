@@ -283,8 +283,10 @@ export const characterSchema = z.object({
   resistances: z.string().default(''),
   notes: z.string().default(''),
 
-  /** Id de compartilhamento (arquivo no repo de dados). null = não publicada. */
+  /** Id de compartilhamento (linha no Supabase). null = não publicada. */
   shareId: z.string().nullable().default(null),
+  /** Token secreto de dono (permite atualizar/despublicar). Nunca vai no link. */
+  shareToken: z.string().nullable().default(null),
 
   theme: themeSchema.default(DEFAULT_THEME),
 })
@@ -332,6 +334,7 @@ export function createBlankCharacter(name = 'Nova Ficha'): Character {
     resistances: '',
     notes: '',
     shareId: null,
+    shareToken: null,
     theme: { ...DEFAULT_THEME },
   }
 }

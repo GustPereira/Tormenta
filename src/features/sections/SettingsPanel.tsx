@@ -8,9 +8,9 @@ import { downloadCharacter } from '../../io'
 import {
   deleteSharedCharacter,
   isShareConfigured,
-  newShareId,
-  putSharedCharacter,
+  publishCharacter,
   shareUrl,
+  updateSharedCharacter,
 } from '../../share'
 import { fileToScaledDataUrl } from '../../lib/image'
 import { FONT_OPTIONS } from '../../lib/theme'
@@ -331,9 +331,13 @@ function SharePanel({
     setBusy(true)
     setError(null)
     try {
-      const id = character.shareId ?? newShareId()
-      await putSharedCharacter(id, { ...character, shareId: id })
-      update((c) => ({ ...c, shareId: id }))
+      if (character.shareId && character.shareToken) {
+        // Já publicada: força uma atualização imediata.
+        await updateSharedCharacter(character.shareId, character.shareToken, character)
+      } else {
+        const { id, token } = await publishCharacter(character)
+        update((c) => ({ ...c, shareId: id, shareToken: token }))
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Falha ao publicar.')
     } finally {
@@ -342,13 +346,13 @@ function SharePanel({
   }
 
   const unpublish = async () => {
-    if (!character.shareId) return
+    if (!character.shareId || !character.shareToken) return
     if (!window.confirm('Despublicar esta ficha? O link deixará de funcionar.')) return
     setBusy(true)
     setError(null)
     try {
-      await deleteSharedCharacter(character.shareId)
-      update((c) => ({ ...c, shareId: null }))
+      await deleteSharedCharacter(character.shareId, character.shareToken)
+      update((c) => ({ ...c, shareId: null, shareToken: null }))
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Falha ao despublicar.')
     } finally {
