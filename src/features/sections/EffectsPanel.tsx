@@ -20,6 +20,13 @@ interface Props {
 export function EffectsPanel({ character, update }: Props) {
   const [lastAddedId, setLastAddedId] = useState<string | null>(null)
   const activeItemEffects = character.inventory.filter((i) => i.activeEffect)
+  const abilityEffects = character.abilities.filter((a) => a.hasEffect)
+
+  const setAbilityActive = (id: string, active: boolean) =>
+    update((c) => ({
+      ...c,
+      abilities: c.abilities.map((a) => (a.id === id ? { ...a, effectActive: active } : a)),
+    }))
 
   const setEffect = (id: string, patch: Partial<EffectData>) =>
     update((c) => ({
@@ -63,6 +70,38 @@ export function EffectsPanel({ character, update }: Props) {
                   <span className="ml-2 text-xs uppercase text-stone-500">item</span>
                 </div>
                 <div className="text-sm text-stone-400">{describeModifiers(item.modifiers)}</div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Panel>
+
+      <Panel title="Efeitos de habilidades">
+        {abilityEffects.length === 0 ? (
+          <p className="text-sm text-stone-500">
+            Nenhuma habilidade com efeito. Marque "Tem efeito" numa habilidade na aba Principal.
+          </p>
+        ) : (
+          <ul className="space-y-2">
+            {abilityEffects.map((a) => (
+              <li
+                key={a.id}
+                className="flex items-center gap-2 rounded-md border border-[var(--card-border)] bg-[var(--card-bg)] px-3 py-2"
+              >
+                <input
+                  type="checkbox"
+                  checked={a.effectActive}
+                  onChange={(e) => setAbilityActive(a.id, e.target.checked)}
+                  className="h-4 w-4 accent-tormenta-500"
+                  aria-label={`Ativar efeito de ${a.name || 'habilidade'}`}
+                />
+                <div className="flex-1">
+                  <div className="font-medium text-[var(--text)]">
+                    {a.name || 'Habilidade sem nome'}
+                    <span className="ml-2 text-xs uppercase text-stone-500">habilidade</span>
+                  </div>
+                  <div className="text-sm text-stone-400">{describeModifiers(a.modifiers)}</div>
+                </div>
               </li>
             ))}
           </ul>

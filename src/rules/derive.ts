@@ -44,6 +44,8 @@ export interface DerivedCharacter {
   defense: number
   /** Deslocamento em metros (da raça; padrão 9). */
   deslocamento: number
+  /** Redução de dano (soma dos efeitos ativos). */
+  damageReduction: number
   /** União das proficiências de armadura/escudo das classes do personagem. */
   proficiencies: Proficiencies
   skills: DerivedSkill[]
@@ -140,6 +142,7 @@ export function deriveCharacter(character: Character): DerivedCharacter {
     maxMana: maxMana(mpClasses) + mods.mana,
     defense: defense({ level, dexMod: attrs.destreza, otherBonus: mods.defense }),
     deslocamento: Math.max(0, (traits?.deslocamento ?? 9) + mods.movement),
+    damageReduction: mods.damageReduction,
     proficiencies,
     skills,
   }

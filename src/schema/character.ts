@@ -68,6 +68,8 @@ export const itemModifiersSchema = z.object({
   penalty: z.number().int().default(0),
   /** Alteração de deslocamento (em metros), somada ao deslocamento base. */
   movement: z.number().int().default(0),
+  /** Redução de dano. */
+  damageReduction: z.number().int().default(0),
 })
 export type ItemModifiers = z.infer<typeof itemModifiersSchema>
 
@@ -79,6 +81,7 @@ export const EMPTY_ITEM_MODIFIERS: ItemModifiers = {
   defense: 0,
   penalty: 0,
   movement: 0,
+  damageReduction: 0,
 }
 
 /**
@@ -142,6 +145,11 @@ export const abilitySchema = z.object({
   acao: z.array(actionKeySchema).default(['Ação Padrão']),
   group: z.enum(['racial', 'classe']).default('classe'),
   notes: z.string().default(''),
+  /** Se a habilidade fornece um efeito (modificadores) ativável. */
+  hasEffect: z.boolean().default(false),
+  /** Se o efeito da habilidade está ativo. */
+  effectActive: z.boolean().default(false),
+  modifiers: itemModifiersSchema.default(EMPTY_ITEM_MODIFIERS),
 })
 export type Ability = z.infer<typeof abilitySchema>
 
@@ -222,6 +230,9 @@ export const characterSchema = z.object({
   /** PV/PM atuais (null = cheio). */
   currentHitPoints: z.number().nullable().default(null),
   currentMana: z.number().nullable().default(null),
+  /** PV/PM temporários. */
+  temporaryHitPoints: z.number().default(0),
+  temporaryMana: z.number().default(0),
 
   conditions: z.string().default(''),
   resistances: z.string().default(''),
@@ -265,6 +276,8 @@ export function createBlankCharacter(name = 'Nova Ficha'): Character {
     money: 0,
     currentHitPoints: null,
     currentMana: null,
+    temporaryHitPoints: 0,
+    temporaryMana: 0,
     conditions: '',
     resistances: '',
     notes: '',

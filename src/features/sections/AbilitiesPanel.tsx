@@ -4,7 +4,15 @@ import { EditableCard } from '../../components/EditableCard'
 import { Panel } from '../../components/Panel'
 import { inputClass } from '../../components/ui'
 import { ORIGINS_BY_ID } from '../../data'
-import { ACTION_KEYS, type Ability, type ActionKey, type Character } from '../../schema'
+import {
+  ACTION_KEYS,
+  EMPTY_ITEM_MODIFIERS,
+  type Ability,
+  type ActionKey,
+  type Character,
+  type ItemModifiers,
+} from '../../schema'
+import { ModifiersEditor } from './ModifiersEditor'
 
 interface Props {
   character: Character
@@ -24,7 +32,18 @@ export function AbilitiesPanel({ character, update }: Props) {
       ...c,
       abilities: [
         ...c.abilities,
-        { id, name: '', group, notes: '', level: 1, mp: 0, acao: ['Ação Padrão'] },
+        {
+          id,
+          name: '',
+          group,
+          notes: '',
+          level: 1,
+          mp: 0,
+          acao: ['Ação Padrão'],
+          hasEffect: false,
+          effectActive: false,
+          modifiers: { ...EMPTY_ITEM_MODIFIERS, attributes: {}, skills: {} },
+        },
       ],
     }))
   }
@@ -144,6 +163,23 @@ function Group({
                   rows={4}
                   aria-label="Descrição do poder"
                 />
+                <label className="flex items-center gap-2 text-xs text-stone-400">
+                  <input
+                    type="checkbox"
+                    checked={a.hasEffect}
+                    onChange={(e) => setAbility(a.id, { hasEffect: e.target.checked })}
+                    className="h-4 w-4 accent-tormenta-500"
+                  />
+                  Tem efeito (aparece na aba Efeitos)
+                </label>
+                {a.hasEffect && (
+                  <div className="border-t border-stone-800 pt-2">
+                    <ModifiersEditor
+                      modifiers={a.modifiers}
+                      onChange={(m: ItemModifiers) => setAbility(a.id, { modifiers: m })}
+                    />
+                  </div>
+                )}
               </div>
             </EditableCard>
           ))}

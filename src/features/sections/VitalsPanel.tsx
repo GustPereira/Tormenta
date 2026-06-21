@@ -27,20 +27,25 @@ export function VitalsPanel({ character, update }: Props) {
 
   return (
     <Panel title="Vitais & Defesa">
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
         <Pool
           label="Pontos de Vida"
           current={character.currentHitPoints}
           max={d.maxHitPoints}
+          temp={character.temporaryHitPoints}
           onChange={(v) => update((c) => ({ ...c, currentHitPoints: v }))}
+          onTempChange={(v) => update((c) => ({ ...c, temporaryHitPoints: v }))}
         />
         <Pool
           label="Pontos de Mana"
           current={character.currentMana}
           max={d.maxMana}
+          temp={character.temporaryMana}
           onChange={(v) => update((c) => ({ ...c, currentMana: v }))}
+          onTempChange={(v) => update((c) => ({ ...c, temporaryMana: v }))}
         />
         <Big label="Defesa" value={d.defense} />
+        <Big label="Red. de Dano" value={d.damageReduction} />
         <Big label="Deslocamento" value={`${d.deslocamento}m`} />
       </div>
 
@@ -58,12 +63,16 @@ function Pool({
   label,
   current,
   max,
+  temp,
   onChange,
+  onTempChange,
 }: {
   label: string
   current: number | null
   max: number
+  temp: number
   onChange: (v: number | null) => void
+  onTempChange: (v: number) => void
 }) {
   return (
     <div className="rounded-md border border-[var(--card-border)] bg-[var(--card-bg)] p-2 text-center">
@@ -78,6 +87,16 @@ function Pool({
         />
         <span className="text-stone-500">/ {max}</span>
       </div>
+      <label className="mt-1 flex items-center justify-center gap-1 text-[11px] text-stone-400">
+        Temp
+        <input
+          type="number"
+          value={temp}
+          onChange={(e) => onTempChange(Number(e.target.value) || 0)}
+          className={inputClass + ' w-12 text-center'}
+          aria-label={`${label} temporários`}
+        />
+      </label>
     </div>
   )
 }
