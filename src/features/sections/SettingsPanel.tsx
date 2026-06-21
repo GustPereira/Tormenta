@@ -1,7 +1,9 @@
+import { useRef } from 'react'
 import { Button } from '../../components/Button'
 import { Panel } from '../../components/Panel'
 import { inputClass } from '../../components/ui'
 import { downloadCharacter } from '../../io'
+import { fileToScaledDataUrl } from '../../lib/image'
 import { FONT_OPTIONS } from '../../lib/theme'
 import { DEFAULT_THEME, type Character, type Theme } from '../../schema'
 
@@ -12,8 +14,18 @@ interface Props {
 }
 
 export function SettingsPanel({ character, update, onDelete }: Props) {
+  const bgFileRef = useRef<HTMLInputElement>(null)
   const setTheme = (patch: Partial<Theme>) =>
     update((c) => ({ ...c, theme: { ...c.theme, ...patch } }))
+
+  async function handleBackground(file: File) {
+    try {
+      const dataUrl = await fileToScaledDataUrl(file, 1280)
+      setTheme({ backgroundImage: dataUrl })
+    } catch {
+      // ignora arquivo inválido
+    }
+  }
 
   return (
     <div className="mx-auto max-w-2xl space-y-4">
@@ -102,6 +114,51 @@ export function SettingsPanel({ character, update, onDelete }: Props) {
               </option>
             ))}
           </select>
+        </div>
+
+        <div className="mt-4">
+          <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-stone-400">
+            Imagem de fundo
+          </label>
+          <div className="flex items-center gap-2">
+            {character.theme.backgroundImage && (
+              <img
+                src={character.theme.backgroundImage}
+                alt="Fundo"
+                className="h-12 w-20 rounded border border-[var(--card-border)] object-cover"
+              />
+            )}
+            <Button variant="secondary" onClick={() => bgFileRef.current?.click()}>
+              {character.theme.backgroundImage ? 'Trocar imagem' : 'Enviar imagem'}
+            </Button>
+            {character.theme.backgroundImage && (
+              <Button variant="ghost" className="text-xs" onClick={() => setTheme({ backgroundImage: '' })}>
+                Remover
+              </Button>
+            )}
+            {character.theme.backgroundImage && (
+              <select
+                value={character.theme.backgroundFit}
+                onChange={(e) => setTheme({ backgroundFit: e.target.value as 'cover' | 'contain' })}
+                className={inputClass + ' text-sm'}
+                aria-label="Ajuste da imagem de fundo"
+              >
+                <option value="cover">Cobrir (corta)</option>
+                <option value="contain">Conter (cabe inteira)</option>
+              </select>
+            )}
+            <input
+              ref={bgFileRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0]
+                if (file) void handleBackground(file)
+                e.target.value = ''
+              }}
+            />
+          </div>
         </div>
       </Panel>
 

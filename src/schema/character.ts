@@ -175,6 +175,10 @@ export const themeSchema = z.object({
   inputBg: z.string().default('#292524'),
   /** Cor do texto dentro dos campos. */
   inputText: z.string().default('#f5f5f4'),
+  /** Imagem de fundo da ficha inteira (data URL). */
+  backgroundImage: z.string().default(''),
+  /** Ajuste da imagem de fundo: cobrir (corta) ou conter (cabe inteira). */
+  backgroundFit: z.enum(['cover', 'contain']).default('cover'),
   fontId: z.string().default('cinzel'),
 })
 export type Theme = z.infer<typeof themeSchema>
@@ -190,6 +194,8 @@ export const DEFAULT_THEME: Theme = {
   buttonTextColor: '#f5f5f4',
   inputBg: '#292524',
   inputText: '#f5f5f4',
+  backgroundImage: '',
+  backgroundFit: 'cover',
   fontId: 'cinzel',
 }
 
@@ -207,6 +213,8 @@ export const characterSchema = z.object({
   origin: z.string().default(''),
   deity: z.string().default(''),
   alignment: z.string().default(''),
+  /** Imagem do personagem (data URL). */
+  portrait: z.string().default(''),
 
   /** Escolhas que alimentam o motor de regras. */
   attributes: attributesSchema,
@@ -255,6 +263,7 @@ export function createBlankCharacter(name = 'Nova Ficha'): Character {
     origin: '',
     deity: '',
     alignment: '',
+    portrait: '',
     attributes: {
       forca: 0,
       destreza: 0,

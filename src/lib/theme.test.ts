@@ -45,6 +45,8 @@ describe('buildThemeStyle', () => {
       buttonTextColor: '#fafafa',
       inputBg: '#111111',
       inputText: '#dddddd',
+      backgroundImage: '',
+      backgroundFit: 'cover',
       fontId: 'lexend',
     }) as Record<string, string>
     expect(style['--color-tormenta-500']).toMatch(/^#/)

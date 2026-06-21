@@ -90,7 +90,7 @@ export function generateAccentVars(hex: string): Record<string, string> {
  */
 export function buildThemeStyle(theme: Theme): CSSProperties {
   const stack = getFontStack(theme.fontId)
-  return {
+  const style: Record<string, string> = {
     ...generateAccentVars(theme.accent),
     '--card-bg': theme.cardBg,
     '--card-border': theme.cardBorder,
@@ -107,5 +107,13 @@ export function buildThemeStyle(theme: Theme): CSSProperties {
     fontFamily: stack,
     color: theme.textColor,
     backgroundColor: theme.pageBg,
-  } as CSSProperties
+  }
+  if (theme.backgroundImage) {
+    style.backgroundImage = `url("${theme.backgroundImage}")`
+    style.backgroundSize = theme.backgroundFit
+    style.backgroundPosition = 'center'
+    style.backgroundRepeat = 'no-repeat'
+    style.backgroundAttachment = 'fixed'
+  }
+  return style as CSSProperties
 }
