@@ -61,7 +61,26 @@ export function SpellsPanel({ character, update }: Props) {
                       onActiveChange={(v) => setField(s.id, { prepared: v })}
                       activeLabel="Preparada"
                       title={s.name || 'Magia sem nome'}
-                      summary={`${s.pm} PM · ${s.action}${s.effect ? ` · ${s.effect}` : ''}`}
+                      summary={`${s.pm} PM · ${s.action}`}
+                      details={
+                        <div className="space-y-1">
+                          <div>
+                            <span className="text-stone-500">Custo:</span> {s.pm} PM
+                            <span className="mx-1 text-stone-600">·</span>
+                            <span className="text-stone-500">Ação:</span> {s.action}
+                          </div>
+                          {s.effect && (
+                            <div>
+                              <span className="text-stone-500">Efeito:</span> {s.effect}
+                            </div>
+                          )}
+                          {s.notes && (
+                            <div>
+                              <span className="text-stone-500">Anotações:</span> {s.notes}
+                            </div>
+                          )}
+                        </div>
+                      }
                       onDelete={() => remove(s.id)}
                       deleteName={s.name}
                       startEditing={s.id === lastAddedId}
