@@ -1,6 +1,6 @@
 import { Check, Pencil, Star } from 'lucide-react'
 import { useState } from 'react'
-import { ATTRIBUTE_ABBR, ATTRIBUTE_LABELS, CLASSES_BY_ID } from '../../data'
+import { ATTRIBUTE_ABBR, ATTRIBUTE_LABELS, CLASSES_BY_ID, RESISTANCE_SKILL_IDS } from '../../data'
 import { Button } from '../../components/Button'
 import { EffectsTooltip } from '../../components/EffectsTooltip'
 import { Panel } from '../../components/Panel'
@@ -104,6 +104,9 @@ export function SkillsPanel({ character, update }: Props) {
                   (m) =>
                     resolveValue(m.skills[skill.id] ?? 0, ctx) +
                     resolveValue(m.allSkills ?? 0, ctx) +
+                    (RESISTANCE_SKILL_IDS.includes(skill.id as (typeof RESISTANCE_SKILL_IDS)[number])
+                      ? resolveValue(m.resistance ?? 0, ctx)
+                      : 0) +
                     (skill.armorPenalty ? resolveValue(m.penalty, ctx) : 0),
                   ctx,
                 ),

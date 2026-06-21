@@ -33,8 +33,10 @@ describe('SheetEditor (página única)', () => {
 
     expect(await screen.findByDisplayValue('Guerreiro Teste')).toBeInTheDocument()
     // PV = 36, PM = 9, Defesa = 13
-    expect(screen.getByText('/ 36')).toBeInTheDocument()
-    expect(screen.getByText('/ 9')).toBeInTheDocument()
+    const hp = screen.getByText('Pontos de Vida').parentElement!
+    expect(within(hp).getByText('36')).toBeInTheDocument()
+    const pm = screen.getByText('Pontos de Mana').parentElement!
+    expect(within(pm).getByText('9')).toBeInTheDocument()
     const def = screen.getByText('Defesa').parentElement!
     expect(within(def).getByText('13')).toBeInTheDocument()
   })

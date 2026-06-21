@@ -71,6 +71,8 @@ export const itemModifiersSchema = z.object({
   attack: modValueSchema.default(0),
   /** Soma a TODAS as perícias (bônus de perícia geral). */
   allSkills: modValueSchema.default(0),
+  /** Soma às perícias de resistência (Fortitude, Reflexos, Vontade). */
+  resistance: modValueSchema.default(0),
   /** Soma ao PV máximo. */
   hitPoints: modValueSchema.default(0),
   /** Soma ao PM máximo. */
@@ -90,6 +92,7 @@ export const EMPTY_ITEM_MODIFIERS: ItemModifiers = {
   skills: {},
   attack: 0,
   allSkills: 0,
+  resistance: 0,
   hitPoints: 0,
   mana: 0,
   defense: 0,

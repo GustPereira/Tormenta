@@ -4,6 +4,7 @@ import {
   ORIGINS_BY_ID,
   RACES_BY_ID,
   RACE_TRAITS_BY_ID,
+  RESISTANCE_SKILL_IDS,
   SKILLS,
 } from '../data'
 import {
@@ -158,14 +159,19 @@ export function deriveCharacter(character: Character): DerivedCharacter {
   // Bônus gerais (de efeitos/itens/habilidades) somados a todas as perícias e ataques.
   const globalSkillBonus = mods.allSkills
   const globalAttackBonus = mods.attack
+  const resistanceIds = new Set<string>(RESISTANCE_SKILL_IDS)
 
   const skills: DerivedSkill[] = SKILLS.map((skill) => {
     const granted = grantedSkills.has(skill.id)
     const trained = granted || character.trainedSkills.includes(skill.id)
     const attributeMod = attrs[skill.attribute]
     // Perícias com penalidade de armadura recebem a penalidade somada dos itens/efeitos ativos.
-    // O bônus global de perícia entra em todas.
-    const otherBonus = (mods.skills[skill.id] ?? 0) + (skill.armorPenalty ? mods.penalty : 0) + globalSkillBonus
+    // O bônus global de perícia entra em todas; o de resistência só nas de resistência.
+    const otherBonus =
+      (mods.skills[skill.id] ?? 0) +
+      (skill.armorPenalty ? mods.penalty : 0) +
+      globalSkillBonus +
+      (resistanceIds.has(skill.id) ? mods.resistance : 0)
     return {
       id: skill.id,
       name: skill.name,

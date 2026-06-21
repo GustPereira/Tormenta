@@ -95,6 +95,8 @@ export interface AggregatedModifiers {
   attack: number
   /** Bônus somado a todas as perícias. */
   allSkills: number
+  /** Bônus somado às perícias de resistência (Fortitude, Reflexos, Vontade). */
+  resistance: number
   hitPoints: number
   mana: number
   defense: number
@@ -120,7 +122,7 @@ export function aggregateActiveModifiers(
   effects: Effect[],
   ctx: FormulaContext = ZERO_CTX,
 ): AggregatedModifiers {
-  const acc: AggregatedModifiers = { attributes: {}, skills: {}, attack: 0, allSkills: 0, hitPoints: 0, mana: 0, defense: 0, penalty: 0, movement: 0, damageReduction: 0 }
+  const acc: AggregatedModifiers = { attributes: {}, skills: {}, attack: 0, allSkills: 0, resistance: 0, hitPoints: 0, mana: 0, defense: 0, penalty: 0, movement: 0, damageReduction: 0 }
   for (const effect of effects) {
     if (!effect.isActive()) continue
     const m = effect.modifiers
@@ -128,6 +130,7 @@ export function aggregateActiveModifiers(
     for (const [k, v] of Object.entries(m.skills)) acc.skills[k] = (acc.skills[k] ?? 0) + resolveValue(v, ctx)
     acc.attack += resolveValue(m.attack ?? 0, ctx)
     acc.allSkills += resolveValue(m.allSkills ?? 0, ctx)
+    acc.resistance += resolveValue(m.resistance ?? 0, ctx)
     acc.hitPoints += resolveValue(m.hitPoints, ctx)
     acc.mana += resolveValue(m.mana, ctx)
     acc.defense += resolveValue(m.defense, ctx)
@@ -179,6 +182,8 @@ export function describeModifiers(m: ItemModifiers): string {
   if (atk) parts.push(`Ataque ${atk}`)
   const allSk = formatModValue(m.allSkills ?? 0)
   if (allSk) parts.push(`Perícias ${allSk}`)
+  const res = formatModValue(m.resistance ?? 0)
+  if (res) parts.push(`Resist. ${res}`)
   const hp = formatModValue(m.hitPoints)
   if (hp) parts.push(`PV ${hp}`)
   const pm = formatModValue(m.mana)

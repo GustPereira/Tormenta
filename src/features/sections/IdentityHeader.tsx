@@ -1,10 +1,10 @@
 import { useRef } from 'react'
 import { ImagePlus, Trash2 } from 'lucide-react'
-import { CLASSES, ORIGINS, RACES } from '../../data'
+import { CLASSES, ORIGINS, RACES, RACE_TRAITS_BY_ID } from '../../data'
 import { Button } from '../../components/Button'
 import { inputClass } from '../../components/ui'
 import { fileToScaledDataUrl } from '../../lib/image'
-import { totalLevel } from '../../rules'
+import { deriveCharacter, totalLevel } from '../../rules'
 import type { Character } from '../../schema'
 
 interface Props {
@@ -36,6 +36,19 @@ export function IdentityHeader({ character, update }: Props) {
     update((c) => ({ ...c, classes: [...c.classes, { classId: CLASSES[0].id, level: 1 }] }))
   const removeClass = (i: number) =>
     update((c) => ({ ...c, classes: c.classes.filter((_, idx) => idx !== i) }))
+
+  const derived = deriveCharacter(character)
+  const traits = character.race ? RACE_TRAITS_BY_ID[character.race.raceId] : undefined
+  const senses = [
+    traits?.visaoPenumbra && 'Visão na penumbra',
+    traits?.visaoEscuro && 'Visão no escuro',
+    traits?.faro && 'Faro',
+  ].filter(Boolean) as string[]
+  const profs = [
+    derived.proficiencies.armaduraMarcial && 'Armaduras marciais',
+    derived.proficiencies.armaduraPesada && 'Armaduras pesadas',
+    derived.proficiencies.escudo && 'Escudos',
+  ].filter(Boolean) as string[]
 
   return (
     <div className="rounded-lg border border-[var(--card-border)] bg-[var(--card-bg)] p-4">
@@ -92,112 +105,131 @@ export function IdentityHeader({ character, update }: Props) {
           />
 
           <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <Labeled label="Raça">
-          <select
-            value={character.race?.raceId ?? ''}
-            onChange={(e) =>
-              set('race', e.target.value ? { raceId: e.target.value } : null)
-            }
-            className={inputClass + ' w-full'}
-          >
-            <option value="">— Sem raça —</option>
-            {RACES.map((r) => (
-              <option key={r.id} value={r.id}>
-                {r.name}
-              </option>
-            ))}
-          </select>
-        </Labeled>
-
-        <Labeled label="Origem">
-          <select
-            value={character.originId ?? ''}
-            onChange={(e) => set('originId', e.target.value || null)}
-            className={inputClass + ' w-full'}
-          >
-            <option value="">— Sem origem —</option>
-            {character.customOrigins.length > 0 && (
-              <optgroup label="Personalizadas">
-                {character.customOrigins.map((o) => (
-                  <option key={o.id} value={o.id}>
-                    {o.name || 'Origem sem nome'}
+            <Labeled label="Raça">
+              <select
+                value={character.race?.raceId ?? ''}
+                onChange={(e) =>
+                  set('race', e.target.value ? { raceId: e.target.value } : null)
+                }
+                className={inputClass + ' w-full'}
+              >
+                <option value="">— Sem raça —</option>
+                {RACES.map((r) => (
+                  <option key={r.id} value={r.id}>
+                    {r.name}
                   </option>
                 ))}
-              </optgroup>
-            )}
-            {ORIGINS.map((o) => (
-              <option key={o.id} value={o.id}>
-                {o.name}
-              </option>
-            ))}
-          </select>
-        </Labeled>
+              </select>
+            </Labeled>
 
-        <Labeled label="Jogador">
-          <input
-            type="text"
-            value={character.player}
-            onChange={(e) => set('player', e.target.value)}
-            className={inputClass + ' w-full'}
-          />
-        </Labeled>
+            <Labeled label="Origem">
+              <select
+                value={character.originId ?? ''}
+                onChange={(e) => set('originId', e.target.value || null)}
+                className={inputClass + ' w-full'}
+              >
+                <option value="">— Sem origem —</option>
+                {character.customOrigins.length > 0 && (
+                  <optgroup label="Personalizadas">
+                    {character.customOrigins.map((o) => (
+                      <option key={o.id} value={o.id}>
+                        {o.name || 'Origem sem nome'}
+                      </option>
+                    ))}
+                  </optgroup>
+                )}
+                {ORIGINS.map((o) => (
+                  <option key={o.id} value={o.id}>
+                    {o.name}
+                  </option>
+                ))}
+              </select>
+            </Labeled>
 
-        <Labeled label="Divindade">
-          <input
-            type="text"
-            value={character.deity}
-            onChange={(e) => set('deity', e.target.value)}
-            className={inputClass + ' w-full'}
-          />
-        </Labeled>
+            <Labeled label="Jogador">
+              <input
+                type="text"
+                value={character.player}
+                onChange={(e) => set('player', e.target.value)}
+                className={inputClass + ' w-full'}
+              />
+            </Labeled>
 
-        <Labeled label="Tendência">
-          <input
-            type="text"
-            value={character.alignment}
-            onChange={(e) => set('alignment', e.target.value)}
-            className={inputClass + ' w-full'}
-          />
-        </Labeled>
+            <Labeled label="Divindade">
+              <input
+                type="text"
+                value={character.deity}
+                onChange={(e) => set('deity', e.target.value)}
+                className={inputClass + ' w-full'}
+              />
+            </Labeled>
 
-        <Labeled label={`Classes (nível ${totalLevel(character)})`}>
-          <div className="space-y-1">
-            {character.classes.map((entry, i) => (
-              <div key={i} className="flex gap-1">
-                <select
-                  value={entry.classId}
-                  onChange={(e) => setClassEntry(i, e.target.value, entry.level)}
-                  className={inputClass + ' flex-1'}
-                >
-                  {CLASSES.map((cls) => (
-                    <option key={cls.id} value={cls.id}>
-                      {cls.name}
-                    </option>
-                  ))}
-                </select>
-                <input
-                  type="number"
-                  min={1}
-                  value={entry.level}
-                  onChange={(e) =>
-                    setClassEntry(i, entry.classId, Math.max(1, Number(e.target.value) || 1))
-                  }
-                  className={inputClass + ' w-14 text-center'}
-                  aria-label="Nível"
-                />
-                <Button variant="ghost" onClick={() => removeClass(i)} aria-label="Remover classe">
-                  ✕
+            <Labeled label="Tendência">
+              <input
+                type="text"
+                value={character.alignment}
+                onChange={(e) => set('alignment', e.target.value)}
+                className={inputClass + ' w-full'}
+              />
+            </Labeled>
+
+            <Labeled label={`Classes (nível ${totalLevel(character)})`}>
+              <div className="space-y-1">
+                {character.classes.map((entry, i) => (
+                  <div key={i} className="flex gap-1">
+                    <select
+                      value={entry.classId}
+                      onChange={(e) => setClassEntry(i, e.target.value, entry.level)}
+                      className={inputClass + ' flex-1'}
+                    >
+                      {CLASSES.map((cls) => (
+                        <option key={cls.id} value={cls.id}>
+                          {cls.name}
+                        </option>
+                      ))}
+                    </select>
+                    <input
+                      type="number"
+                      min={1}
+                      value={entry.level}
+                      onChange={(e) =>
+                        setClassEntry(i, entry.classId, Math.max(1, Number(e.target.value) || 1))
+                      }
+                      className={inputClass + ' w-14 text-center'}
+                      aria-label="Nível"
+                    />
+                    <Button variant="ghost" onClick={() => removeClass(i)} aria-label="Remover classe">
+                      ✕
+                    </Button>
+                  </div>
+                ))}
+                <Button variant="ghost" onClick={addClass} className="text-xs">
+                  + classe
                 </Button>
               </div>
-            ))}
-            <Button variant="ghost" onClick={addClass} className="text-xs">
-              + classe
-            </Button>
+            </Labeled>
           </div>
-        </Labeled>
-          </div>
+          <dl className="mt-4 flex flex-row gap-4 w-full">
+            <Info label="Tipo" value={traits?.tipo ?? '—'} />
+            <Info label="Tamanho" value={traits?.tamanho ?? '—'} />
+            <Info label="Sentidos" value={senses.join(', ') || '—'} />
+
+          </dl>
+          <dl className="mt-4 flex flex-row gap-4 just">
+            <Info label="Proficiências" value={profs.join(', ') || '—'} />
+          </dl>
         </div>
+
       </div>
+    </div>
+  )
+}
+
+function Info({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex flex-1 justify-between gap-2 border-b border-stone-800 py-0.5">
+      <dt className="text-stone-400">{label}</dt>
+      <dd className="text-right text-[var(--text)]">{value}</dd>
     </div>
   )
 }

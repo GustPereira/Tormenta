@@ -1,8 +1,19 @@
-import { RACE_TRAITS_BY_ID } from '../../data'
+import { ATTRIBUTE_LABELS, RESISTANCE_SKILL_IDS } from '../../data'
 import { EffectsTooltip } from '../../components/EffectsTooltip'
 import { Panel } from '../../components/Panel'
 import { inputClass } from '../../components/ui'
-import { deriveCharacter, effectContributions, type EffectContribution } from '../../rules'
+import { signed } from '../../lib/format'
+import {
+  deriveCharacter,
+  effectContributions,
+  halfLevel,
+  resolveValue,
+  trainingBonus,
+  type DerivedCharacter,
+  type DerivedSkill,
+  type EffectContribution,
+  type FormulaContext,
+} from '../../rules'
 import type { Character } from '../../schema'
 
 interface Props {
@@ -10,26 +21,41 @@ interface Props {
   update: (updater: (c: Character) => Character) => void
 }
 
+/** Detalhamento completo do bônus de uma perícia (para o tooltip). */
+function skillBreakdown(
+  skill: DerivedSkill,
+  d: DerivedCharacter,
+  character: Character,
+  ctx: FormulaContext,
+): EffectContribution[] {
+  return [
+    { name: '½ nível', value: halfLevel(d.totalLevel) },
+    { name: ATTRIBUTE_LABELS[skill.attribute], value: skill.attributeMod },
+    ...(skill.trained ? [{ name: 'Treino', value: trainingBonus(d.totalLevel, true) }] : []),
+    ...effectContributions(
+      character,
+      (m) =>
+        resolveValue(m.skills[skill.id] ?? 0, ctx) +
+        resolveValue(m.allSkills ?? 0, ctx) +
+        resolveValue(m.resistance ?? 0, ctx) +
+        (skill.armorPenalty ? resolveValue(m.penalty, ctx) : 0),
+      ctx,
+    ),
+  ].filter((c) => c.value !== 0)
+}
+
 export function VitalsPanel({ character, update }: Props) {
   const d = deriveCharacter(character)
-  const ctx = { attributes: d.finalAttributes, level: d.totalLevel }
-  const traits = character.race ? RACE_TRAITS_BY_ID[character.race.raceId] : undefined
+  const ctx: FormulaContext = { attributes: d.finalAttributes, level: d.totalLevel }
 
-  const senses = [
-    traits?.visaoPenumbra && 'Visão na penumbra',
-    traits?.visaoEscuro && 'Visão no escuro',
-    traits?.faro && 'Faro',
-  ].filter(Boolean) as string[]
-
-  const profs = [
-    d.proficiencies.armaduraMarcial && 'Armaduras marciais',
-    d.proficiencies.armaduraPesada && 'Armaduras pesadas',
-    d.proficiencies.escudo && 'Escudos',
-  ].filter(Boolean) as string[]
+  const resistances = RESISTANCE_SKILL_IDS.map((id) => d.skills.find((s) => s.id === id)).filter(
+    (s): s is DerivedSkill => Boolean(s),
+  )
 
   return (
     <Panel title="Vitais & Defesa">
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+      {/* Pontos de Vida e Mana */}
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <Pool
           label="Pontos de Vida"
           current={character.currentHitPoints}
@@ -48,17 +74,40 @@ export function VitalsPanel({ character, update }: Props) {
           onChange={(v) => update((c) => ({ ...c, currentMana: v }))}
           onTempChange={(v) => update((c) => ({ ...c, temporaryMana: v }))}
         />
-        <Big label="Defesa" value={d.defense} contributions={effectContributions(character, (m) => m.defense, ctx)} />
+      </div>
+
+      {/* Defesa, Redução de Dano e Deslocamento */}
+      <div className="mt-3 grid grid-cols-3 gap-3">
+        <Big
+          label="Defesa"
+          value={d.defense}
+          contributions={[
+            { name: 'Base', value: 10 },
+            { name: '½ nível', value: halfLevel(d.totalLevel) },
+            { name: 'Destreza', value: d.finalAttributes.destreza },
+            ...effectContributions(character, (m) => m.defense, ctx),
+          ].filter((c) => c.value !== 0)}
+        />
         <Big label="Red. de Dano" value={d.damageReduction} contributions={effectContributions(character, (m) => m.damageReduction, ctx)} />
         <Big label="Deslocamento" value={`${d.deslocamento}m`} contributions={effectContributions(character, (m) => m.movement, ctx)} />
       </div>
 
-      <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
-        <Info label="Tipo" value={traits?.tipo ?? '—'} />
-        <Info label="Tamanho" value={traits?.tamanho ?? '—'} />
-        <Info label="Sentidos" value={senses.join(', ') || '—'} />
-        <Info label="Proficiências" value={profs.join(', ') || '—'} />
-      </dl>
+      {/* Resistências (testes de resistência) */}
+      <div className="mt-3">
+        <div className="mb-1 text-[11px] font-medium uppercase tracking-wide text-stone-400">
+          Resistências
+        </div>
+        <div className="grid grid-cols-3 gap-3">
+          {resistances.map((skill) => (
+            <Big
+              key={skill.id}
+              label={skill.name}
+              value={signed(skill.total)}
+              contributions={skillBreakdown(skill, d, character, ctx)}
+            />
+          ))}
+        </div>
+      </div>
     </Panel>
   )
 }
@@ -81,30 +130,45 @@ function Pool({
   onTempChange: (v: number) => void
 }) {
   return (
-    <div className="rounded-md border border-[var(--card-border)] bg-[var(--card-bg)] p-2 text-center">
-      <div className="text-[11px] uppercase text-stone-400">{label}</div>
-      <div className="flex items-center justify-center gap-1">
-        <input
-          type="number"
-          value={current ?? max}
-          onChange={(e) => onChange(e.target.value === '' ? null : Number(e.target.value))}
-          className={inputClass + ' w-14 text-center text-lg font-bold'}
-          aria-label={`${label} atual`}
-        />
-        <EffectsTooltip contributions={contributions}>
-          <span className="text-stone-500">/ {max}</span>
-        </EffectsTooltip>
+    <div className="rounded-md border border-[var(--card-border)] bg-[var(--card-bg)] p-2">
+      <div className="text-center text-[11px] uppercase text-stone-400">{label}</div>
+      <div className="mt-1 flex items-end justify-center gap-2">
+        <Field caption="Atual">
+          <input
+            type="number"
+            value={current ?? max}
+            onChange={(e) => onChange(e.target.value === '' ? null : Number(e.target.value))}
+            className={inputClass + ' w-14 text-center text-lg font-bold'}
+            aria-label={`${label} atual`}
+          />
+        </Field>
+        <span className="pb-5 text-lg text-stone-500">/</span>
+        <Field caption="Máx">
+          <EffectsTooltip contributions={contributions}>
+            <span className="font-display text-2xl font-bold text-tormenta-300">{max}</span>
+          </EffectsTooltip>
+        </Field>
+        <span className="pb-5 text-lg text-stone-500">/</span>
+        <Field caption="Temp">
+          <input
+            type="number"
+            value={temp}
+            onChange={(e) => onTempChange(Number(e.target.value) || 0)}
+            className={inputClass + ' w-12 text-center'}
+            aria-label={`${label} temporários`}
+          />
+        </Field>
       </div>
-      <label className="mt-1 flex items-center justify-center gap-1 text-[11px] text-stone-400">
-        Temp
-        <input
-          type="number"
-          value={temp}
-          onChange={(e) => onTempChange(Number(e.target.value) || 0)}
-          className={inputClass + ' w-12 text-center'}
-          aria-label={`${label} temporários`}
-        />
-      </label>
+    </div>
+  )
+}
+
+/** Rótulo pequeno abaixo de um valor (atual/máx/temp). */
+function Field({ caption, children }: { caption: string; children: React.ReactNode }) {
+  return (
+    <div className="flex flex-col items-center gap-0.5">
+      {children}
+      <span className="text-[10px] uppercase text-stone-500">{caption}</span>
     </div>
   )
 }
@@ -124,15 +188,6 @@ function Big({
       <EffectsTooltip contributions={contributions}>
         <span className="font-display text-2xl font-bold text-tormenta-300">{value}</span>
       </EffectsTooltip>
-    </div>
-  )
-}
-
-function Info({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex justify-between gap-2 border-b border-stone-800 py-0.5">
-      <dt className="text-stone-400">{label}</dt>
-      <dd className="text-right text-[var(--text)]">{value}</dd>
     </div>
   )
 }

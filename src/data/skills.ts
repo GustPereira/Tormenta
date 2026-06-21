@@ -40,3 +40,9 @@ export const SKILLS: SkillDef[] = [
 export const SKILLS_BY_ID: Record<string, SkillDef> = Object.fromEntries(
   SKILLS.map((s) => [s.id, s]),
 )
+
+/**
+ * Perícias de resistência (testes de resistência do T20). Recebem o bônus
+ * geral de resistência dos efeitos e são exibidas em destaque nos Vitais.
+ */
+export const RESISTANCE_SKILL_IDS = ['fortitude', 'reflexos', 'vontade'] as const
