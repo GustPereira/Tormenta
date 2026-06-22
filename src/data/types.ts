@@ -52,4 +52,15 @@ export interface RaceDef {
   attributeModifiers: AttributeModifiers
   /** Escolha livre "+1 em N atributos diferentes", se a raça tiver. */
   freeChoice?: FreeAttributeChoice
+  /**
+   * Perícias treinadas à escolha concedidas pela raça (ex.: Humano "Versátil" = 2,
+   * Osteon/Kliren = 1). A maioria das raças não concede e omite este campo.
+   */
+  pericasEscolha?: number
+  /**
+   * Se uma das perícias da raça pode ser trocada por um poder geral
+   * (Humano "Versátil", Osteon "Memória Póstuma"). Quando trocada, o limite de
+   * perícias diminui em 1. Kliren concede perícia mas não permite a troca.
+   */
+  podeTrocarPericiaPorPoder?: boolean
 }

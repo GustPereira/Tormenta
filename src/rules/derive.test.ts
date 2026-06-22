@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { createBlankCharacter, type Character, type ItemModifiers } from '../schema'
-import { deriveCharacter, finalAttributes, totalLevel } from './derive'
+import { deriveCharacter, finalAttributes, skillChoiceLimit, totalLevel } from './derive'
 
 function build(overrides: Partial<Character>): Character {
   return { ...createBlankCharacter(), ...overrides }
@@ -159,6 +159,42 @@ describe('deriveCharacter', () => {
     expect(d.skills.find((s) => s.id === 'atletismo')!.total).toBe(0)
     // Deslocamento base 9 (sem raça) com -3 da armadura → 6
     expect(d.deslocamento).toBe(6)
+  })
+
+  it('armadura pesada equipada não aplica Destreza na Defesa', () => {
+    const c = build({
+      attributes: { forca: 0, destreza: 3, constituicao: 0, inteligencia: 0, sabedoria: 0, carisma: 0 },
+      classes: [{ classId: 'guerreiro', level: 1 }],
+      inventory: [
+        {
+          id: 'arm', name: 'Cota de Malha', quantity: 1, spaces: 0,
+          equipped: true, equipmentType: 'armadura', attack: null, proficiency: 'Pesadas', activeEffect: false,
+          notes: '', modifiers: { ...ZERO_MODS, defense: 6 },
+        },
+      ],
+    })
+    const d = deriveCharacter(c)
+    expect(d.heavyArmorEquipped).toBe(true)
+    // Defesa: 10 + ½ nível 0 + Des 0 (ignorada) + armadura 6 = 16 (não 19)
+    expect(d.defense).toBe(16)
+  })
+
+  it('armadura leve equipada continua aplicando a Destreza na Defesa', () => {
+    const c = build({
+      attributes: { forca: 0, destreza: 3, constituicao: 0, inteligencia: 0, sabedoria: 0, carisma: 0 },
+      classes: [{ classId: 'guerreiro', level: 1 }],
+      inventory: [
+        {
+          id: 'arm', name: 'Couro', quantity: 1, spaces: 0,
+          equipped: true, equipmentType: 'armadura', attack: null, proficiency: 'Leves', activeEffect: false,
+          notes: '', modifiers: { ...ZERO_MODS, defense: 2 },
+        },
+      ],
+    })
+    const d = deriveCharacter(c)
+    expect(d.heavyArmorEquipped).toBe(false)
+    // Defesa: 10 + ½ nível 0 + Des 3 + armadura 2 = 15
+    expect(d.defense).toBe(15)
   })
 
   it('resolve fórmula de perícia (@car) contra o atributo final', () => {
@@ -399,5 +435,49 @@ describe('deriveCharacter', () => {
     // For final 4, meio nível 0, treino +2 => 6
     expect(atletismo.attributeMod).toBe(4)
     expect(atletismo.total).toBe(6)
+  })
+})
+
+describe('skillChoiceLimit', () => {
+  it('soma perícias à escolha de classe, raça e Inteligência', () => {
+    const c = build({
+      race: { raceId: 'humano' }, // 2 perícias
+      classes: [{ classId: 'guerreiro', level: 1 }], // 2 perícias
+    })
+    // Int final 0: guerreiro 2 + humano 2 = 4
+    expect(skillChoiceLimit(c, 0).limit).toBe(4)
+  })
+
+  it('soma a Inteligência final passada (não conta Int negativa)', () => {
+    const c = build({ classes: [{ classId: 'guerreiro', level: 1 }] })
+    expect(skillChoiceLimit(c, 3).limit).toBe(5) // 2 + 3
+    expect(skillChoiceLimit(c, -2).limit).toBe(2) // 2 + 0
+  })
+
+  it('desconta 1 quando a raça troca perícia por poder (humano)', () => {
+    const c = build({
+      race: { raceId: 'humano' },
+      classes: [{ classId: 'guerreiro', level: 1 }],
+      racePowerForSkill: true,
+    })
+    // 2 (humano) - 1 (troca) + 2 (guerreiro) = 3
+    expect(skillChoiceLimit(c, 0).limit).toBe(3)
+  })
+
+  it('ignora a troca para raças que não permitem (kliren)', () => {
+    const c = build({ race: { raceId: 'kliren' }, racePowerForSkill: true })
+    // kliren concede 1 e não permite troca → 1
+    expect(skillChoiceLimit(c, 0).limit).toBe(1)
+  })
+
+  it('expõe a raça (e a troca) nas fontes do limite', () => {
+    const c = build({
+      race: { raceId: 'osteon' }, // 1 perícia, permite troca
+      racePowerForSkill: true,
+    })
+    const { limit, sources } = skillChoiceLimit(c, 0)
+    expect(limit).toBe(0) // 1 - 1
+    expect(sources).toContainEqual({ name: 'Raça', value: 1 })
+    expect(sources).toContainEqual({ name: 'Troca por poder', value: -1 })
   })
 })

@@ -88,7 +88,10 @@ export function VitalsPanel({ character, update }: Props) {
           contributions={[
             { name: 'Base', value: 10 },
             { name: '½ nível', value: halfLevel(d.totalLevel) },
-            { name: 'Destreza', value: d.finalAttributes.destreza },
+            // Armadura pesada: a Destreza não conta na Defesa (regra do T20).
+            ...(d.heavyArmorEquipped
+              ? []
+              : [{ name: 'Destreza', value: d.finalAttributes.destreza }]),
             ...effectContributions(character, (m) => m.defense, ctx),
           ].filter((c) => c.value !== 0)}
         />

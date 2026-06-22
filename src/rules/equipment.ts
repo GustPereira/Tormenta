@@ -39,3 +39,13 @@ export function equippedArmor(character: Character, ctx: FormulaContext): Equipp
 export function equippedShield(character: Character, ctx: FormulaContext): EquippedSlot {
   return equippedOfType(character, 'escudo', ctx)
 }
+
+/**
+ * Verdadeiro se há uma armadura pesada (proficiência "Pesadas") equipada.
+ * Regra do T20: usando armadura pesada, você não aplica a Destreza na Defesa.
+ */
+export function hasHeavyArmorEquipped(character: Character): boolean {
+  return character.inventory.some(
+    (i) => i.equipped && i.equipmentType === 'armadura' && i.proficiency === 'Pesadas',
+  )
+}

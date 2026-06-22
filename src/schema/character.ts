@@ -312,6 +312,11 @@ export const characterSchema = z.object({
   originId: z.string().nullable().default(null),
   /** Origens personalizadas cadastradas pelo jogador. */
   customOrigins: z.array(customOriginSchema).default([]),
+  /**
+   * Se o jogador trocou uma perícia concedida pela raça por um poder geral
+   * (Humano "Versátil", Osteon "Memória Póstuma"). Reduz o limite de perícias em 1.
+   */
+  racePowerForSkill: z.boolean().default(false),
   classes: z.array(classEntrySchema).default([]),
   /** IDs das perícias treinadas pelo jogador. */
   trainedSkills: z.array(z.string()).default([]),
@@ -372,6 +377,7 @@ export function createBlankCharacter(name = 'Nova Ficha'): Character {
     race: null,
     originId: null,
     customOrigins: [],
+    racePowerForSkill: false,
     classes: [],
     trainedSkills: [],
     abilities: [],

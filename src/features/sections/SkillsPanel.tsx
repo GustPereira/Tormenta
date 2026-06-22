@@ -1,6 +1,6 @@
 import { Check, Pencil, Star } from 'lucide-react'
 import { useState } from 'react'
-import { ATTRIBUTE_ABBR, ATTRIBUTE_LABELS, CLASSES_BY_ID, RESISTANCE_SKILL_IDS } from '../../data'
+import { ATTRIBUTE_ABBR, ATTRIBUTE_LABELS, RACES_BY_ID, RESISTANCE_SKILL_IDS } from '../../data'
 import { Button } from '../../components/Button'
 import { EffectsTooltip } from '../../components/EffectsTooltip'
 import { Panel } from '../../components/Panel'
@@ -9,8 +9,8 @@ import {
   deriveCharacter,
   effectContributions,
   halfLevel,
-  resolveOrigin,
   resolveValue,
+  skillChoiceLimit,
   trainingBonus,
 } from '../../rules'
 import type { Character } from '../../schema'
@@ -24,42 +24,23 @@ export function SkillsPanel({ character, update }: Props) {
   const [editing, setEditing] = useState(false)
   const derived = deriveCharacter(character)
 
-  // Quantas perícias o jogador pode escolher: as "à escolha" da 1ª classe +
-  // Inteligência. Multiclasse (T20): a nova classe não concede perícias.
-  const firstClass = character.classes[0]
-  const fromClasses = firstClass ? (CLASSES_BY_ID[firstClass.classId]?.pericasEscolha ?? 0) : 0
-  const intBonus = Math.max(0, derived.finalAttributes.inteligencia)
-  const origin = resolveOrigin(character)
-
-  // Perícias fixas concedidas (com repetição) pela 1ª classe + origem. Cada
-  // repetição vira uma escolha extra (a perícia já treinada por outra fonte).
-  const grantedList = [
-    ...(firstClass ? (CLASSES_BY_ID[firstClass.classId]?.pericasFixas ?? []) : []),
-    ...(origin?.pericasFixas ?? []),
-  ]
-  const duplicateBonus = grantedList.length - new Set(grantedList).size
-
-  const chooseLimit = fromClasses + intBonus + (origin?.pericasEscolha ?? 0) + duplicateBonus
+  // Quantas perícias o jogador pode escolher (1ª classe + origem + raça + Int +
+  // fixas repetidas). Multiclasse (T20): a nova classe não concede perícias.
+  const { limit: chooseLimit, sources: limitSources } = skillChoiceLimit(
+    character,
+    derived.finalAttributes.inteligencia,
+  )
   const chosen = derived.skills.filter((s) => s.trained && !s.granted).length
+
+  // Raça que permite trocar uma perícia por um poder geral (Humano, Osteon).
+  const race = character.race ? RACES_BY_ID[character.race.raceId] : undefined
+  const canTradeSkillForPower = Boolean(race?.podeTrocarPericiaPorPoder)
 
   const ctx = {
     attributes: derived.finalAttributes,
     level: derived.totalLevel,
     shieldDefense: derived.shieldDefense,
   }
-
-  // De onde vem o limite (para o tooltip).
-  const limitSources = [
-    ...(firstClass
-      ? [{
-          name: `${CLASSES_BY_ID[firstClass.classId]?.name ?? 'Classe'} (classe)`,
-          value: CLASSES_BY_ID[firstClass.classId]?.pericasEscolha ?? 0,
-        }]
-      : []),
-    { name: 'Origem', value: origin?.pericasEscolha ?? 0 },
-    { name: 'Inteligência', value: intBonus },
-    { name: 'Perícias fixas repetidas', value: duplicateBonus },
-  ].filter((s) => s.value !== 0)
 
   const toggle = (skillId: string) =>
     update((c) => ({
@@ -91,6 +72,22 @@ export function SkillsPanel({ character, update }: Props) {
         </EffectsTooltip>
         {' '}<span className="text-stone-500">(guia; perícias da classe são automáticas)</span>
       </p>
+      {editing && canTradeSkillForPower && (
+        <label className="mb-2 flex items-start gap-2 text-xs text-stone-300">
+          <input
+            type="checkbox"
+            checked={character.racePowerForSkill}
+            onChange={(e) =>
+              update((c) => ({ ...c, racePowerForSkill: e.target.checked }))
+            }
+            className="mt-0.5 h-3.5 w-3.5 accent-tormenta-500"
+          />
+          <span>
+            Troquei uma perícia da raça por um poder geral
+            <span className="text-stone-500"> (reduz 1 perícia; adicione o poder em Habilidades)</span>
+          </span>
+        </label>
+      )}
       <ul className="grid grid-cols-1 gap-x-4">
         {derived.skills.map((skill) => {
           const disabled = !editing || skill.granted

@@ -15,7 +15,7 @@ import {
 } from '../schema'
 import { defense } from './defense'
 import { aggregateActiveModifiers, collectEffects } from './effect'
-import { equippedShield } from './equipment'
+import { equippedShield, hasHeavyArmorEquipped } from './equipment'
 import { maxHitPoints, maxMana } from './health'
 import { skillBonus } from './skills'
 
@@ -51,6 +51,8 @@ export interface DerivedCharacter {
   defense: number
   /** Deslocamento em metros (da raça; padrão 9). */
   deslocamento: number
+  /** Verdadeiro se há armadura pesada equipada (Destreza não conta na Defesa). */
+  heavyArmorEquipped: boolean
   /** Redução de dano (soma dos efeitos ativos). */
   damageReduction: number
   /** União das proficiências de armadura/escudo das classes do personagem. */
@@ -83,6 +85,59 @@ export function resolveOrigin(character: Character): ResolvedOrigin | undefined 
     ORIGINS_BY_ID[character.originId] ??
     character.customOrigins.find((o) => o.id === character.originId)
   )
+}
+
+/** Uma parcela do limite de perícias à escolha (para o tooltip de proveniência). */
+export interface SkillChoiceSource {
+  name: string
+  value: number
+}
+
+export interface SkillChoiceLimit {
+  /** Quantas perícias treinadas o jogador pode escolher. */
+  limit: number
+  /** De onde vem o limite (parcelas não-zero), para o tooltip. */
+  sources: SkillChoiceSource[]
+}
+
+/**
+ * Quantas perícias treinadas o jogador pode escolher (guia da UI; as perícias
+ * fixas de classe/origem são automáticas). Soma: perícias à escolha da 1ª classe
+ * + da origem + da raça + Inteligência (final, não conta negativa) + perícias
+ * fixas repetidas (cada repetição vira uma escolha extra). Se a raça permite e o
+ * jogador trocou uma perícia por um poder geral, desconta 1.
+ *
+ * Recebe a Inteligência final já calculada (inclui efeitos) para evitar recalcular
+ * os derivados aqui e manter a função pura/testável.
+ */
+export function skillChoiceLimit(character: Character, finalIntelligence: number): SkillChoiceLimit {
+  const firstClass = character.classes[0]
+  const classDef = firstClass ? CLASSES_BY_ID[firstClass.classId] : undefined
+  const fromClass = classDef?.pericasEscolha ?? 0
+  const intBonus = Math.max(0, finalIntelligence)
+  const origin = resolveOrigin(character)
+  const fromOrigin = origin?.pericasEscolha ?? 0
+
+  // Perícias fixas concedidas (com repetição) pela 1ª classe + origem. Cada
+  // repetição vira uma escolha extra (a perícia já está treinada por outra fonte).
+  const grantedList = [...(classDef?.pericasFixas ?? []), ...(origin?.pericasFixas ?? [])]
+  const duplicateBonus = grantedList.length - new Set(grantedList).size
+
+  const race = character.race ? RACES_BY_ID[character.race.raceId] : undefined
+  const fromRace = race?.pericasEscolha ?? 0
+  const traded = race?.podeTrocarPericiaPorPoder && character.racePowerForSkill ? 1 : 0
+
+  const limit = fromClass + fromOrigin + fromRace - traded + intBonus + duplicateBonus
+  const sources: SkillChoiceSource[] = [
+    ...(classDef ? [{ name: `${classDef.name} (classe)`, value: fromClass }] : []),
+    { name: 'Origem', value: fromOrigin },
+    { name: 'Raça', value: fromRace },
+    ...(traded ? [{ name: 'Troca por poder', value: -traded }] : []),
+    { name: 'Inteligência', value: intBonus },
+    { name: 'Perícias fixas repetidas', value: duplicateBonus },
+  ].filter((s) => s.value !== 0)
+
+  return { limit, sources }
 }
 
 /** Calcula os atributos finais aplicando os modificadores da raça e as escolhas livres. */
@@ -208,13 +263,21 @@ export function deriveCharacter(character: Character): DerivedCharacter {
 
   const traits = character.race ? RACE_TRAITS_BY_ID[character.race.raceId] : undefined
 
+  // Armadura pesada: você não aplica a Destreza na Defesa.
+  const heavyArmorEquipped = hasHeavyArmorEquipped(character)
+
   return {
     totalLevel: level,
     finalAttributes: attrs,
     maxHitPoints: maxHitPoints(hpClasses, attrs.constituicao) + mods.hitPoints,
     maxMana: maxMana(mpClasses) + mods.mana,
-    defense: defense({ level, dexMod: attrs.destreza, otherBonus: mods.defense }),
+    defense: defense({
+      level,
+      dexMod: heavyArmorEquipped ? 0 : attrs.destreza,
+      otherBonus: mods.defense,
+    }),
     deslocamento: Math.max(0, (traits?.deslocamento ?? 9) + mods.movement),
+    heavyArmorEquipped,
     damageReduction: mods.damageReduction,
     proficiencies,
     globalSkillBonus,
