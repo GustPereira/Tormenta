@@ -67,15 +67,24 @@ export function EditableCard({
         )}
         {!editing &&
           (details != null ? (
-            <button
-              type="button"
+            // div (não <button>) para o toggle continuar funcionando dentro de um
+            // <fieldset disabled> (modo somente leitura do link compartilhado).
+            <div
+              role="button"
+              tabIndex={0}
               onClick={() => setOpen((o) => !o)}
-              className="flex flex-1 items-center gap-1 text-left font-medium text-[var(--text)]"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault()
+                  setOpen((o) => !o)
+                }
+              }}
+              className="flex flex-1 cursor-pointer items-center gap-1 text-left font-medium text-[var(--text)]"
               aria-expanded={open}
             >
               <span className="text-xs text-stone-500">{open ? '▾' : '▸'}</span>
               {title}
-            </button>
+            </div>
           ) : (
             <span className="flex-1 font-medium text-[var(--text)]">{title}</span>
           ))}

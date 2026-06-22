@@ -1,8 +1,12 @@
 name: Supabase migrations
 
 # CI/CD do schema do Supabase: aplica as migrations em supabase/migrations/
-# ao dar push na main. Requer o secret SUPABASE_DB_URL (Project Settings →
-# Database → Connection string, formato URI, com a senha).
+# ao dar push na main. Requer o secret SUPABASE_DB_URL.
+#
+# IMPORTANTE: o runner do GitHub não tem IPv6, e a conexão DIRETA do Supabase é
+# IPv6-only. Use a connection string do POOLER (IPv4): Dashboard → Connect →
+# "Session pooler" (porta 5432) → copie o URI e troque [YOUR-PASSWORD] pela senha.
+#   postgresql://postgres.<ref>:<senha>@aws-0-<regiao>.pooler.supabase.com:5432/postgres
 on:
   push:
     branches: [main]

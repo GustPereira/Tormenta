@@ -21,10 +21,16 @@ const STATUS_LABEL: Record<string, string> = {
   saved: 'Salvo ✓',
 }
 
+const SHARE_SYNC_LABEL: Record<string, string> = {
+  syncing: 'Sincronizando link…',
+  synced: 'Link sincronizado ✓',
+  error: 'Erro ao sincronizar link',
+}
+
 export function SheetEditor() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { character, status, load, update, reset } = useSheetStore()
+  const { character, status, shareSync, load, update, reset } = useSheetStore()
   const [tab, setTab] = useState('principal')
 
   useEffect(() => {
@@ -67,7 +73,14 @@ export function SheetEditor() {
         <Link to="/" className="text-sm text-tormenta-400 hover:underline">
           ← Minhas Fichas
         </Link>
-        <span className="text-xs text-stone-500">{STATUS_LABEL[status] ?? ''}</span>
+        <div className="flex items-center gap-3 text-xs text-stone-500">
+          {character.shareId && shareSync !== 'idle' && (
+            <span className={shareSync === 'error' ? 'text-red-400' : undefined}>
+              {SHARE_SYNC_LABEL[shareSync] ?? ''}
+            </span>
+          )}
+          <span>{STATUS_LABEL[status] ?? ''}</span>
+        </div>
       </header>
 
       <Tabs tabs={TABS} active={tab} onChange={setTab} />
