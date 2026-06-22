@@ -3,7 +3,7 @@ import { Button } from '../../components/Button'
 import { EditableCard } from '../../components/EditableCard'
 import { Panel } from '../../components/Panel'
 import { inputClass } from '../../components/ui'
-import type { Character, Spell } from '../../schema'
+import { DURATION_KEYS, type Character, type DurationKey, type Spell } from '../../schema'
 
 interface Props {
   character: Character
@@ -25,7 +25,7 @@ export function SpellsPanel({ character, update }: Props) {
       ...c,
       spells: [
         ...c.spells,
-        { id, name: '', circle, pm: PM_BY_CIRCLE[circle] ?? 1, action: 'Padrão', effect: '', prepared: false, notes: '' },
+        { id, name: '', circle, pm: PM_BY_CIRCLE[circle] ?? 1, action: 'Padrão', duration: 'Instantânea', effect: '', prepared: false, notes: '' },
       ],
     }))
   }
@@ -61,13 +61,15 @@ export function SpellsPanel({ character, update }: Props) {
                       onActiveChange={(v) => setField(s.id, { prepared: v })}
                       activeLabel="Preparada"
                       title={s.name || 'Magia sem nome'}
-                      summary={`${s.pm} PM · ${s.action}`}
+                      summary={`${s.pm} PM · ${s.action} · ${s.duration}`}
                       details={
                         <div className="space-y-1">
                           <div>
                             <span className="text-stone-500">Custo:</span> {s.pm} PM
                             <span className="mx-1 text-stone-600">·</span>
                             <span className="text-stone-500">Ação:</span> {s.action}
+                            <span className="mx-1 text-stone-600">·</span>
+                            <span className="text-stone-500">Duração:</span> {s.duration}
                           </div>
                           {s.effect && (
                             <div>
@@ -117,6 +119,19 @@ export function SpellsPanel({ character, update }: Props) {
                               <option key={a} value={a}>{a}</option>
                             ))}
                             {!SPELL_ACTIONS.includes(s.action) && <option value={s.action}>{s.action}</option>}
+                          </select>
+                        </label>
+                        <label className="flex items-center gap-1 text-xs text-stone-400">
+                          Duração
+                          <select
+                            value={s.duration}
+                            onChange={(e) => setField(s.id, { duration: e.target.value as DurationKey })}
+                            className={inputClass + ' text-sm'}
+                            aria-label="Duração"
+                          >
+                            {DURATION_KEYS.map((d) => (
+                              <option key={d} value={d}>{d}</option>
+                            ))}
                           </select>
                         </label>
                       </div>

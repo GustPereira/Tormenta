@@ -58,6 +58,8 @@ export interface DerivedCharacter {
   globalSkillBonus: number
   /** Bônus global resolvido somado a todos os ataques. */
   globalAttackBonus: number
+  /** Bônus global resolvido somado ao dano de todos os ataques. */
+  globalDamageBonus: number
   skills: DerivedSkill[]
 }
 
@@ -161,6 +163,7 @@ export function deriveCharacter(character: Character): DerivedCharacter {
   // Bônus gerais (de efeitos/itens/habilidades) somados a todas as perícias e ataques.
   const globalSkillBonus = mods.allSkills
   const globalAttackBonus = mods.attack
+  const globalDamageBonus = mods.damage
   const resistanceIds = new Set<string>(RESISTANCE_SKILL_IDS)
 
   const skills: DerivedSkill[] = SKILLS.map((skill) => {
@@ -210,6 +213,7 @@ export function deriveCharacter(character: Character): DerivedCharacter {
     proficiencies,
     globalSkillBonus,
     globalAttackBonus,
+    globalDamageBonus,
     skills,
   }
 }

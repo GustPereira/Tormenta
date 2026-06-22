@@ -37,6 +37,17 @@ export function IdentityHeader({ character, update }: Props) {
   const removeClass = (i: number) =>
     update((c) => ({ ...c, classes: c.classes.filter((_, idx) => idx !== i) }))
 
+  // Encerrar cena: desativa todos os efeitos (habilidades e avulsos) de duração "Cena".
+  const hasSceneActive =
+    character.abilities.some((a) => a.duration === 'Cena' && a.effectActive) ||
+    character.effects.some((e) => e.duration === 'Cena' && e.active)
+  const endScene = () =>
+    update((c) => ({
+      ...c,
+      abilities: c.abilities.map((a) => (a.duration === 'Cena' ? { ...a, effectActive: false } : a)),
+      effects: c.effects.map((e) => (e.duration === 'Cena' ? { ...e, active: false } : e)),
+    }))
+
   const derived = deriveCharacter(character)
   const traits = character.race ? RACE_TRAITS_BY_ID[character.race.raceId] : undefined
   const senses = [
@@ -219,6 +230,18 @@ export function IdentityHeader({ character, update }: Props) {
           <dl className="mt-4 flex flex-row gap-4 just">
             <Info label="Proficiências" value={profs.join(', ') || '—'} />
           </dl>
+
+          <div className="mt-4 flex justify-end">
+            <Button
+              variant="secondary"
+              className="text-xs"
+              onClick={endScene}
+              disabled={!hasSceneActive}
+              title="Desativa os efeitos de duração Cena"
+            >
+              Encerrar cena
+            </Button>
+          </div>
         </div>
 
       </div>

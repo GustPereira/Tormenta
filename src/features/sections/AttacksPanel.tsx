@@ -103,6 +103,12 @@ function attackContributions(
   ]
 }
 
+/** Anexa o bônus global de dano (com sinal) à expressão, para o resolveDamage somar. */
+function withDamageBonus(expr: string, bonus: number): string {
+  if (!bonus) return expr
+  return `${expr}${bonus > 0 ? '+' : '-'}${Math.abs(bonus)}`
+}
+
 export function AttacksPanel({ character, update }: Props) {
   const derived = deriveCharacter(character)
   const ctx: FormulaContext = { attributes: derived.finalAttributes, level: derived.totalLevel }
@@ -147,7 +153,7 @@ export function AttacksPanel({ character, update }: Props) {
                     attack={a}
                     total={total}
                     contributions={contribs}
-                    damageText={resolveDamage(a.damage, ctx)}
+                    damageText={resolveDamage(withDamageBonus(a.damage, derived.globalDamageBonus), ctx)}
                   />
                 }
                 onDelete={() => remove(a.id)}

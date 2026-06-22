@@ -6,10 +6,12 @@ import { inputClass } from '../../components/ui'
 import { ORIGINS_BY_ID } from '../../data'
 import {
   ACTION_KEYS,
+  DURATION_KEYS,
   EMPTY_ITEM_MODIFIERS,
   type Ability,
   type ActionKey,
   type Character,
+  type DurationKey,
   type ItemModifiers,
 } from '../../schema'
 import { ModifiersEditor } from './ModifiersEditor'
@@ -20,7 +22,7 @@ interface Props {
 }
 
 function summarize(a: Ability): string {
-  return `Nível ${a.level} · ${a.mp} PM · ${a.acao[0] ?? 'Ação Padrão'}`
+  return `Nível ${a.level} · ${a.mp} PM · ${a.acao[0] ?? 'Ação Padrão'} · ${a.duration}`
 }
 
 export function AbilitiesPanel({ character, update }: Props) {
@@ -40,6 +42,7 @@ export function AbilitiesPanel({ character, update }: Props) {
           level: 1,
           mp: 0,
           acao: ['Ação Padrão'],
+          duration: 'Cena',
           hasEffect: false,
           effectActive: false,
           modifiers: { ...EMPTY_ITEM_MODIFIERS, attributes: {}, skills: {} },
@@ -107,6 +110,9 @@ function Group({
               title={a.name || 'Poder sem nome'}
               summary={summarize(a)}
               details={a.notes || 'Sem descrição.'}
+              active={a.hasEffect ? a.effectActive : undefined}
+              onActiveChange={a.hasEffect ? (v) => setAbility(a.id, { effectActive: v }) : undefined}
+              activeLabel="Ativo"
               onDelete={() => remove(a.id)}
               deleteName={a.name}
               startEditing={a.id === lastAddedId}
@@ -142,19 +148,34 @@ function Group({
                     />
                   </label>
                 </div>
-                <label className="flex items-center gap-2 text-xs text-stone-400">
-                  Ação
-                  <select
-                    value={a.acao[0] ?? 'Ação Padrão'}
-                    onChange={(e) => setAbility(a.id, { acao: [e.target.value as ActionKey] })}
-                    className={inputClass}
-                    aria-label="Ação"
-                  >
-                    {ACTION_KEYS.map((action) => (
-                      <option key={action} value={action}>{action}</option>
-                    ))}
-                  </select>
-                </label>
+                <div className="flex flex-wrap gap-3">
+                  <label className="flex items-center gap-2 text-xs text-stone-400">
+                    Ação
+                    <select
+                      value={a.acao[0] ?? 'Ação Padrão'}
+                      onChange={(e) => setAbility(a.id, { acao: [e.target.value as ActionKey] })}
+                      className={inputClass}
+                      aria-label="Ação"
+                    >
+                      {ACTION_KEYS.map((action) => (
+                        <option key={action} value={action}>{action}</option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="flex items-center gap-2 text-xs text-stone-400">
+                    Duração
+                    <select
+                      value={a.duration}
+                      onChange={(e) => setAbility(a.id, { duration: e.target.value as DurationKey })}
+                      className={inputClass}
+                      aria-label="Duração"
+                    >
+                      {DURATION_KEYS.map((d) => (
+                        <option key={d} value={d}>{d}</option>
+                      ))}
+                    </select>
+                  </label>
+                </div>
                 <textarea
                   value={a.notes}
                   placeholder="Descrição / efeito"

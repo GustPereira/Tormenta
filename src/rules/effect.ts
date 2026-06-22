@@ -26,7 +26,8 @@ export class Effect {
   readonly active: boolean
   readonly modifiers: ItemModifiers
 
-  constructor(data: EffectData) {
+  // Só os campos usados na agregação (duration não importa aqui).
+  constructor(data: Pick<EffectData, 'id' | 'name' | 'active' | 'modifiers'>) {
     this.id = data.id
     this.name = data.name
     this.active = data.active
@@ -93,6 +94,8 @@ export interface AggregatedModifiers {
   skills: Record<string, number>
   /** Bônus somado a todos os ataques. */
   attack: number
+  /** Bônus somado ao dano de todos os ataques. */
+  damage: number
   /** Bônus somado a todas as perícias. */
   allSkills: number
   /** Bônus somado às perícias de resistência (Fortitude, Reflexos, Vontade). */
@@ -124,7 +127,7 @@ export function aggregateActiveModifiers(
   effects: Effect[],
   ctx: FormulaContext = ZERO_CTX,
 ): AggregatedModifiers {
-  const acc: AggregatedModifiers = { attributes: {}, skills: {}, attack: 0, allSkills: 0, resistance: 0, trainedSkills: [], hitPoints: 0, mana: 0, defense: 0, penalty: 0, movement: 0, damageReduction: 0 }
+  const acc: AggregatedModifiers = { attributes: {}, skills: {}, attack: 0, damage: 0, allSkills: 0, resistance: 0, trainedSkills: [], hitPoints: 0, mana: 0, defense: 0, penalty: 0, movement: 0, damageReduction: 0 }
   for (const effect of effects) {
     if (!effect.isActive()) continue
     const m = effect.modifiers
@@ -132,6 +135,7 @@ export function aggregateActiveModifiers(
     for (const [k, v] of Object.entries(m.skills)) acc.skills[k] = (acc.skills[k] ?? 0) + resolveValue(v, ctx)
     for (const id of m.trainedSkills ?? []) if (!acc.trainedSkills.includes(id)) acc.trainedSkills.push(id)
     acc.attack += resolveValue(m.attack ?? 0, ctx)
+    acc.damage += resolveValue(m.damage ?? 0, ctx)
     acc.allSkills += resolveValue(m.allSkills ?? 0, ctx)
     acc.resistance += resolveValue(m.resistance ?? 0, ctx)
     acc.hitPoints += resolveValue(m.hitPoints, ctx)
@@ -183,6 +187,8 @@ export function describeModifiers(m: ItemModifiers): string {
   }
   const atk = formatModValue(m.attack ?? 0)
   if (atk) parts.push(`Ataque ${atk}`)
+  const dmg = formatModValue(m.damage ?? 0)
+  if (dmg) parts.push(`Dano ${dmg}`)
   const allSk = formatModValue(m.allSkills ?? 0)
   if (allSk) parts.push(`Perícias ${allSk}`)
   const res = formatModValue(m.resistance ?? 0)

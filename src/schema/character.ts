@@ -24,11 +24,15 @@ export const ACTION_KEYS = [
   'Passivo',
 ] as const
 
+export const DURATION_KEYS = ['Sustentada', 'Cena', 'Instantânea'] as const
+
 export type AttributeKey = (typeof ATTRIBUTE_KEYS)[number]
 export type ActionKey = (typeof ACTION_KEYS)[number]
+export type DurationKey = (typeof DURATION_KEYS)[number]
 
 export const attributeKeySchema = z.enum(ATTRIBUTE_KEYS)
 export const actionKeySchema = z.enum(ACTION_KEYS)
+export const durationSchema = z.enum(DURATION_KEYS)
 
 export const attributesSchema = z.object({
   forca: z.number().int(),
@@ -70,6 +74,8 @@ export const itemModifiersSchema = z.object({
   skills: z.record(z.string(), modValueSchema).default({}),
   /** Soma a TODOS os ataques (bônus de ataque geral). */
   attack: modValueSchema.default(0),
+  /** Soma ao dano de TODOS os ataques (bônus de dano geral). */
+  damage: modValueSchema.default(0),
   /** Soma a TODAS as perícias (bônus de perícia geral). */
   allSkills: modValueSchema.default(0),
   /** Soma às perícias de resistência (Fortitude, Reflexos, Vontade). */
@@ -94,6 +100,7 @@ export const EMPTY_ITEM_MODIFIERS: ItemModifiers = {
   attributes: {},
   skills: {},
   attack: 0,
+  damage: 0,
   allSkills: 0,
   resistance: 0,
   trainedSkills: [],
@@ -114,6 +121,8 @@ export const effectSchema = z.object({
   id: z.string(),
   name: z.string().default(''),
   active: z.boolean().default(true),
+  /** Duração do efeito (Cena é encerrada pelo botão "Encerrar cena"). */
+  duration: durationSchema.default('Cena'),
   modifiers: itemModifiersSchema.default(EMPTY_ITEM_MODIFIERS),
 })
 export type EffectData = z.infer<typeof effectSchema>
@@ -153,6 +162,8 @@ export const spellSchema = z.object({
   pm: z.number().int().min(0).default(1),
   /** Ação de execução (ex.: "Padrão", "Movimento", "Completa", "Reação", "Livre"). */
   action: z.string().default('Padrão'),
+  /** Duração (Sustentada, Cena, Instantânea). */
+  duration: durationSchema.default('Instantânea'),
   /** Descrição do efeito da magia. */
   effect: z.string().default(''),
   prepared: z.boolean().default(false),
@@ -182,6 +193,8 @@ export const abilitySchema = z.object({
   level: z.number().int().default(1),
   mp: z.number().default(0),
   acao: z.array(actionKeySchema).default(['Ação Padrão']),
+  /** Duração (Sustentada, Cena, Instantânea). Cena é encerrada pelo botão. */
+  duration: durationSchema.default('Cena'),
   group: z.enum(['racial', 'classe']).default('classe'),
   notes: z.string().default(''),
   /** Se a habilidade fornece um efeito (modificadores) ativável. */

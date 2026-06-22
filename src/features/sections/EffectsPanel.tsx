@@ -5,8 +5,10 @@ import { Panel } from '../../components/Panel'
 import { inputClass } from '../../components/ui'
 import { describeModifiers } from '../../rules'
 import {
+  DURATION_KEYS,
   EMPTY_ITEM_MODIFIERS,
   type Character,
+  type DurationKey,
   type EffectData,
   type ItemModifiers,
 } from '../../schema'
@@ -43,7 +45,7 @@ export function EffectsPanel({ character, update }: Props) {
       ...c,
       effects: [
         ...c.effects,
-        { id, name: '', active: true, modifiers: { ...EMPTY_ITEM_MODIFIERS, attributes: {}, skills: {} } },
+        { id, name: '', active: true, duration: 'Cena', modifiers: { ...EMPTY_ITEM_MODIFIERS, attributes: {}, skills: {} } },
       ],
     }))
   }
@@ -138,6 +140,19 @@ export function EffectsPanel({ character, update }: Props) {
                   className={inputClass + ' mb-2 w-full font-medium'}
                   aria-label="Nome do efeito"
                 />
+                <label className="mb-2 flex items-center gap-2 text-xs text-stone-400">
+                  Duração
+                  <select
+                    value={effect.duration}
+                    onChange={(e) => setEffect(effect.id, { duration: e.target.value as DurationKey })}
+                    className={inputClass + ' text-sm'}
+                    aria-label="Duração do efeito"
+                  >
+                    {DURATION_KEYS.map((d) => (
+                      <option key={d} value={d}>{d}</option>
+                    ))}
+                  </select>
+                </label>
                 <ModifiersEditor
                   modifiers={effect.modifiers}
                   onChange={(m) => setModifiers(effect.id, m)}

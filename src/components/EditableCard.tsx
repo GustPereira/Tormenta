@@ -111,7 +111,9 @@ export function EditableCard({
       )}
 
       {!editing && open && details != null && (
-        <div className="mt-1 whitespace-pre-wrap text-sm text-stone-300">{details}</div>
+        <div className="mt-2 whitespace-pre-wrap border-t border-stone-800 pt-2 text-sm text-stone-300">
+          {details}
+        </div>
       )}
 
       {editing && <div className="mt-2 border-t border-stone-800 pt-2">{children}</div>}
