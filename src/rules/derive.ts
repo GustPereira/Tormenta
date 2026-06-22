@@ -58,8 +58,8 @@ export interface DerivedCharacter {
   globalSkillBonus: number
   /** Bônus global resolvido somado a todos os ataques. */
   globalAttackBonus: number
-  /** Bônus global resolvido somado ao dano de todos os ataques. */
-  globalDamageBonus: number
+  /** Dano extra global (expressão mesclada, ex.: "1d8+2") somado a todos os ataques. */
+  globalDamageBonus: string
   skills: DerivedSkill[]
 }
 

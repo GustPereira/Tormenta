@@ -9,8 +9,9 @@ import { signed } from '../../lib/format'
 import {
   deriveCharacter,
   effectContributions,
+  effectDamageContributions,
   halfLevel,
-  resolveDamage,
+  mergeDamage,
   resolveValue,
   trainingBonus,
   type DerivedCharacter,
@@ -103,12 +104,6 @@ function attackContributions(
   ]
 }
 
-/** Anexa o bônus global de dano (com sinal) à expressão, para o resolveDamage somar. */
-function withDamageBonus(expr: string, bonus: number): string {
-  if (!bonus) return expr
-  return `${expr}${bonus > 0 ? '+' : '-'}${Math.abs(bonus)}`
-}
-
 export function AttacksPanel({ character, update }: Props) {
   const derived = deriveCharacter(character)
   const ctx: FormulaContext = { attributes: derived.finalAttributes, level: derived.totalLevel }
@@ -143,7 +138,7 @@ export function AttacksPanel({ character, update }: Props) {
         <ul className="space-y-2">
           {character.attacks.map((a) => {
             const contribs = attackContributions(a, derived, character, ctx)
-            const total = contribs.reduce((s, c) => s + c.value, 0)
+            const total = contribs.reduce((s, c) => s + (typeof c.value === 'number' ? c.value : 0), 0)
             return (
               <EditableCard
                 key={a.id}
@@ -153,8 +148,8 @@ export function AttacksPanel({ character, update }: Props) {
                     attack={a}
                     total={total}
                     contributions={contribs}
-                    damageText={resolveDamage(withDamageBonus(a.damage, derived.globalDamageBonus), ctx)}
-                    damageContributions={effectContributions(character, (m) => m.damage, ctx)}
+                    damageText={mergeDamage([a.damage, derived.globalDamageBonus], ctx)}
+                    damageContributions={effectDamageContributions(character, ctx)}
                   />
                 }
                 onDelete={() => remove(a.id)}

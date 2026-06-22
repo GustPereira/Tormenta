@@ -313,7 +313,7 @@ describe('deriveCharacter', () => {
     expect(deriveCharacter(c).globalSkillBonus).toBe(2)
   })
 
-  it('bônus global de dano soma de efeitos ativos', () => {
+  it('bônus global de dano soma de efeitos ativos (numérico)', () => {
     const c = build({
       classes: [{ classId: 'guerreiro', level: 1 }],
       effects: [
@@ -321,7 +321,18 @@ describe('deriveCharacter', () => {
         { id: 'b', name: 'Bênção', active: true, alwaysActive: false, duration: 'Cena', modifiers: { ...ZERO_MODS, damage: 1 } },
       ],
     })
-    expect(deriveCharacter(c).globalDamageBonus).toBe(3)
+    expect(deriveCharacter(c).globalDamageBonus).toBe('3')
+  })
+
+  it('bônus global de dano mescla dados do mesmo tipo', () => {
+    const c = build({
+      classes: [{ classId: 'guerreiro', level: 1 }],
+      effects: [
+        { id: 'a', name: 'A', active: true, alwaysActive: false, duration: 'Cena', modifiers: { ...ZERO_MODS, damage: '1d8' } },
+        { id: 'b', name: 'B', active: true, alwaysActive: false, duration: 'Cena', modifiers: { ...ZERO_MODS, damage: '1d8+1d4' } },
+      ],
+    })
+    expect(deriveCharacter(c).globalDamageBonus).toBe('2d8+1d4')
   })
 
   it('modificadores de ataque de vários efeitos somam (3 + (1+@car) = 4+car)', () => {

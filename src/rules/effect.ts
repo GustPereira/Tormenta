@@ -7,7 +7,7 @@ import {
   type InventoryItem,
   type ItemModifiers,
 } from '../schema'
-import { isFormula, resolveValue, type FormulaContext } from './formula'
+import { isFormula, mergeDamage, resolveValue, type FormulaContext } from './formula'
 
 const ZERO_ATTRS: Attributes = {
   forca: 0, destreza: 0, constituicao: 0, inteligencia: 0, sabedoria: 0, carisma: 0,
@@ -102,8 +102,8 @@ export interface AggregatedModifiers {
   skills: Record<string, number>
   /** Bônus somado a todos os ataques. */
   attack: number
-  /** Bônus somado ao dano de todos os ataques. */
-  damage: number
+  /** Dano extra (expressão mesclada, ex.: "1d8+2") somado a todos os ataques. */
+  damage: string
   /** Bônus somado a todas as perícias. */
   allSkills: number
   /** Bônus somado às perícias de resistência (Fortitude, Reflexos, Vontade). */
@@ -135,7 +135,8 @@ export function aggregateActiveModifiers(
   effects: Effect[],
   ctx: FormulaContext = ZERO_CTX,
 ): AggregatedModifiers {
-  const acc: AggregatedModifiers = { attributes: {}, skills: {}, attack: 0, damage: 0, allSkills: 0, resistance: 0, trainedSkills: [], hitPoints: 0, mana: 0, defense: 0, penalty: 0, movement: 0, damageReduction: 0 }
+  const acc: AggregatedModifiers = { attributes: {}, skills: {}, attack: 0, damage: '', allSkills: 0, resistance: 0, trainedSkills: [], hitPoints: 0, mana: 0, defense: 0, penalty: 0, movement: 0, damageReduction: 0 }
+  const damageParts: Array<string | number> = []
   for (const effect of effects) {
     if (!effect.isActive()) continue
     const m = effect.modifiers
@@ -143,7 +144,7 @@ export function aggregateActiveModifiers(
     for (const [k, v] of Object.entries(m.skills)) acc.skills[k] = (acc.skills[k] ?? 0) + resolveValue(v, ctx)
     for (const id of m.trainedSkills ?? []) if (!acc.trainedSkills.includes(id)) acc.trainedSkills.push(id)
     acc.attack += resolveValue(m.attack ?? 0, ctx)
-    acc.damage += resolveValue(m.damage ?? 0, ctx)
+    damageParts.push(m.damage ?? 0)
     acc.allSkills += resolveValue(m.allSkills ?? 0, ctx)
     acc.resistance += resolveValue(m.resistance ?? 0, ctx)
     acc.hitPoints += resolveValue(m.hitPoints, ctx)
@@ -153,12 +154,14 @@ export function aggregateActiveModifiers(
     acc.movement += resolveValue(m.movement ?? 0, ctx)
     acc.damageReduction += resolveValue(m.damageReduction ?? 0, ctx)
   }
+  acc.damage = mergeDamage(damageParts, ctx)
   return acc
 }
 
 export interface EffectContribution {
   name: string
-  value: number
+  /** Número (mostrado com sinal) ou texto já formatado (ex.: expressão de dano). */
+  value: number | string
 }
 
 /**
@@ -175,6 +178,20 @@ export function effectContributions(
     .filter((e) => e.isActive())
     .map((e) => ({ name: e.name, value: resolveValue(selector(e.modifiers), ctx) }))
     .filter((c) => c.value !== 0)
+}
+
+/**
+ * Lista os efeitos ativos que somam dano, com a expressão de dano de cada um
+ * (ex.: "1d8", "+2"), para o tooltip de proveniência do dano.
+ */
+export function effectDamageContributions(
+  character: Character,
+  ctx: FormulaContext = ZERO_CTX,
+): EffectContribution[] {
+  return collectEffects(character)
+    .filter((e) => e.isActive())
+    .map((e) => ({ name: e.name, value: mergeDamage([e.modifiers.damage ?? 0], ctx) }))
+    .filter((c) => c.value !== '' && c.value !== '0')
 }
 
 /**

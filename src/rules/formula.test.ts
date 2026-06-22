@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { resolveDamage, resolveValue, type FormulaContext } from './formula'
+import { mergeDamage, resolveDamage, resolveValue, type FormulaContext } from './formula'
 
 const ctx: FormulaContext = {
   attributes: { forca: 1, destreza: 2, constituicao: 0, inteligencia: 4, sabedoria: 0, carisma: 3 },
@@ -56,5 +56,27 @@ describe('resolveDamage', () => {
     expect(resolveDamage('1d6+1d4+@des', dmgCtx)).toBe('1d6+1d4+1')
     expect(resolveDamage('@for+3', dmgCtx)).toBe('5') // sem dados → número
     expect(resolveDamage('', dmgCtx)).toBe('')
+  })
+})
+
+describe('mergeDamage', () => {
+  const dmgCtx: FormulaContext = {
+    attributes: { forca: 2, destreza: 1, constituicao: 0, inteligencia: 0, sabedoria: 0, carisma: 3 },
+    level: 4,
+  }
+
+  it('soma dados do mesmo tipo', () => {
+    expect(mergeDamage(['1d8', '1d8'], dmgCtx)).toBe('2d8')
+    expect(mergeDamage(['1d8', '1d8+1d4+@car'], dmgCtx)).toBe('2d8+1d4+3') // Car 3
+  })
+
+  it('mescla dados diferentes (maior primeiro) e numéricos', () => {
+    expect(mergeDamage(['1d6', '1d8+2'], dmgCtx)).toBe('1d8+1d6+2')
+    expect(mergeDamage(['2', 3], dmgCtx)).toBe('5')
+  })
+
+  it('ignora partes vazias', () => {
+    expect(mergeDamage(['1d8', '', 0], dmgCtx)).toBe('1d8')
+    expect(mergeDamage([], dmgCtx)).toBe('')
   })
 })

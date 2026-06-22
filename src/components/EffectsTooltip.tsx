@@ -19,7 +19,10 @@ export function EffectsTooltip({ contributions, children }: Props) {
       <span className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-1 hidden -translate-x-1/2 whitespace-nowrap rounded-md border border-[var(--card-border)] bg-stone-900 px-2 py-1 text-left text-xs font-normal text-stone-200 shadow-lg group-hover:block">
         {contributions.map((c, i) => (
           <span key={i} className="block">
-            <span className="font-semibold text-tormenta-300">{signed(c.value)}</span> {c.name}
+            <span className="font-semibold text-tormenta-300">
+              {typeof c.value === 'number' ? signed(c.value) : c.value}
+            </span>{' '}
+            {c.name}
           </span>
         ))}
       </span>
