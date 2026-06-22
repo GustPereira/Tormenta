@@ -22,7 +22,14 @@ interface Props {
 }
 
 function summarize(a: Ability): string {
-  return `Nível ${a.level} · ${a.mp} PM · ${a.acao[0] ?? 'Ação Padrão'} · ${a.duration}`
+  return [
+    `Nível ${a.level}`,
+    a.mp > 0 ? `${a.mp} PM` : null,
+    a.acao[0] ?? 'Ação Padrão',
+    a.duration,
+  ]
+    .filter(Boolean)
+    .join(' · ')
 }
 
 export function AbilitiesPanel({ character, update }: Props) {
