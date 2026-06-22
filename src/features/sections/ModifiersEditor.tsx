@@ -35,6 +35,12 @@ export function ModifiersEditor({ modifiers, onChange }: Props) {
     onChange({ ...modifiers, skills })
   }
 
+  const trainedSkills = modifiers.trainedSkills ?? []
+  const addTrained = (skillId: string) =>
+    onChange({ ...modifiers, trainedSkills: [...trainedSkills, skillId] })
+  const removeTrained = (skillId: string) =>
+    onChange({ ...modifiers, trainedSkills: trainedSkills.filter((s) => s !== skillId) })
+
   return (
     <div className="space-y-3">
       <p className="text-[11px] text-stone-500">{FORMULA_HINT}</p>
@@ -92,6 +98,38 @@ export function ModifiersEditor({ modifiers, onChange }: Props) {
           >
             <option value="">+ adicionar perícia…</option>
             {SKILLS.filter((s) => !(s.id in modifiers.skills)).map((s) => (
+              <option key={s.id} value={s.id}>{s.name}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <div className="mb-1 text-xs font-medium uppercase tracking-wide text-stone-400">
+          Perícias treinadas
+        </div>
+        <p className="mb-1 text-[11px] text-stone-500">
+          Torna a perícia treinada (mesma regra da perícia de classe), enquanto o efeito estiver ativo.
+        </p>
+        <div className="space-y-1">
+          {trainedSkills.map((skillId) => (
+            <div key={skillId} className="flex items-center gap-2">
+              <span className="flex-1 text-sm text-[var(--text)]">
+                {SKILLS_BY_ID[skillId]?.name ?? skillId}
+              </span>
+              <Button variant="ghost" onClick={() => removeTrained(skillId)} aria-label="Remover perícia treinada">✕</Button>
+            </div>
+          ))}
+          <select
+            value=""
+            onChange={(e) => {
+              if (e.target.value) addTrained(e.target.value)
+            }}
+            className={inputClass + ' text-sm'}
+            aria-label="Adicionar perícia treinada"
+          >
+            <option value="">+ tornar perícia treinada…</option>
+            {SKILLS.filter((s) => !trainedSkills.includes(s.id)).map((s) => (
               <option key={s.id} value={s.id}>{s.name}</option>
             ))}
           </select>

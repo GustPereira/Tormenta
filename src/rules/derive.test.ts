@@ -7,7 +7,7 @@ function build(overrides: Partial<Character>): Character {
 }
 
 const ZERO_MODS: ItemModifiers = {
-  attributes: {}, skills: {}, attack: 0, allSkills: 0, resistance: 0, hitPoints: 0, mana: 0, defense: 0, penalty: 0, movement: 0, damageReduction: 0,
+  attributes: {}, skills: {}, attack: 0, allSkills: 0, resistance: 0, trainedSkills: [], hitPoints: 0, mana: 0, defense: 0, penalty: 0, movement: 0, damageReduction: 0,
 }
 
 describe('totalLevel', () => {
@@ -97,7 +97,7 @@ describe('deriveCharacter', () => {
           proficiency: '',
           activeEffect: true,
           notes: '',
-          modifiers: { attributes: { forca: 2 }, skills: { atletismo: 3 }, attack: 0, allSkills: 0, resistance: 0, hitPoints: 5, mana: 2, defense: 1, penalty: 0, movement: 0, damageReduction: 2 },
+          modifiers: { attributes: { forca: 2 }, skills: { atletismo: 3 }, attack: 0, allSkills: 0, resistance: 0, trainedSkills: [], hitPoints: 5, mana: 2, defense: 1, penalty: 0, movement: 0, damageReduction: 2 },
         },
         {
           id: 'i2',
@@ -108,7 +108,7 @@ describe('deriveCharacter', () => {
           proficiency: '',
           activeEffect: false,
           notes: '',
-          modifiers: { attributes: { forca: 99 }, skills: {}, attack: 0, allSkills: 0, resistance: 0, hitPoints: 999, mana: 0, defense: 0, penalty: 0, movement: 0, damageReduction: 0 },
+          modifiers: { attributes: { forca: 99 }, skills: {}, attack: 0, allSkills: 0, resistance: 0, trainedSkills: [], hitPoints: 999, mana: 0, defense: 0, penalty: 0, movement: 0, damageReduction: 0 },
         },
       ],
     })
@@ -142,7 +142,7 @@ describe('deriveCharacter', () => {
           proficiency: 'Pesadas',
           activeEffect: true,
           notes: '',
-          modifiers: { attributes: {}, skills: {}, attack: 0, allSkills: 0, resistance: 0, hitPoints: 0, mana: 0, defense: 10, penalty: -5, movement: -3, damageReduction: 0 },
+          modifiers: { attributes: {}, skills: {}, attack: 0, allSkills: 0, resistance: 0, trainedSkills: [], hitPoints: 0, mana: 0, defense: 10, penalty: -5, movement: -3, damageReduction: 0 },
         },
       ],
     })
@@ -164,7 +164,7 @@ describe('deriveCharacter', () => {
           id: 'e',
           name: 'Inspiração',
           active: true,
-          modifiers: { attributes: {}, skills: { atletismo: '@car' }, attack: 0, allSkills: 0, resistance: 0, hitPoints: 0, mana: 0, defense: 0, penalty: 0, movement: 0, damageReduction: 0 },
+          modifiers: { attributes: {}, skills: { atletismo: '@car' }, attack: 0, allSkills: 0, resistance: 0, trainedSkills: [], hitPoints: 0, mana: 0, defense: 0, penalty: 0, movement: 0, damageReduction: 0 },
         },
       ],
     })
@@ -255,6 +255,27 @@ describe('deriveCharacter', () => {
     expect(d.globalSkillBonus).toBe(2)
     // Atletismo (não treinada): ½ nível 0 + For 0 + geral 2 = 2
     expect(d.skills.find((s) => s.id === 'atletismo')!.total).toBe(2)
+  })
+
+  it('efeito ativo torna uma perícia treinada (regra de perícia de classe)', () => {
+    const c = build({
+      classes: [{ classId: 'guerreiro', level: 1 }],
+      effects: [{ id: 'e', name: 'Foco', active: true, modifiers: { ...ZERO_MODS, trainedSkills: ['ladinagem'] } }],
+    })
+    const lad = deriveCharacter(c).skills.find((s) => s.id === 'ladinagem')!
+    expect(lad.trained).toBe(true)
+    expect(lad.granted).toBe(true) // não pode desmarcar, igual perícia de classe
+    expect(lad.unusable).toBe(false) // ladinagem é só-treinada, agora utilizável
+    // ½ nível 0 + Des 0 + treino +2 => 2
+    expect(lad.total).toBe(2)
+  })
+
+  it('efeito inativo não torna a perícia treinada', () => {
+    const c = build({
+      classes: [{ classId: 'guerreiro', level: 1 }],
+      effects: [{ id: 'e', name: 'Foco', active: false, modifiers: { ...ZERO_MODS, trainedSkills: ['ladinagem'] } }],
+    })
+    expect(deriveCharacter(c).skills.find((s) => s.id === 'ladinagem')!.trained).toBe(false)
   })
 
   it('modificador de resistência só soma em Fortitude, Reflexos e Vontade', () => {

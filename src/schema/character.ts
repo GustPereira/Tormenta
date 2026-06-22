@@ -21,6 +21,7 @@ export const ACTION_KEYS = [
   'Reação',
   'Movimento',
   'Completa',
+  'Passivo',
 ] as const
 
 export type AttributeKey = (typeof ATTRIBUTE_KEYS)[number]
@@ -73,6 +74,8 @@ export const itemModifiersSchema = z.object({
   allSkills: modValueSchema.default(0),
   /** Soma às perícias de resistência (Fortitude, Reflexos, Vontade). */
   resistance: modValueSchema.default(0),
+  /** Perícias que o efeito torna TREINADAS (mesma regra de perícia de classe). */
+  trainedSkills: z.array(z.string()).default([]),
   /** Soma ao PV máximo. */
   hitPoints: modValueSchema.default(0),
   /** Soma ao PM máximo. */
@@ -93,6 +96,7 @@ export const EMPTY_ITEM_MODIFIERS: ItemModifiers = {
   attack: 0,
   allSkills: 0,
   resistance: 0,
+  trainedSkills: [],
   hitPoints: 0,
   mana: 0,
   defense: 0,

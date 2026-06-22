@@ -155,6 +155,8 @@ export function deriveCharacter(character: Character): DerivedCharacter {
     CLASSES_BY_ID[firstClass.classId]?.pericasFixas.forEach((id) => grantedSkills.add(id))
   }
   resolveOrigin(character)?.pericasFixas.forEach((id) => grantedSkills.add(id))
+  // Perícias tornadas treinadas por efeitos ativos (mesma regra de perícia de classe).
+  mods.trainedSkills.forEach((id) => grantedSkills.add(id))
 
   // Bônus gerais (de efeitos/itens/habilidades) somados a todas as perícias e ataques.
   const globalSkillBonus = mods.allSkills

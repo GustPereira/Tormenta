@@ -97,6 +97,8 @@ export interface AggregatedModifiers {
   allSkills: number
   /** Bônus somado às perícias de resistência (Fortitude, Reflexos, Vontade). */
   resistance: number
+  /** Perícias tornadas treinadas pelos efeitos ativos (regra de perícia de classe). */
+  trainedSkills: string[]
   hitPoints: number
   mana: number
   defense: number
@@ -122,12 +124,13 @@ export function aggregateActiveModifiers(
   effects: Effect[],
   ctx: FormulaContext = ZERO_CTX,
 ): AggregatedModifiers {
-  const acc: AggregatedModifiers = { attributes: {}, skills: {}, attack: 0, allSkills: 0, resistance: 0, hitPoints: 0, mana: 0, defense: 0, penalty: 0, movement: 0, damageReduction: 0 }
+  const acc: AggregatedModifiers = { attributes: {}, skills: {}, attack: 0, allSkills: 0, resistance: 0, trainedSkills: [], hitPoints: 0, mana: 0, defense: 0, penalty: 0, movement: 0, damageReduction: 0 }
   for (const effect of effects) {
     if (!effect.isActive()) continue
     const m = effect.modifiers
     for (const [k, v] of Object.entries(m.attributes)) acc.attributes[k] = (acc.attributes[k] ?? 0) + resolveValue(v, ctx)
     for (const [k, v] of Object.entries(m.skills)) acc.skills[k] = (acc.skills[k] ?? 0) + resolveValue(v, ctx)
+    for (const id of m.trainedSkills ?? []) if (!acc.trainedSkills.includes(id)) acc.trainedSkills.push(id)
     acc.attack += resolveValue(m.attack ?? 0, ctx)
     acc.allSkills += resolveValue(m.allSkills ?? 0, ctx)
     acc.resistance += resolveValue(m.resistance ?? 0, ctx)
@@ -199,6 +202,9 @@ export function describeModifiers(m: ItemModifiers): string {
   for (const [id, v] of Object.entries(m.skills)) {
     const s = formatModValue(v)
     if (s) parts.push(`${SKILLS_BY_ID[id]?.name ?? id} ${s}`)
+  }
+  for (const id of m.trainedSkills ?? []) {
+    parts.push(`${SKILLS_BY_ID[id]?.name ?? id} (treinada)`)
   }
   return parts.join(', ') || 'sem modificadores'
 }
