@@ -23,11 +23,18 @@ export function EffectsPanel({ character, update }: Props) {
   const [lastAddedId, setLastAddedId] = useState<string | null>(null)
   const activeItemEffects = character.inventory.filter((i) => i.activeEffect)
   const abilityEffects = character.abilities.filter((a) => a.hasEffect)
+  const spellEffects = character.spells.filter((s) => s.hasEffect)
 
   const setAbilityActive = (id: string, active: boolean) =>
     update((c) => ({
       ...c,
       abilities: c.abilities.map((a) => (a.id === id ? { ...a, effectActive: active } : a)),
+    }))
+
+  const setSpellActive = (id: string, active: boolean) =>
+    update((c) => ({
+      ...c,
+      spells: c.spells.map((s) => (s.id === id ? { ...s, effectActive: active } : s)),
     }))
 
   const setEffect = (id: string, patch: Partial<EffectData>) =>
@@ -112,6 +119,38 @@ export function EffectsPanel({ character, update }: Props) {
                     <span className="ml-2 text-xs uppercase text-stone-500">habilidade</span>
                   </div>
                   <div className="text-sm text-stone-400">{describeModifiers(a.modifiers)}</div>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Panel>
+
+      <Panel title="Efeitos de magias">
+        {spellEffects.length === 0 ? (
+          <p className="text-sm text-stone-500">
+            Nenhuma magia com efeito. Marque "Tem efeito" numa magia na aba Principal.
+          </p>
+        ) : (
+          <ul className="space-y-2">
+            {spellEffects.map((s) => (
+              <li
+                key={s.id}
+                className="flex items-center gap-2 rounded-md border border-[var(--card-border)] bg-[var(--card-bg)] px-3 py-2"
+              >
+                <input
+                  type="checkbox"
+                  checked={s.effectActive}
+                  onChange={(e) => setSpellActive(s.id, e.target.checked)}
+                  className="h-4 w-4 accent-tormenta-500"
+                  aria-label={`Ativar efeito de ${s.name || 'magia'}`}
+                />
+                <div className="flex-1">
+                  <div className="font-medium text-[var(--text)]">
+                    {s.name || 'Magia sem nome'}
+                    <span className="ml-2 text-xs uppercase text-stone-500">magia</span>
+                  </div>
+                  <div className="text-sm text-stone-400">{describeModifiers(s.modifiers)}</div>
                 </div>
               </li>
             ))}

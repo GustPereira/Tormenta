@@ -44,12 +44,14 @@ export function IdentityHeader({ character, update }: Props) {
   // Encerrar cena: desativa efeitos de duração "Cena" e reseta recursos marcados.
   const hasSceneActive =
     character.abilities.some((a) => a.duration === 'Cena' && a.effectActive) ||
+    character.spells.some((s) => s.hasEffect && s.duration === 'Cena' && s.effectActive) ||
     character.effects.some((e) => e.duration === 'Cena' && e.active) ||
     character.resources.some((r) => r.resetsOnScene && r.current !== resetValue(r))
   const endScene = () =>
     update((c) => ({
       ...c,
       abilities: c.abilities.map((a) => (a.duration === 'Cena' ? { ...a, effectActive: false } : a)),
+      spells: c.spells.map((s) => (s.duration === 'Cena' ? { ...s, effectActive: false } : s)),
       effects: c.effects.map((e) => (e.duration === 'Cena' ? { ...e, active: false } : e)),
       resources: c.resources.map((r) =>
         r.resetsOnScene ? { ...r, current: resetValue(r) } : r,

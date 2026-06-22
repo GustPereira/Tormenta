@@ -6,6 +6,7 @@ import {
   type Character,
   type InventoryItem,
   type ItemModifiers,
+  type Spell,
 } from '../schema'
 import { isFormula, mergeDamage, resolveValue, type FormulaContext } from './formula'
 
@@ -97,6 +98,26 @@ export class AbilityEffect extends Effect {
   }
 }
 
+/** Efeito proveniente de uma magia (ativável na aba de efeitos). */
+export class SpellEffect extends Effect {
+  constructor(spell: Spell) {
+    super({
+      id: spell.id,
+      name: spell.name || 'Magia sem nome',
+      active: spell.effectActive,
+      modifiers: spell.modifiers,
+    })
+  }
+
+  override get editable(): boolean {
+    return false
+  }
+
+  override get sourceLabel(): string {
+    return 'Magia'
+  }
+}
+
 export interface AggregatedModifiers {
   attributes: Record<string, number>
   skills: Record<string, number>
@@ -126,6 +147,7 @@ export function collectEffects(character: Character): Effect[] {
   return [
     ...character.inventory.map((item) => new ItemEffect(item)),
     ...character.abilities.filter((a) => a.hasEffect).map((a) => new AbilityEffect(a)),
+    ...character.spells.filter((s) => s.hasEffect).map((s) => new SpellEffect(s)),
     ...character.effects.map((data) => new Effect(data)),
   ]
 }

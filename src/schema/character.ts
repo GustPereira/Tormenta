@@ -186,6 +186,11 @@ export const spellSchema = z.object({
   /** Descrição do efeito da magia. */
   effect: z.string().default(''),
   prepared: z.boolean().default(false),
+  /** Se a magia fornece um efeito (modificadores) ativável. */
+  hasEffect: z.boolean().default(false),
+  /** Se o efeito da magia está ativo. */
+  effectActive: z.boolean().default(false),
+  modifiers: itemModifiersSchema.default(EMPTY_ITEM_MODIFIERS),
   notes: z.string().default(''),
 })
 export type Spell = z.infer<typeof spellSchema>

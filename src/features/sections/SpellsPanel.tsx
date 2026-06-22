@@ -3,7 +3,15 @@ import { Button } from '../../components/Button'
 import { EditableCard } from '../../components/EditableCard'
 import { Panel } from '../../components/Panel'
 import { inputClass } from '../../components/ui'
-import { DURATION_KEYS, type Character, type DurationKey, type Spell } from '../../schema'
+import {
+  DURATION_KEYS,
+  EMPTY_ITEM_MODIFIERS,
+  type Character,
+  type DurationKey,
+  type ItemModifiers,
+  type Spell,
+} from '../../schema'
+import { ModifiersEditor } from './ModifiersEditor'
 
 interface Props {
   character: Character
@@ -25,7 +33,20 @@ export function SpellsPanel({ character, update }: Props) {
       ...c,
       spells: [
         ...c.spells,
-        { id, name: '', circle, pm: PM_BY_CIRCLE[circle] ?? 1, action: 'Padrão', duration: 'Instantânea', effect: '', prepared: false, notes: '' },
+        {
+          id,
+          name: '',
+          circle,
+          pm: PM_BY_CIRCLE[circle] ?? 1,
+          action: 'Padrão',
+          duration: 'Instantânea',
+          effect: '',
+          prepared: false,
+          hasEffect: false,
+          effectActive: false,
+          modifiers: { ...EMPTY_ITEM_MODIFIERS, attributes: {}, skills: {} },
+          notes: '',
+        },
       ],
     }))
   }
@@ -60,6 +81,20 @@ export function SpellsPanel({ character, update }: Props) {
                       active={s.prepared}
                       onActiveChange={(v) => setField(s.id, { prepared: v })}
                       activeLabel="Preparada"
+                      headerExtra={
+                        s.hasEffect ? (
+                          <label className="flex items-center gap-1 text-xs text-stone-400">
+                            <input
+                              type="checkbox"
+                              checked={s.effectActive}
+                              onChange={(e) => setField(s.id, { effectActive: e.target.checked })}
+                              className="h-4 w-4 accent-tormenta-500"
+                              aria-label="Ativar efeito"
+                            />
+                            Efeito
+                          </label>
+                        ) : undefined
+                      }
                       title={s.name || 'Magia sem nome'}
                       summary={`${s.pm} PM · ${s.action} · ${s.duration}`}
                       details={
@@ -147,10 +182,27 @@ export function SpellsPanel({ character, update }: Props) {
                         value={s.notes}
                         placeholder="Anotações"
                         onChange={(e) => setField(s.id, { notes: e.target.value })}
-                        className={inputClass + ' w-full resize-y text-sm'}
+                        className={inputClass + ' mb-2 w-full resize-y text-sm'}
                         rows={2}
                         aria-label="Anotações da magia"
                       />
+                      <label className="flex items-center gap-2 text-xs text-stone-400">
+                        <input
+                          type="checkbox"
+                          checked={s.hasEffect}
+                          onChange={(e) => setField(s.id, { hasEffect: e.target.checked })}
+                          className="h-4 w-4 accent-tormenta-500"
+                        />
+                        Tem efeito (aparece na aba Efeitos)
+                      </label>
+                      {s.hasEffect && (
+                        <div className="mt-2 border-t border-stone-800 pt-2">
+                          <ModifiersEditor
+                            modifiers={s.modifiers}
+                            onChange={(m: ItemModifiers) => setField(s.id, { modifiers: m })}
+                          />
+                        </div>
+                      )}
                     </EditableCard>
                   ))}
                 </ul>
