@@ -24,7 +24,7 @@ export const ACTION_KEYS = [
   'Passivo',
 ] as const
 
-export const DURATION_KEYS = ['Sustentada', 'Cena', 'Instantânea'] as const
+export const DURATION_KEYS = ['Sustentada', 'Cena', 'Rodada', 'Instantânea'] as const
 
 export type AttributeKey = (typeof ATTRIBUTE_KEYS)[number]
 export type ActionKey = (typeof ACTION_KEYS)[number]
