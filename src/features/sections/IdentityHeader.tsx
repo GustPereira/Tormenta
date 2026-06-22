@@ -37,15 +37,23 @@ export function IdentityHeader({ character, update }: Props) {
   const removeClass = (i: number) =>
     update((c) => ({ ...c, classes: c.classes.filter((_, idx) => idx !== i) }))
 
-  // Encerrar cena: desativa todos os efeitos (habilidades e avulsos) de duração "Cena".
+  // Valor de um recurso após resetar (zerar ou encher até o máximo).
+  const resetValue = (r: Character['resources'][number]) =>
+    r.resetTo === 'max' ? r.max ?? r.current : 0
+
+  // Encerrar cena: desativa efeitos de duração "Cena" e reseta recursos marcados.
   const hasSceneActive =
     character.abilities.some((a) => a.duration === 'Cena' && a.effectActive) ||
-    character.effects.some((e) => e.duration === 'Cena' && e.active)
+    character.effects.some((e) => e.duration === 'Cena' && e.active) ||
+    character.resources.some((r) => r.resetsOnScene && r.current !== resetValue(r))
   const endScene = () =>
     update((c) => ({
       ...c,
       abilities: c.abilities.map((a) => (a.duration === 'Cena' ? { ...a, effectActive: false } : a)),
       effects: c.effects.map((e) => (e.duration === 'Cena' ? { ...e, active: false } : e)),
+      resources: c.resources.map((r) =>
+        r.resetsOnScene ? { ...r, current: resetValue(r) } : r,
+      ),
     }))
 
   const derived = deriveCharacter(character)

@@ -129,6 +129,23 @@ export const effectSchema = z.object({
 })
 export type EffectData = z.infer<typeof effectSchema>
 
+/**
+ * Recurso rastreável customizado pelo jogador (usos diários, cargas, munição,
+ * pontos de uma habilidade…). Mostrado no painel "Recursos".
+ */
+export const resourceSchema = z.object({
+  id: z.string(),
+  title: z.string().default(''),
+  current: z.number().int().default(0),
+  /** Máximo opcional (null = sem teto). */
+  max: z.number().int().nullable().default(null),
+  /** Se o recurso é restaurado ao encerrar a cena. */
+  resetsOnScene: z.boolean().default(false),
+  /** Valor aplicado ao resetar: zerar ou encher até o máximo. */
+  resetTo: z.enum(['zero', 'max']).default('zero'),
+})
+export type Resource = z.infer<typeof resourceSchema>
+
 /** Origem personalizada cadastrada pelo jogador. */
 export const customOriginSchema = z.object({
   id: z.string(),
@@ -290,6 +307,8 @@ export const characterSchema = z.object({
   inventory: z.array(inventoryItemSchema).default([]),
   /** Efeitos avulsos (não vindos de itens), editáveis pelo jogador. */
   effects: z.array(effectSchema).default([]),
+  /** Recursos rastreáveis customizados (usos, cargas, munição…). */
+  resources: z.array(resourceSchema).default([]),
   /** Dinheiro em Tibares (T$). */
   money: z.number().min(0).default(0),
 
@@ -346,6 +365,7 @@ export function createBlankCharacter(name = 'Nova Ficha'): Character {
     attacks: [],
     inventory: [],
     effects: [],
+    resources: [],
     money: 0,
     currentHitPoints: null,
     currentMana: null,
