@@ -95,6 +95,7 @@ describe('deriveCharacter', () => {
           spaces: 1,
           equipped: true,
           equipmentType: '',
+          attack: null,
           proficiency: '',
           activeEffect: true,
           notes: '',
@@ -107,6 +108,7 @@ describe('deriveCharacter', () => {
           spaces: 0,
           equipped: false,
           equipmentType: '',
+          attack: null,
           proficiency: '',
           activeEffect: false,
           notes: '',
@@ -142,6 +144,7 @@ describe('deriveCharacter', () => {
           spaces: 0,
           equipped: true,
           equipmentType: 'armadura',
+          attack: null,
           proficiency: 'Pesadas',
           activeEffect: true,
           notes: '',
@@ -185,13 +188,13 @@ describe('deriveCharacter', () => {
         // Escudo equipado: sua defesa (2) entra direto; @escudo = 2.
         {
           id: 's2', name: 'Escudo Pesado', quantity: 1, spaces: 1,
-          equipped: true, equipmentType: 'escudo', proficiency: 'Escudos', activeEffect: false,
+          equipped: true, equipmentType: 'escudo', attack: null, proficiency: 'Escudos', activeEffect: false,
           notes: '', modifiers: { ...ZERO_MODS, defense: 2 },
         },
         // Escudo guardado (não equipado): não conta.
         {
           id: 's1', name: 'Escudo Leve', quantity: 1, spaces: 1,
-          equipped: false, equipmentType: 'escudo', proficiency: 'Escudos', activeEffect: false,
+          equipped: false, equipmentType: 'escudo', attack: null, proficiency: 'Escudos', activeEffect: false,
           notes: '', modifiers: { ...ZERO_MODS, defense: 1 },
         },
       ],

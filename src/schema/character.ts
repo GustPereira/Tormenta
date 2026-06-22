@@ -161,6 +161,20 @@ export const EQUIPMENT_TYPES = ['', 'escudo', 'armadura'] as const
 export const equipmentTypeSchema = z.enum(EQUIPMENT_TYPES)
 export type EquipmentType = (typeof EQUIPMENT_TYPES)[number]
 
+/** Um ataque/conjuração da tabela de ataques (também embutido em armas). */
+export const attackSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  /** Base de perícia/atributo somada ao bônus (ex.: 'luta-for', 'magico'). */
+  base: z.string().default(''),
+  attackBonus: z.string().default(''),
+  damage: z.string().default(''),
+  critical: z.string().default(''),
+  damageType: z.string().default(''),
+  range: z.string().default(''),
+})
+export type Attack = z.infer<typeof attackSchema>
+
 export const inventoryItemSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -170,6 +184,8 @@ export const inventoryItemSchema = z.object({
   equipped: z.boolean().default(false),
   /** Tipo de equipamento (escudo/armadura) — alimenta a Defesa e o token @escudo. */
   equipmentType: equipmentTypeSchema.default(''),
+  /** Ataque embutido (item é uma arma quando != null). Aparece nos Ataques quando equipada. */
+  attack: attackSchema.nullable().default(null),
   /** Proficiência exigida (ex.: Leves, Pesadas, Escudos). Informativo. */
   proficiency: z.string().default(''),
   /** Se verdadeiro, os modificadores do item são aplicados aos valores derivados. */
@@ -201,20 +217,6 @@ export const spellSchema = z.object({
   notes: z.string().default(''),
 })
 export type Spell = z.infer<typeof spellSchema>
-
-/** Um ataque/conjuração da tabela de ataques. */
-export const attackSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  /** Base de perícia/atributo somada ao bônus (ex.: 'luta-for', 'magico'). */
-  base: z.string().default(''),
-  attackBonus: z.string().default(''),
-  damage: z.string().default(''),
-  critical: z.string().default(''),
-  damageType: z.string().default(''),
-  range: z.string().default(''),
-})
-export type Attack = z.infer<typeof attackSchema>
 
 /** Uma habilidade/poder, agrupada por fonte (racial&origem ou classe&geral). */
 export const abilitySchema = z.object({

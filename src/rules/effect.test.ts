@@ -16,6 +16,7 @@ function item(over: Partial<InventoryItem>): InventoryItem {
     spaces: 0,
     equipped: false,
     equipmentType: '',
+    attack: null,
     proficiency: '',
     activeEffect: false,
     modifiers: { attributes: {}, skills: {}, attack: 0, damage: 0, allSkills: 0, resistance: 0, trainedSkills: [], hitPoints: 0, mana: 0, defense: 0, penalty: 0, movement: 0, damageReduction: 0 },

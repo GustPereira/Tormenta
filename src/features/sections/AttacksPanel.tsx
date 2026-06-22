@@ -1,107 +1,20 @@
-import { useState, type ReactNode } from 'react'
+import { useState } from 'react'
 import { Button } from '../../components/Button'
 import { EditableCard } from '../../components/EditableCard'
-import { EffectsTooltip } from '../../components/EffectsTooltip'
 import { Panel } from '../../components/Panel'
 import { inputClass } from '../../components/ui'
-import { ATTRIBUTE_LABELS } from '../../data'
-import { signed } from '../../lib/format'
 import {
   deriveCharacter,
-  effectContributions,
   effectDamageContributions,
-  halfLevel,
   mergeDamage,
-  resolveValue,
-  trainingBonus,
-  type DerivedCharacter,
-  type EffectContribution,
   type FormulaContext,
 } from '../../rules'
-import type { AttributeKey, Attack, Character } from '../../schema'
+import type { Attack, Character } from '../../schema'
+import { AttackBoxes, AttackFields, attackContributions, attackTotal } from './attackShared'
 
 interface Props {
   character: Character
   update: (updater: (c: Character) => Character) => void
-}
-
-const FIELDS: { key: keyof Attack; label: string }[] = [
-  { key: 'damage', label: 'Dano' },
-  { key: 'critical', label: 'Crítico' },
-]
-
-/** Tipos de dano do T20 (físicos + elementais). */
-const DAMAGE_TYPES = [
-  'Corte', 'Impacto', 'Perfuração',
-  'Ácido', 'Eletricidade', 'Essência', 'Fogo', 'Frio', 'Luz', 'Psíquico',
-]
-
-/** Alcances padrão. */
-const RANGES = ['Pessoal', 'Toque', 'Curto (9m)', 'Médio (30m)', 'Longo (90m)', 'Ilimitado']
-
-/** Bases de ataque: combinação de perícia + atributo somada ao bônus. */
-const ATTACK_BASES: { key: string; label: string }[] = [
-  { key: 'luta-for', label: 'Luta + FOR' },
-  { key: 'luta-des', label: 'Luta + DES' },
-  { key: 'pontaria-des', label: 'Pontaria + DES' },
-  { key: 'atuacao', label: 'Atuação' },
-  { key: 'magico', label: 'B. Mágico' },
-]
-
-const SKILL_BASES: Record<string, { skillId: string; skillName: string; attribute: AttributeKey }> = {
-  'luta-for': { skillId: 'luta', skillName: 'Luta', attribute: 'forca' },
-  'luta-des': { skillId: 'luta', skillName: 'Luta', attribute: 'destreza' },
-  'pontaria-des': { skillId: 'pontaria', skillName: 'Pontaria', attribute: 'destreza' },
-  atuacao: { skillId: 'atuacao', skillName: 'Atuação', attribute: 'carisma' },
-}
-
-/** Contribuições da base escolhida (½ nível, atributo, treino, efeitos). */
-function baseContributions(
-  base: string,
-  derived: DerivedCharacter,
-  character: Character,
-  ctx: FormulaContext,
-): EffectContribution[] {
-  if (!base) return []
-  const level = derived.totalLevel
-  const attrs = derived.finalAttributes
-
-  if (base === 'magico') {
-    const useInt = attrs.inteligencia >= attrs.carisma
-    return [
-      { name: '½ nível', value: halfLevel(level) },
-      {
-        name: useInt ? ATTRIBUTE_LABELS.inteligencia : ATTRIBUTE_LABELS.carisma,
-        value: useInt ? attrs.inteligencia : attrs.carisma,
-      },
-    ].filter((c) => c.value !== 0)
-  }
-
-  const cfg = SKILL_BASES[base]
-  if (!cfg) return []
-  const skill = derived.skills.find((s) => s.id === cfg.skillId)
-  const trained = skill?.trained ?? false
-  return [
-    { name: '½ nível', value: halfLevel(level) },
-    { name: ATTRIBUTE_LABELS[cfg.attribute], value: attrs[cfg.attribute] },
-    ...(trained ? [{ name: `Treino (${cfg.skillName})`, value: trainingBonus(level, true) }] : []),
-    ...effectContributions(character, (m) => resolveValue(m.skills[cfg.skillId] ?? 0, ctx), ctx),
-  ].filter((c) => c.value !== 0)
-}
-
-/** Lista completa de parcelas que somam o bônus final do ataque. */
-function attackContributions(
-  a: Attack,
-  derived: DerivedCharacter,
-  character: Character,
-  ctx: FormulaContext,
-): EffectContribution[] {
-  const manual = resolveValue(a.attackBonus, ctx)
-  return [
-    ...baseContributions(a.base, derived, character, ctx),
-    ...(manual !== 0 ? [{ name: 'Bônus', value: manual }] : []),
-    ...effectContributions(character, (m) => m.attack ?? 0, ctx),
-  ]
 }
 
 export function AttacksPanel({ character, update }: Props) {
@@ -131,19 +44,48 @@ export function AttacksPanel({ character, update }: Props) {
   const remove = (id: string) =>
     update((c) => ({ ...c, attacks: c.attacks.filter((a) => a.id !== id) }))
 
+  // Ataques de armas equipadas — aparecem no começo da lista (somente leitura;
+  // edite a arma no Inventário).
+  const weaponAttacks = character.inventory
+    .filter((it) => it.equipped && it.attack)
+    .map((it) => ({ item: it, attack: it.attack as Attack }))
+
+  const empty = character.attacks.length === 0 && weaponAttacks.length === 0
+
   return (
     <Panel
       title="Ataques & Conjurações"
       collapsible
       action={<Button variant="ghost" className="text-xs" onClick={add}>+ ataque</Button>}
     >
-      {character.attacks.length === 0 ? (
+      {empty ? (
         <p className="text-sm text-stone-500">Nenhum ataque.</p>
       ) : (
         <ul className="space-y-2">
+          {weaponAttacks.map(({ item, attack }) => {
+            const contribs = attackContributions(attack, derived, character, ctx)
+            return (
+              <li
+                key={item.id}
+                className="rounded-md border border-[var(--card-border)] bg-[var(--card-bg)] p-2"
+              >
+                <div className="mb-1 font-medium text-[var(--text)]">
+                  🗡 {item.name || attack.name || 'Arma'}
+                  <span className="ml-2 text-xs uppercase text-stone-500">arma equipada</span>
+                </div>
+                <AttackBoxes
+                  attack={attack}
+                  total={attackTotal(contribs)}
+                  contributions={contribs}
+                  damageText={mergeDamage([attack.damage, derived.globalDamageBonus], ctx)}
+                  damageContributions={effectDamageContributions(character, ctx)}
+                />
+              </li>
+            )
+          })}
+
           {character.attacks.map((a) => {
             const contribs = attackContributions(a, derived, character, ctx)
-            const total = contribs.reduce((s, c) => s + (typeof c.value === 'number' ? c.value : 0), 0)
             return (
               <EditableCard
                 key={a.id}
@@ -151,7 +93,7 @@ export function AttacksPanel({ character, update }: Props) {
                 summary={
                   <AttackBoxes
                     attack={a}
-                    total={total}
+                    total={attackTotal(contribs)}
                     contributions={contribs}
                     damageText={mergeDamage([a.damage, derived.globalDamageBonus], ctx)}
                     damageContributions={effectDamageContributions(character, ctx)}
@@ -170,79 +112,7 @@ export function AttacksPanel({ character, update }: Props) {
                     className={inputClass + ' w-full font-medium'}
                     aria-label="Nome do ataque"
                   />
-                  <div className="flex flex-wrap gap-3">
-                    <label className="flex items-center gap-1 text-xs text-stone-400">
-                      Base
-                      <select
-                        value={a.base}
-                        onChange={(e) => setField(a.id, 'base', e.target.value)}
-                        className={inputClass + ' w-36'}
-                        aria-label="Base do ataque"
-                      >
-                        <option value="">Nenhuma</option>
-                        {ATTACK_BASES.map((b) => (
-                          <option key={b.key} value={b.key}>
-                            {b.label}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-                    <label className="flex items-center gap-1 text-xs text-stone-400">
-                      Bônus
-                      <input
-                        type="text"
-                        value={a.attackBonus}
-                        placeholder="ex.: 4+@car"
-                        onChange={(e) => setField(a.id, 'attackBonus', e.target.value)}
-                        className={inputClass + ' w-24'}
-                        aria-label="Bônus do ataque"
-                      />
-                    </label>
-                    {FIELDS.map((f) => (
-                      <label key={f.key} className="flex items-center gap-1 text-xs text-stone-400">
-                        {f.label}
-                        <input
-                          type="text"
-                          value={a[f.key]}
-                          onChange={(e) => setField(a.id, f.key, e.target.value)}
-                          className={inputClass + ' w-24'}
-                          aria-label={`${f.label} do ataque`}
-                        />
-                      </label>
-                    ))}
-                    <label className="flex items-center gap-1 text-xs text-stone-400">
-                      Tipo
-                      <select
-                        value={a.damageType}
-                        onChange={(e) => setField(a.id, 'damageType', e.target.value)}
-                        className={inputClass + ' w-32'}
-                        aria-label="Tipo do ataque"
-                      >
-                        <option value="">—</option>
-                        {DAMAGE_TYPES.map((t) => (
-                          <option key={t} value={t}>
-                            {t}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-                    <label className="flex items-center gap-1 text-xs text-stone-400">
-                      Alcance
-                      <select
-                        value={a.range}
-                        onChange={(e) => setField(a.id, 'range', e.target.value)}
-                        className={inputClass + ' w-32'}
-                        aria-label="Alcance do ataque"
-                      >
-                        <option value="">—</option>
-                        {RANGES.map((r) => (
-                          <option key={r} value={r}>
-                            {r}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-                  </div>
+                  <AttackFields attack={a} onChange={(key, value) => setField(a.id, key, value)} />
                 </div>
               </EditableCard>
             )
@@ -250,55 +120,5 @@ export function AttacksPanel({ character, update }: Props) {
         </ul>
       )}
     </Panel>
-  )
-}
-
-/** Exibição (read-only): cada campo do ataque num box estilo atributo, fonte maior. */
-function AttackBoxes({
-  attack,
-  total,
-  contributions,
-  damageText,
-  damageContributions,
-}: {
-  attack: Attack
-  total: number
-  contributions: EffectContribution[]
-  damageText: string
-  damageContributions: EffectContribution[]
-}) {
-  const boxes: { label: string; value: ReactNode }[] = [
-    {
-      label: 'Ataque',
-      value: (
-        <EffectsTooltip contributions={contributions}>
-          <span>{signed(total)}</span>
-        </EffectsTooltip>
-      ),
-    },
-    {
-      label: 'Dano',
-      value: (
-        <EffectsTooltip contributions={damageContributions}>
-          <span>{damageText || '—'}</span>
-        </EffectsTooltip>
-      ),
-    },
-    { label: 'Crítico', value: attack.critical || '—' },
-    { label: 'Tipo', value: attack.damageType || '—' },
-    { label: 'Alcance', value: attack.range || '—' },
-  ]
-  return (
-    <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
-      {boxes.map((b) => (
-        <div
-          key={b.label}
-          className="flex flex-col items-center rounded-md border border-[var(--card-border)] bg-[var(--card-bg)] p-2"
-        >
-          <span className="text-xs uppercase text-stone-400">{b.label}</span>
-          <span className="font-display text-xl font-bold text-tormenta-400">{b.value}</span>
-        </div>
-      ))}
-    </div>
   )
 }

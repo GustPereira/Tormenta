@@ -7,11 +7,13 @@ import { ITEM_CATALOG, ITEM_CATALOG_CATEGORIES, type CatalogItem } from '../../d
 import { describeModifiers } from '../../rules'
 import {
   EMPTY_ITEM_MODIFIERS,
+  type Attack,
   type Character,
   type EquipmentType,
   type InventoryItem,
   type ItemModifiers,
 } from '../../schema'
+import { AttackFields } from './attackShared'
 import { ModifiersEditor } from './ModifiersEditor'
 
 /** Proficiências de itens de defesa. Define também o slot (escudo vs armadura). */
@@ -19,7 +21,15 @@ const DEFENSE_PROFICIENCIES = ['Leves', 'Pesadas', 'Escudos'] as const
 
 /** Categorias do catálogo que são itens de defesa (armadura/escudo). */
 const DEFENSE_CATEGORIES = ['Armaduras', 'Escudos']
-const OTHER_CATEGORIES = ITEM_CATALOG_CATEGORIES.filter((c) => !DEFENSE_CATEGORIES.includes(c))
+const WEAPON_CATEGORIES = ['Armas']
+const OTHER_CATEGORIES = ITEM_CATALOG_CATEGORIES.filter(
+  (c) => !DEFENSE_CATEGORIES.includes(c) && !WEAPON_CATEGORIES.includes(c),
+)
+
+/** Cria um ataque embutido em branco para uma arma. */
+function blankAttack(): Attack {
+  return { id: crypto.randomUUID(), name: '', base: '', attackBonus: '', damage: '', critical: '', damageType: '', range: '' }
+}
 
 /** Slot do item de defesa a partir da proficiência: Escudos → escudo; demais → armadura. */
 function slotForProficiency(proficiency: string): Exclude<EquipmentType, ''> {
@@ -30,6 +40,8 @@ function slotForProficiency(proficiency: string): Exclude<EquipmentType, ''> {
 function fromCatalog(c: CatalogItem): InventoryItem {
   const equipmentType: EquipmentType =
     c.category === 'Armaduras' ? 'armadura' : c.category === 'Escudos' ? 'escudo' : ''
+  const attack: Attack | null =
+    c.category === 'Armas' ? { ...blankAttack(), name: c.name, ...c.attack } : null
   return {
     id: crypto.randomUUID(),
     name: c.name,
@@ -37,6 +49,7 @@ function fromCatalog(c: CatalogItem): InventoryItem {
     spaces: c.spaces ?? 0,
     equipped: false,
     equipmentType,
+    attack,
     proficiency: c.proficiency ?? '',
     activeEffect: false,
     modifiers: { ...EMPTY_ITEM_MODIFIERS, attributes: {}, skills: {}, ...c.modifiers },
@@ -76,6 +89,18 @@ function summarizeDefense(item: InventoryItem): string {
   return parts.join(' · ')
 }
 
+function summarizeWeapon(item: InventoryItem): string {
+  const a = item.attack
+  const parts = [
+    a?.damage || null,
+    a?.damageType || null,
+    a?.range || null,
+    item.proficiency || null,
+    item.equipped && 'Equipada',
+  ].filter(Boolean)
+  return parts.join(' · ') || 'Arma'
+}
+
 export function InventoryPanel({ character, update }: Props) {
   const [lastAddedId, setLastAddedId] = useState<string | null>(null)
   const setItem = (id: string, patch: Partial<InventoryItem>) =>
@@ -87,6 +112,8 @@ export function InventoryPanel({ character, update }: Props) {
   const setModifiers = (id: string, modifiers: ItemModifiers) => setItem(id, { modifiers })
   const setModField = (item: InventoryItem, key: keyof ItemModifiers, value: number) =>
     setItem(item.id, { modifiers: { ...item.modifiers, [key]: value } })
+  const setAttackField = (item: InventoryItem, key: keyof Attack, value: string) =>
+    setItem(item.id, { attack: { ...(item.attack ?? blankAttack()), [key]: value } })
 
   // Equipar respeita o limite de 1 armadura + 1 escudo: ao equipar uma peça de
   // defesa, as outras do mesmo slot são desequipadas.
@@ -106,7 +133,7 @@ export function InventoryPanel({ character, update }: Props) {
   const setDefenseProficiency = (item: InventoryItem, proficiency: string) =>
     setItem(item.id, { proficiency, equipmentType: slotForProficiency(proficiency) })
 
-  const addItem = (defense: boolean) => {
+  const addItem = (kind: 'item' | 'defesa' | 'arma') => {
     const id = crypto.randomUUID()
     setLastAddedId(id)
     update((c) => ({
@@ -119,8 +146,9 @@ export function InventoryPanel({ character, update }: Props) {
           quantity: 1,
           spaces: 0,
           equipped: false,
-          equipmentType: defense ? 'armadura' : '',
-          proficiency: defense ? 'Leves' : '',
+          equipmentType: kind === 'defesa' ? 'armadura' : '',
+          attack: kind === 'arma' ? blankAttack() : null,
+          proficiency: kind === 'defesa' ? 'Leves' : '',
           activeEffect: false,
           modifiers: { ...EMPTY_ITEM_MODIFIERS, attributes: {}, skills: {} },
           notes: '',
@@ -136,7 +164,8 @@ export function InventoryPanel({ character, update }: Props) {
     update((c) => ({ ...c, inventory: c.inventory.filter((it) => it.id !== id) }))
 
   const defenseItems = character.inventory.filter((it) => it.equipmentType !== '')
-  const otherItems = character.inventory.filter((it) => it.equipmentType === '')
+  const weaponItems = character.inventory.filter((it) => it.equipmentType === '' && it.attack)
+  const otherItems = character.inventory.filter((it) => it.equipmentType === '' && !it.attack)
   const totalSpaces = character.inventory.reduce((s, it) => s + it.spaces * it.quantity, 0)
 
   const renderDefenseCard = (item: InventoryItem) => (
@@ -287,6 +316,67 @@ export function InventoryPanel({ character, update }: Props) {
     </EditableCard>
   )
 
+  const renderWeaponCard = (item: InventoryItem) => {
+    const attack = item.attack ?? blankAttack()
+    return (
+      <EditableCard
+        key={item.id}
+        headerExtra={<EquippedToggle item={item} onChange={setEquipped} />}
+        title={`${item.quantity}× ${item.name || 'Arma sem nome'}`}
+        summary={summarizeWeapon(item)}
+        details={item.notes || 'Sem descrição.'}
+        onDelete={() => remove(item.id)}
+        deleteName={item.name}
+        startEditing={item.id === lastAddedId}
+      >
+        <div className="space-y-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <QtyField item={item} setItem={setItem} />
+            <input
+              type="text"
+              value={item.name}
+              placeholder="Nome da arma"
+              onChange={(e) => setItem(item.id, { name: e.target.value })}
+              className={inputClass + ' min-w-40 flex-1 font-medium'}
+              aria-label="Nome da arma"
+            />
+            <SpacesField item={item} setItem={setItem} />
+            <label className="flex items-center gap-1 text-xs text-stone-400">
+              Proficiência
+              <input
+                type="text"
+                value={item.proficiency}
+                onChange={(e) => setItem(item.id, { proficiency: e.target.value })}
+                className={inputClass + ' w-28'}
+                aria-label="Proficiência"
+              />
+            </label>
+          </div>
+
+          <div className="rounded-md border border-stone-800 p-2">
+            <p className="mb-2 text-[11px] text-stone-500">Ataque (aparece nos Ataques quando equipada):</p>
+            <AttackFields attack={attack} onChange={(key, value) => setAttackField(item, key, value)} />
+          </div>
+
+          <textarea
+            value={item.notes}
+            placeholder="Descrição"
+            onChange={(e) => setItem(item.id, { notes: e.target.value })}
+            className={inputClass + ' w-full resize-y text-sm'}
+            rows={3}
+            aria-label="Descrição da arma"
+          />
+          <div className="border-t border-stone-800 pt-2">
+            <p className="mb-2 text-[11px] text-stone-500">
+              Efeitos adicionais (aplicados enquanto equipada):
+            </p>
+            <ModifiersEditor modifiers={item.modifiers} onChange={(m) => setModifiers(item.id, m)} />
+          </div>
+        </div>
+      </EditableCard>
+    )
+  }
+
   return (
     <Panel title="Inventário">
       <div className="mb-3 flex flex-wrap items-center gap-4 text-sm">
@@ -307,9 +397,21 @@ export function InventoryPanel({ character, update }: Props) {
       </div>
 
       <ItemGroup
+        title="Armas"
+        addLabel="+ arma"
+        onAdd={() => addItem('arma')}
+        catalogCategories={WEAPON_CATEGORIES}
+        onAddFromCatalog={addFromCatalog}
+        items={weaponItems}
+        renderCard={renderWeaponCard}
+        emptyText='Nenhuma arma. Use "+ arma".'
+        className="mb-4"
+      />
+
+      <ItemGroup
         title="Itens de Defesa"
         addLabel="+ defesa"
-        onAdd={() => addItem(true)}
+        onAdd={() => addItem('defesa')}
         catalogCategories={DEFENSE_CATEGORIES}
         onAddFromCatalog={addFromCatalog}
         items={defenseItems}
@@ -321,7 +423,7 @@ export function InventoryPanel({ character, update }: Props) {
       <ItemGroup
         title="Itens"
         addLabel="+ item"
-        onAdd={() => addItem(false)}
+        onAdd={() => addItem('item')}
         catalogCategories={OTHER_CATEGORIES}
         onAddFromCatalog={addFromCatalog}
         items={otherItems}
