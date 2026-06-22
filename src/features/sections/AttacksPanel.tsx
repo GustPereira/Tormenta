@@ -154,6 +154,7 @@ export function AttacksPanel({ character, update }: Props) {
                     total={total}
                     contributions={contribs}
                     damageText={resolveDamage(withDamageBonus(a.damage, derived.globalDamageBonus), ctx)}
+                    damageContributions={effectContributions(character, (m) => m.damage, ctx)}
                   />
                 }
                 onDelete={() => remove(a.id)}
@@ -258,11 +259,13 @@ function AttackBoxes({
   total,
   contributions,
   damageText,
+  damageContributions,
 }: {
   attack: Attack
   total: number
   contributions: EffectContribution[]
   damageText: string
+  damageContributions: EffectContribution[]
 }) {
   const boxes: { label: string; value: ReactNode }[] = [
     {
@@ -273,7 +276,14 @@ function AttackBoxes({
         </EffectsTooltip>
       ),
     },
-    { label: 'Dano', value: damageText || '—' },
+    {
+      label: 'Dano',
+      value: (
+        <EffectsTooltip contributions={damageContributions}>
+          <span>{damageText || '—'}</span>
+        </EffectsTooltip>
+      ),
+    },
     { label: 'Crítico', value: attack.critical || '—' },
     { label: 'Tipo', value: attack.damageType || '—' },
     { label: 'Alcance', value: attack.range || '—' },
