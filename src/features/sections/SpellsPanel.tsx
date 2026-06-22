@@ -38,7 +38,7 @@ export function SpellsPanel({ character, update }: Props) {
     update((c) => ({ ...c, spells: c.spells.filter((s) => s.id !== id) }))
 
   return (
-    <Panel title="Magias">
+    <Panel title="Magias" collapsible>
       <div className="space-y-3">
         {CIRCLES.map((circle) => {
           const spells = character.spells.filter((s) => s.circle === circle)

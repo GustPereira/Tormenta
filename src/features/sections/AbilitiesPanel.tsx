@@ -62,7 +62,7 @@ export function AbilitiesPanel({ character, update }: Props) {
   const originPower = character.originId ? ORIGINS_BY_ID[character.originId]?.power : null
 
   return (
-    <Panel title="Habilidades & Poderes">
+    <Panel title="Habilidades & Poderes" collapsible>
       {originPower && (
         <p className="mb-2 text-xs text-stone-400">
           Poder de origem: <span className="text-tormenta-300">{originPower}</span>

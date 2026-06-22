@@ -130,6 +130,7 @@ export function AttacksPanel({ character, update }: Props) {
   return (
     <Panel
       title="Ataques & Conjurações"
+      collapsible
       action={<Button variant="ghost" className="text-xs" onClick={add}>+ ataque</Button>}
     >
       {character.attacks.length === 0 ? (
