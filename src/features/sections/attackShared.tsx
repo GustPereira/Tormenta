@@ -1,7 +1,7 @@
 import { type ReactNode } from 'react'
 import { EffectsTooltip } from '../../components/EffectsTooltip'
 import { inputClass } from '../../components/ui'
-import { ATTRIBUTE_LABELS } from '../../data'
+import { ATTRIBUTE_LABELS, SKILLS_BY_ID } from '../../data'
 import { signed } from '../../lib/format'
 import {
   effectContributions,
@@ -70,11 +70,23 @@ export function baseContributions(
   if (!cfg) return []
   const skill = derived.skills.find((s) => s.id === cfg.skillId)
   const trained = skill?.trained ?? false
+  // No T20 o ataque é um teste da perícia (Luta/Pontaria/Atuação), então as
+  // parcelas devem bater com o total da perícia: além do bônus específico da
+  // perícia, somam-se o bônus geral de perícia (allSkills) e — para perícias com
+  // penalidade de armadura — a penalidade. (Resistência não se aplica a ataques.)
+  const armorPenalty = SKILLS_BY_ID[cfg.skillId]?.armorPenalty ?? false
   return [
     { name: '½ nível', value: halfLevel(level) },
     { name: ATTRIBUTE_LABELS[cfg.attribute], value: attrs[cfg.attribute] },
     ...(trained ? [{ name: `Treino (${cfg.skillName})`, value: trainingBonus(level, true) }] : []),
-    ...effectContributions(character, (m) => resolveValue(m.skills[cfg.skillId] ?? 0, ctx), ctx),
+    ...effectContributions(
+      character,
+      (m) =>
+        resolveValue(m.skills[cfg.skillId] ?? 0, ctx) +
+        resolveValue(m.allSkills ?? 0, ctx) +
+        (armorPenalty ? resolveValue(m.penalty ?? 0, ctx) : 0),
+      ctx,
+    ),
   ].filter((c) => c.value !== 0)
 }
 
