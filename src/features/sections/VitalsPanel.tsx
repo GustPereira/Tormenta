@@ -154,7 +154,7 @@ function Pool({
             type="number"
             value={temp}
             onChange={(e) => onTempChange(Number(e.target.value) || 0)}
-            className={inputClass + ' w-12 text-center'}
+            className={inputClass + ' w-16 text-center text-lg font-bold'}
             aria-label={`${label} temporários`}
           />
         </Field>

@@ -224,10 +224,11 @@ export function IdentityHeader({ character, update }: Props) {
           <dl className="mt-4 flex flex-row gap-4 w-full">
             <Info label="Tipo" value={traits?.tipo ?? '—'} />
             <Info label="Tamanho" value={traits?.tamanho ?? '—'} />
-            <Info label="Sentidos" value={senses.join(', ') || '—'} />
-
           </dl>
-          <dl className="mt-4 flex flex-row gap-4 just">
+          <dl className="mt-4 flex flex-row gap-4 w-full">
+            <Info label="Sentidos" value={senses.join(', ') || '—'} />
+          </dl>
+          <dl className="mt-4 flex flex-row gap-4 w-full">
             <Info label="Proficiências" value={profs.join(', ') || '—'} />
           </dl>
 
