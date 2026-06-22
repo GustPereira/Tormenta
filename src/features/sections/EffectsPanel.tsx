@@ -45,7 +45,7 @@ export function EffectsPanel({ character, update }: Props) {
       ...c,
       effects: [
         ...c.effects,
-        { id, name: '', active: true, duration: 'Cena', modifiers: { ...EMPTY_ITEM_MODIFIERS, attributes: {}, skills: {} } },
+        { id, name: '', active: true, alwaysActive: false, duration: 'Cena', modifiers: { ...EMPTY_ITEM_MODIFIERS, attributes: {}, skills: {} } },
       ],
     }))
   }
@@ -90,13 +90,22 @@ export function EffectsPanel({ character, update }: Props) {
                 key={a.id}
                 className="flex items-center gap-2 rounded-md border border-[var(--card-border)] bg-[var(--card-bg)] px-3 py-2"
               >
-                <input
-                  type="checkbox"
-                  checked={a.effectActive}
-                  onChange={(e) => setAbilityActive(a.id, e.target.checked)}
-                  className="h-4 w-4 accent-tormenta-500"
-                  aria-label={`Ativar efeito de ${a.name || 'habilidade'}`}
-                />
+                {a.alwaysActive ? (
+                  <span
+                    className="rounded-full bg-tormenta-900/60 px-2 py-0.5 text-[10px] uppercase text-tormenta-300"
+                    title="Efeito sempre ativo"
+                  >
+                    sempre
+                  </span>
+                ) : (
+                  <input
+                    type="checkbox"
+                    checked={a.effectActive}
+                    onChange={(e) => setAbilityActive(a.id, e.target.checked)}
+                    className="h-4 w-4 accent-tormenta-500"
+                    aria-label={`Ativar efeito de ${a.name || 'habilidade'}`}
+                  />
+                )}
                 <div className="flex-1">
                   <div className="font-medium text-[var(--text)]">
                     {a.name || 'Habilidade sem nome'}
@@ -123,8 +132,10 @@ export function EffectsPanel({ character, update }: Props) {
             {character.effects.map((effect) => (
               <EditableCard
                 key={effect.id}
-                active={effect.active}
-                onActiveChange={(v) => setEffect(effect.id, { active: v })}
+                active={effect.alwaysActive ? undefined : effect.active}
+                onActiveChange={
+                  effect.alwaysActive ? undefined : (v) => setEffect(effect.id, { active: v })
+                }
                 activeLabel="Ativo"
                 title={effect.name || 'Efeito sem nome'}
                 summary={describeModifiers(effect.modifiers)}
@@ -152,6 +163,15 @@ export function EffectsPanel({ character, update }: Props) {
                       <option key={d} value={d}>{d}</option>
                     ))}
                   </select>
+                </label>
+                <label className="mb-2 flex items-center gap-2 text-xs text-stone-400">
+                  <input
+                    type="checkbox"
+                    checked={effect.alwaysActive}
+                    onChange={(e) => setEffect(effect.id, { alwaysActive: e.target.checked })}
+                    className="h-4 w-4 accent-tormenta-500"
+                  />
+                  Sempre ativo (não precisa ativar/desativar)
                 </label>
                 <ModifiersEditor
                   modifiers={effect.modifiers}

@@ -4,7 +4,6 @@ import {
   type Ability,
   type Attributes,
   type Character,
-  type EffectData,
   type InventoryItem,
   type ItemModifiers,
 } from '../schema'
@@ -24,18 +23,26 @@ export class Effect {
   readonly id: string
   readonly name: string
   readonly active: boolean
+  readonly alwaysActive: boolean
   readonly modifiers: ItemModifiers
 
   // Só os campos usados na agregação (duration não importa aqui).
-  constructor(data: Pick<EffectData, 'id' | 'name' | 'active' | 'modifiers'>) {
+  constructor(data: {
+    id: string
+    name: string
+    active: boolean
+    modifiers: ItemModifiers
+    alwaysActive?: boolean
+  }) {
     this.id = data.id
     this.name = data.name
     this.active = data.active
+    this.alwaysActive = data.alwaysActive ?? false
     this.modifiers = data.modifiers
   }
 
   isActive(): boolean {
-    return this.active
+    return this.alwaysActive || this.active
   }
 
   /** Se o efeito pode ser editado nesta tela (avulsos sim; de itens não). */
@@ -76,6 +83,7 @@ export class AbilityEffect extends Effect {
       id: ability.id,
       name: ability.name || 'Habilidade sem nome',
       active: ability.effectActive,
+      alwaysActive: ability.alwaysActive,
       modifiers: ability.modifiers,
     })
   }

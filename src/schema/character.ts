@@ -121,6 +121,8 @@ export const effectSchema = z.object({
   id: z.string(),
   name: z.string().default(''),
   active: z.boolean().default(true),
+  /** Sempre ativo: ignora o toggle de ativar/desativar (e não some o checkbox). */
+  alwaysActive: z.boolean().default(false),
   /** Duração do efeito (Cena é encerrada pelo botão "Encerrar cena"). */
   duration: durationSchema.default('Cena'),
   modifiers: itemModifiersSchema.default(EMPTY_ITEM_MODIFIERS),
@@ -201,6 +203,8 @@ export const abilitySchema = z.object({
   hasEffect: z.boolean().default(false),
   /** Se o efeito da habilidade está ativo. */
   effectActive: z.boolean().default(false),
+  /** Sempre ativo: ignora o toggle (e não mostra o checkbox de ativar). */
+  alwaysActive: z.boolean().default(false),
   modifiers: itemModifiersSchema.default(EMPTY_ITEM_MODIFIERS),
 })
 export type Ability = z.infer<typeof abilitySchema>

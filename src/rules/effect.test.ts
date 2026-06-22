@@ -49,8 +49,8 @@ describe('collectEffects + aggregateActiveModifiers', () => {
         item({ id: 'b', activeEffect: false, modifiers: { attributes: { forca: 99 }, skills: {}, attack: 0, damage: 0, allSkills: 0, resistance: 0, trainedSkills: [], hitPoints: 99, mana: 0, defense: 0, penalty: 0, movement: 0, damageReduction: 0 } }),
       ],
       effects: [
-        { id: 'e1', name: 'Bênção', active: true, duration: 'Cena', modifiers: { attributes: { forca: 1 }, skills: {}, attack: 0, damage: 0, allSkills: 0, resistance: 0, trainedSkills: [], hitPoints: 0, mana: 3, defense: 0, penalty: 0, movement: 0, damageReduction: 0 } },
-        { id: 'e2', name: 'Desligado', active: false, duration: 'Cena', modifiers: { attributes: { forca: 50 }, skills: {}, attack: 0, damage: 0, allSkills: 0, resistance: 0, trainedSkills: [], hitPoints: 0, mana: 0, defense: 0, penalty: 0, movement: 0, damageReduction: 0 } },
+        { id: 'e1', name: 'Bênção', active: true, alwaysActive: false, duration: 'Cena', modifiers: { attributes: { forca: 1 }, skills: {}, attack: 0, damage: 0, allSkills: 0, resistance: 0, trainedSkills: [], hitPoints: 0, mana: 3, defense: 0, penalty: 0, movement: 0, damageReduction: 0 } },
+        { id: 'e2', name: 'Desligado', active: false, alwaysActive: false, duration: 'Cena', modifiers: { attributes: { forca: 50 }, skills: {}, attack: 0, damage: 0, allSkills: 0, resistance: 0, trainedSkills: [], hitPoints: 0, mana: 0, defense: 0, penalty: 0, movement: 0, damageReduction: 0 } },
       ],
     }
     const agg = aggregateActiveModifiers(collectEffects(c))

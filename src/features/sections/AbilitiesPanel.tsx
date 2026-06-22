@@ -45,6 +45,7 @@ export function AbilitiesPanel({ character, update }: Props) {
           duration: 'Cena',
           hasEffect: false,
           effectActive: false,
+          alwaysActive: false,
           modifiers: { ...EMPTY_ITEM_MODIFIERS, attributes: {}, skills: {} },
         },
       ],
@@ -110,8 +111,10 @@ function Group({
               title={a.name || 'Poder sem nome'}
               summary={summarize(a)}
               details={a.notes || 'Sem descrição.'}
-              active={a.hasEffect ? a.effectActive : undefined}
-              onActiveChange={a.hasEffect ? (v) => setAbility(a.id, { effectActive: v }) : undefined}
+              active={a.hasEffect && !a.alwaysActive ? a.effectActive : undefined}
+              onActiveChange={
+                a.hasEffect && !a.alwaysActive ? (v) => setAbility(a.id, { effectActive: v }) : undefined
+              }
               activeLabel="Ativo"
               onDelete={() => remove(a.id)}
               deleteName={a.name}
@@ -193,6 +196,17 @@ function Group({
                   />
                   Tem efeito (aparece na aba Efeitos)
                 </label>
+                {a.hasEffect && (
+                  <label className="flex items-center gap-2 text-xs text-stone-400">
+                    <input
+                      type="checkbox"
+                      checked={a.alwaysActive}
+                      onChange={(e) => setAbility(a.id, { alwaysActive: e.target.checked })}
+                      className="h-4 w-4 accent-tormenta-500"
+                    />
+                    Sempre ativo (não precisa ativar/desativar)
+                  </label>
+                )}
                 {a.hasEffect && (
                   <div className="border-t border-stone-800 pt-2">
                     <ModifiersEditor
