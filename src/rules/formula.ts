@@ -4,6 +4,8 @@ import type { Attributes } from '../schema'
 export interface FormulaContext {
   attributes: Attributes
   level: number
+  /** Valor de defesa do escudo equipado (token @escudo). */
+  shieldDefense?: number
 }
 
 const ATTR_TOKENS: Record<string, keyof Attributes> = {
@@ -16,12 +18,13 @@ const ATTR_TOKENS: Record<string, keyof Attributes> = {
 }
 
 /** Tokens disponíveis para referências (para dicas na UI). */
-export const FORMULA_TOKENS = ['@for', '@des', '@con', '@int', '@sab', '@car', '@nivel', '@meionivel']
+export const FORMULA_TOKENS = ['@for', '@des', '@con', '@int', '@sab', '@car', '@nivel', '@meionivel', '@escudo']
 
 function tokenValue(raw: string, ctx: FormulaContext): number {
   const t = raw.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase()
   if (t === 'nivel') return ctx.level
   if (t === 'meionivel') return Math.floor(ctx.level / 2)
+  if (t === 'escudo') return ctx.shieldDefense ?? 0
   const attr = ATTR_TOKENS[t]
   return attr ? ctx.attributes[attr] : 0
 }

@@ -106,7 +106,11 @@ function attackContributions(
 
 export function AttacksPanel({ character, update }: Props) {
   const derived = deriveCharacter(character)
-  const ctx: FormulaContext = { attributes: derived.finalAttributes, level: derived.totalLevel }
+  const ctx: FormulaContext = {
+    attributes: derived.finalAttributes,
+    level: derived.totalLevel,
+    shieldDefense: derived.shieldDefense,
+  }
   const [lastAddedId, setLastAddedId] = useState<string | null>(null)
   const add = () => {
     const id = crypto.randomUUID()

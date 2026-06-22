@@ -15,7 +15,11 @@ interface Props {
 
 export function AttributesPanel({ character, update }: Props) {
   const derived = deriveCharacter(character)
-  const ctx = { attributes: derived.finalAttributes, level: derived.totalLevel }
+  const ctx = {
+    attributes: derived.finalAttributes,
+    level: derived.totalLevel,
+    shieldDefense: derived.shieldDefense,
+  }
   const race = character.race ? RACES_BY_ID[character.race.raceId] : undefined
   const freeChoice = race?.freeChoice
   const [editing, setEditing] = useState(false)

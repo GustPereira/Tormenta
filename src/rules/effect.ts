@@ -63,7 +63,9 @@ export class ItemEffect extends Effect {
     super({
       id: item.id,
       name: item.name || 'Item sem nome',
-      active: item.activeEffect,
+      // Itens de defesa (armadura/escudo) aplicam quando equipados; demais itens,
+      // quando o efeito está marcado como ativo.
+      active: item.equipmentType ? item.equipped : item.activeEffect,
       modifiers: item.modifiers,
     })
   }

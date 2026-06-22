@@ -4,7 +4,7 @@ import { CLASSES, ORIGINS, RACES, RACE_TRAITS_BY_ID } from '../../data'
 import { Button } from '../../components/Button'
 import { inputClass } from '../../components/ui'
 import { fileToScaledDataUrl } from '../../lib/image'
-import { deriveCharacter, totalLevel } from '../../rules'
+import { deriveCharacter, equippedArmor, equippedShield, totalLevel } from '../../rules'
 import type { Character } from '../../schema'
 
 interface Props {
@@ -58,6 +58,23 @@ export function IdentityHeader({ character, update }: Props) {
       ),
     }))
 
+  // Fazer descanso (regra T20): recupera todos os PV e PM. Encerra a cena junto
+  // (efeitos de Cena off + recursos resetados) e zera os pontos temporários.
+  const rest = () =>
+    update((c) => ({
+      ...c,
+      currentHitPoints: null,
+      currentMana: null,
+      temporaryHitPoints: 0,
+      temporaryMana: 0,
+      abilities: c.abilities.map((a) => (a.duration === 'Cena' ? { ...a, effectActive: false } : a)),
+      spells: c.spells.map((s) => (s.duration === 'Cena' ? { ...s, effectActive: false } : s)),
+      effects: c.effects.map((e) => (e.duration === 'Cena' ? { ...e, active: false } : e)),
+      resources: c.resources.map((r) =>
+        r.resetsOnScene ? { ...r, current: resetValue(r) } : r,
+      ),
+    }))
+
   const derived = deriveCharacter(character)
   const traits = character.race ? RACE_TRAITS_BY_ID[character.race.raceId] : undefined
   const senses = [
@@ -71,8 +88,31 @@ export function IdentityHeader({ character, update }: Props) {
     derived.proficiencies.escudo && 'Escudos',
   ].filter(Boolean) as string[]
 
+  // Equipamentos equipados (o de maior Defesa, se houver mais de um por slot).
+  const equipCtx = {
+    attributes: derived.finalAttributes,
+    level: derived.totalLevel,
+    shieldDefense: derived.shieldDefense,
+  }
+  const armorSlot = equippedArmor(character, equipCtx)
+  const shieldSlot = equippedShield(character, equipCtx)
+  const multiArmor = armorSlot.count > 1
+  const multiShield = shieldSlot.count > 1
+  const multiWarning = multiArmor && multiShield
+    ? 'Mais de uma armadura e mais de um escudo equipados'
+    : multiArmor
+      ? 'Mais de uma armadura equipada'
+      : multiShield
+        ? 'Mais de um escudo equipado'
+        : ''
+
   return (
     <div className="rounded-lg border border-[var(--card-border)] bg-[var(--card-bg)] p-4">
+      {multiWarning && (
+        <div className="mb-3 rounded-md border border-amber-700/60 bg-amber-950/40 px-3 py-2 text-xs text-amber-300">
+          ⚠ {multiWarning} — usando o de maior Defesa.
+        </div>
+      )}
       <div className="flex gap-4">
         <div className="flex flex-col items-center gap-1">
           {character.portrait ? (
@@ -242,7 +282,36 @@ export function IdentityHeader({ character, update }: Props) {
             <Info label="Proficiências" value={profs.join(', ') || '—'} />
           </dl>
 
-          <div className="mt-4 flex justify-end">
+          {(armorSlot.item || shieldSlot.item) && (
+            <dl className="mt-4 flex flex-row gap-4 w-full">
+              {armorSlot.item && (
+                <Info
+                  label="Armadura"
+                  value={`${armorSlot.item.name || 'Sem nome'} (+${armorSlot.defense} Def)`}
+                />
+              )}
+              {shieldSlot.item && (
+                <Info
+                  label="Escudo"
+                  value={`${shieldSlot.item.name || 'Sem nome'} (+${shieldSlot.defense} Def)`}
+                />
+              )}
+            </dl>
+          )}
+
+          <div className="mt-4 flex justify-end gap-2">
+            <Button
+              variant="secondary"
+              className="text-xs"
+              onClick={() => {
+                if (window.confirm('Fazer descanso? Recupera todos os PV e PM e encerra a cena.')) {
+                  rest()
+                }
+              }}
+              title="Recupera todos os PV e PM (regra de descanso)"
+            >
+              Fazer descanso
+            </Button>
             <Button
               variant="secondary"
               className="text-xs"

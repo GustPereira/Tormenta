@@ -94,6 +94,7 @@ describe('deriveCharacter', () => {
           quantity: 1,
           spaces: 1,
           equipped: true,
+          equipmentType: '',
           proficiency: '',
           activeEffect: true,
           notes: '',
@@ -105,6 +106,7 @@ describe('deriveCharacter', () => {
           quantity: 1,
           spaces: 0,
           equipped: false,
+          equipmentType: '',
           proficiency: '',
           activeEffect: false,
           notes: '',
@@ -139,6 +141,7 @@ describe('deriveCharacter', () => {
           quantity: 1,
           spaces: 0,
           equipped: true,
+          equipmentType: 'armadura',
           proficiency: 'Pesadas',
           activeEffect: true,
           notes: '',
@@ -173,6 +176,38 @@ describe('deriveCharacter', () => {
     const d = deriveCharacter(c)
     // Atletismo: ½ nível 0 + Força 0 + @car (3) = 3
     expect(d.skills.find((s) => s.id === 'atletismo')!.total).toBe(3)
+  })
+
+  it('item de defesa aplica quando equipado, alimenta shieldDefense e o token @escudo', () => {
+    const c = build({
+      classes: [{ classId: 'guerreiro', level: 1 }],
+      inventory: [
+        // Escudo equipado: sua defesa (2) entra direto; @escudo = 2.
+        {
+          id: 's2', name: 'Escudo Pesado', quantity: 1, spaces: 1,
+          equipped: true, equipmentType: 'escudo', proficiency: 'Escudos', activeEffect: false,
+          notes: '', modifiers: { ...ZERO_MODS, defense: 2 },
+        },
+        // Escudo guardado (não equipado): não conta.
+        {
+          id: 's1', name: 'Escudo Leve', quantity: 1, spaces: 1,
+          equipped: false, equipmentType: 'escudo', proficiency: 'Escudos', activeEffect: false,
+          notes: '', modifiers: { ...ZERO_MODS, defense: 1 },
+        },
+      ],
+      // Efeito que soma a defesa do escudo equipado de novo, via token @escudo.
+      effects: [
+        {
+          id: 'e', name: 'Bloqueio', active: true, alwaysActive: false, duration: 'Cena',
+          modifiers: { ...ZERO_MODS, defense: '@escudo' },
+        },
+      ],
+    })
+    const d = deriveCharacter(c)
+    // Escolhe o escudo equipado (2); o guardado não conta.
+    expect(d.shieldDefense).toBe(2)
+    // Defesa: 10 + ½ nível 0 + Des 0 + escudo equipado 2 + efeito (@escudo = 2) = 14
+    expect(d.defense).toBe(14)
   })
 
   it('fórmula em atributo (@nivel) resolve contra os atributos base', () => {

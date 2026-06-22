@@ -15,6 +15,7 @@ import {
 } from '../schema'
 import { defense } from './defense'
 import { aggregateActiveModifiers, collectEffects } from './effect'
+import { equippedShield } from './equipment'
 import { maxHitPoints, maxMana } from './health'
 import { skillBonus } from './skills'
 
@@ -60,6 +61,8 @@ export interface DerivedCharacter {
   globalAttackBonus: number
   /** Dano extra global (expressão mesclada, ex.: "1d8+2") somado a todos os ataques. */
   globalDamageBonus: string
+  /** Defesa do escudo equipado (valor do token @escudo). */
+  shieldDefense: number
   skills: DerivedSkill[]
 }
 
@@ -116,9 +119,12 @@ export function activeModifiers(character: Character) {
   const pass1 = aggregateActiveModifiers(effects, { attributes: baseAttrs, level })
   const attrs = { ...baseAttrs }
   for (const key of ATTRIBUTE_KEYS) attrs[key] += pass1.attributes[key] ?? 0
-  // Passe 2: demais fórmulas resolvidas contra os atributos finais.
-  const pass2 = aggregateActiveModifiers(effects, { attributes: attrs, level })
-  return { ...pass2, attributes: pass1.attributes }
+  // Defesa do escudo equipado (token @escudo). Resolvida sem @escudo no contexto
+  // para não cair em recursão se a defesa do escudo for, ela mesma, uma fórmula.
+  const shieldDefense = equippedShield(character, { attributes: attrs, level }).defense
+  // Passe 2: demais fórmulas resolvidas contra os atributos finais (com @escudo).
+  const pass2 = aggregateActiveModifiers(effects, { attributes: attrs, level, shieldDefense })
+  return { ...pass2, attributes: pass1.attributes, shieldDefense }
 }
 
 /**
@@ -214,6 +220,7 @@ export function deriveCharacter(character: Character): DerivedCharacter {
     globalSkillBonus,
     globalAttackBonus,
     globalDamageBonus,
+    shieldDefense: mods.shieldDefense,
     skills,
   }
 }

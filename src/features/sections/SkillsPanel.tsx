@@ -42,7 +42,11 @@ export function SkillsPanel({ character, update }: Props) {
   const chooseLimit = fromClasses + intBonus + (origin?.pericasEscolha ?? 0) + duplicateBonus
   const chosen = derived.skills.filter((s) => s.trained && !s.granted).length
 
-  const ctx = { attributes: derived.finalAttributes, level: derived.totalLevel }
+  const ctx = {
+    attributes: derived.finalAttributes,
+    level: derived.totalLevel,
+    shieldDefense: derived.shieldDefense,
+  }
 
   // De onde vem o limite (para o tooltip).
   const limitSources = [

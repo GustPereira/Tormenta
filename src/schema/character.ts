@@ -156,6 +156,11 @@ export const customOriginSchema = z.object({
 })
 export type CustomOrigin = z.infer<typeof customOriginSchema>
 
+/** Tipo de equipamento para fins de Defesa: nenhum, escudo ou armadura. */
+export const EQUIPMENT_TYPES = ['', 'escudo', 'armadura'] as const
+export const equipmentTypeSchema = z.enum(EQUIPMENT_TYPES)
+export type EquipmentType = (typeof EQUIPMENT_TYPES)[number]
+
 export const inventoryItemSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -163,6 +168,8 @@ export const inventoryItemSchema = z.object({
   /** Peso em espaços (sistema de carga do T20). */
   spaces: z.number().min(0).default(0),
   equipped: z.boolean().default(false),
+  /** Tipo de equipamento (escudo/armadura) — alimenta a Defesa e o token @escudo. */
+  equipmentType: equipmentTypeSchema.default(''),
   /** Proficiência exigida (ex.: Leves, Pesadas, Escudos). Informativo. */
   proficiency: z.string().default(''),
   /** Se verdadeiro, os modificadores do item são aplicados aos valores derivados. */

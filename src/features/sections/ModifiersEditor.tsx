@@ -6,6 +6,8 @@ import { ATTRIBUTE_KEYS, type ItemModifiers } from '../../schema'
 interface Props {
   modifiers: ItemModifiers
   onChange: (modifiers: ItemModifiers) => void
+  /** Oculta Defesa/Penalidade/Desloc. (editados à parte em itens de defesa). */
+  hideDefenseStats?: boolean
 }
 
 /** Converte o texto de um campo em número (se for inteiro) ou fórmula (texto). */
@@ -22,7 +24,7 @@ const FORMULA_HINT = 'Número fixo ou fórmula: @for @des @con @int @sab @car @n
  * Editor reutilizável dos modificadores de um efeito/item: atributos, vitais &
  * defesa e perícias. Todo campo aceita número fixo ou fórmula (ex.: @car+2).
  */
-export function ModifiersEditor({ modifiers, onChange }: Props) {
+export function ModifiersEditor({ modifiers, onChange, hideDefenseStats = false }: Props) {
   const setAttr = (key: string, value: number | string) =>
     onChange({ ...modifiers, attributes: { ...modifiers.attributes, [key]: value } })
 
@@ -65,9 +67,13 @@ export function ModifiersEditor({ modifiers, onChange }: Props) {
       <Group label="Vitais & Defesa">
         <ModInput label="PV" value={modifiers.hitPoints} onChange={(v) => onChange({ ...modifiers, hitPoints: v })} />
         <ModInput label="PM" value={modifiers.mana} onChange={(v) => onChange({ ...modifiers, mana: v })} />
-        <ModInput label="Defesa" value={modifiers.defense} onChange={(v) => onChange({ ...modifiers, defense: v })} />
-        <ModInput label="Penal." value={modifiers.penalty} onChange={(v) => onChange({ ...modifiers, penalty: v })} />
-        <ModInput label="Desloc." value={modifiers.movement} onChange={(v) => onChange({ ...modifiers, movement: v })} />
+        {!hideDefenseStats && (
+          <>
+            <ModInput label="Defesa" value={modifiers.defense} onChange={(v) => onChange({ ...modifiers, defense: v })} />
+            <ModInput label="Penal." value={modifiers.penalty} onChange={(v) => onChange({ ...modifiers, penalty: v })} />
+            <ModInput label="Desloc." value={modifiers.movement} onChange={(v) => onChange({ ...modifiers, movement: v })} />
+          </>
+        )}
         <ModInput label="Red. Dano" value={modifiers.damageReduction} onChange={(v) => onChange({ ...modifiers, damageReduction: v })} />
       </Group>
 

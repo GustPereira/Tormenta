@@ -46,7 +46,11 @@ function skillBreakdown(
 
 export function VitalsPanel({ character, update }: Props) {
   const d = deriveCharacter(character)
-  const ctx: FormulaContext = { attributes: d.finalAttributes, level: d.totalLevel }
+  const ctx: FormulaContext = {
+    attributes: d.finalAttributes,
+    level: d.totalLevel,
+    shieldDefense: d.shieldDefense,
+  }
 
   const resistances = RESISTANCE_SKILL_IDS.map((id) => d.skills.find((s) => s.id === id)).filter(
     (s): s is DerivedSkill => Boolean(s),
