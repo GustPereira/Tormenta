@@ -1,9 +1,11 @@
-import { useState, type ReactNode } from 'react'
+import { useRef, useState, type ReactNode } from 'react'
 import { Button } from '../../components/Button'
 import { EditableCard } from '../../components/EditableCard'
+import { Modal } from '../../components/Modal'
 import { Panel } from '../../components/Panel'
 import { inputClass } from '../../components/ui'
 import { ITEM_CATALOG, ITEM_CATALOG_CATEGORIES, type CatalogItem } from '../../data'
+import { arrayMove } from '../../lib/reorder'
 import { describeModifiers } from '../../rules'
 import {
   EMPTY_ITEM_MODIFIERS,
@@ -89,6 +91,16 @@ function summarizeDefense(item: InventoryItem): string {
   return parts.join(' · ')
 }
 
+/** Resumo curto dos atributos de um item do catálogo (mostrado ao lado do nome). */
+function catalogStats(item: CatalogItem): string {
+  if (item.attack) {
+    const a = item.attack
+    return [a.damage, a.critical, a.damageType, a.range, item.proficiency].filter(Boolean).join(' · ')
+  }
+  if (item.modifiers?.defense) return `Defesa +${item.modifiers.defense}`
+  return ''
+}
+
 function summarizeWeapon(item: InventoryItem): string {
   const a = item.attack
   const parts = [
@@ -163,6 +175,18 @@ export function InventoryPanel({ character, update }: Props) {
   const remove = (id: string) =>
     update((c) => ({ ...c, inventory: c.inventory.filter((it) => it.id !== id) }))
 
+  // Reordenação por arrastar (dentro de cada subgrupo; o filtro é estável).
+  const draggingId = useRef<string | null>(null)
+  const reorder = (overId: string) => {
+    const activeId = draggingId.current
+    if (activeId) update((c) => ({ ...c, inventory: arrayMove(c.inventory, activeId, overId) }))
+  }
+  const dragProps = (id: string) => ({
+    reorderable: true,
+    onReorderStart: () => (draggingId.current = id),
+    onReorderDrop: () => reorder(id),
+  })
+
   const defenseItems = character.inventory.filter((it) => it.equipmentType !== '')
   const weaponItems = character.inventory.filter((it) => it.equipmentType === '' && it.attack)
   const otherItems = character.inventory.filter((it) => it.equipmentType === '' && !it.attack)
@@ -171,6 +195,7 @@ export function InventoryPanel({ character, update }: Props) {
   const renderDefenseCard = (item: InventoryItem) => (
     <EditableCard
       key={item.id}
+      {...dragProps(item.id)}
       headerExtra={<EquippedToggle item={item} onChange={setEquipped} />}
       title={`${item.quantity}× ${item.name || 'Item sem nome'}`}
       summary={summarizeDefense(item)}
@@ -267,6 +292,7 @@ export function InventoryPanel({ character, update }: Props) {
   const renderItemCard = (item: InventoryItem) => (
     <EditableCard
       key={item.id}
+      {...dragProps(item.id)}
       active={item.activeEffect}
       onActiveChange={(v) => setItem(item.id, { activeEffect: v })}
       activeLabel="Efeito ativo"
@@ -321,6 +347,7 @@ export function InventoryPanel({ character, update }: Props) {
     return (
       <EditableCard
         key={item.id}
+        {...dragProps(item.id)}
         headerExtra={<EquippedToggle item={item} onChange={setEquipped} />}
         title={`${item.quantity}× ${item.name || 'Arma sem nome'}`}
         summary={summarizeWeapon(item)}
@@ -456,21 +483,26 @@ function ItemGroup({
   emptyText: string
   className?: string
 }) {
-  const [showCatalog, setShowCatalog] = useState(false)
+  const [catalogOpen, setCatalogOpen] = useState(false)
+  // Adiciona a cópia ao inventário e fecha o modal do catálogo.
+  const pickFromCatalog = (item: CatalogItem) => {
+    onAddFromCatalog(item)
+    setCatalogOpen(false)
+  }
   return (
     <div className={className}>
       <div className="mb-1 flex items-center justify-between">
         <h3 className="text-xs font-semibold uppercase text-tormenta-300">{title}</h3>
         <div className="flex gap-1">
-          <Button variant="ghost" className="text-xs" onClick={() => setShowCatalog((s) => !s)}>
-            {showCatalog ? '▾ Catálogo' : '▸ Catálogo'}
+          <Button variant="ghost" className="text-xs" onClick={() => setCatalogOpen(true)}>
+            Catálogo
           </Button>
           <Button variant="ghost" className="text-xs" onClick={onAdd}>{addLabel}</Button>
         </div>
       </div>
 
-      {showCatalog && (
-        <div className="mb-3 rounded-md border border-[var(--card-border)] bg-[var(--card-bg)] p-2">
+      {catalogOpen && (
+        <Modal title={`Catálogo — ${title}`} onClose={() => setCatalogOpen(false)}>
           <p className="mb-2 text-xs text-stone-400">
             Itens prontos — clique para adicionar uma cópia ao inventário.
           </p>
@@ -478,21 +510,22 @@ function ItemGroup({
             <div key={cat} className="mb-2">
               <h4 className="mb-1 text-xs font-semibold uppercase text-tormenta-300">{cat}</h4>
               <ul className="flex flex-col gap-1">
-                {ITEM_CATALOG.filter((i) => i.category === cat).map((item) => (
-                  <li key={item.id} className="flex items-center gap-2">
-                    <Button variant="secondary" className="text-xs" onClick={() => onAddFromCatalog(item)}>
-                      + Adicionar
-                    </Button>
-                    <span className="text-sm text-[var(--text)]">{item.name}</span>
-                    {item.modifiers?.defense ? (
-                      <span className="text-xs text-stone-500">Defesa +{item.modifiers.defense}</span>
-                    ) : null}
-                  </li>
-                ))}
+                {ITEM_CATALOG.filter((i) => i.category === cat).map((item) => {
+                  const stats = catalogStats(item)
+                  return (
+                    <li key={item.id} className="flex flex-wrap items-center gap-2">
+                      <Button variant="secondary" className="text-xs" onClick={() => pickFromCatalog(item)}>
+                        + Adicionar
+                      </Button>
+                      <span className="text-sm text-[var(--text)]">{item.name}</span>
+                      {stats && <span className="text-xs text-stone-500">{stats}</span>}
+                    </li>
+                  )
+                })}
               </ul>
             </div>
           ))}
-        </div>
+        </Modal>
       )}
 
       {items.length === 0 ? (
