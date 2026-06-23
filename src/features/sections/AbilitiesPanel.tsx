@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Button } from '../../components/Button'
 import { EditableCard } from '../../components/EditableCard'
 import { Panel } from '../../components/Panel'
 import { inputClass } from '../../components/ui'
 import { ORIGINS_BY_ID } from '../../data'
+import { arrayMove } from '../../lib/reorder'
 import {
   ACTION_KEYS,
   DURATION_KEYS,
@@ -66,6 +67,13 @@ export function AbilitiesPanel({ character, update }: Props) {
   const remove = (id: string) =>
     update((c) => ({ ...c, abilities: c.abilities.filter((a) => a.id !== id) }))
 
+  // Reordenação por arrastar: guarda o id arrastado e move ao soltar sobre outro.
+  const draggingId = useRef<string | null>(null)
+  const reorder = (overId: string) => {
+    const activeId = draggingId.current
+    if (activeId) update((c) => ({ ...c, abilities: arrayMove(c.abilities, activeId, overId) }))
+  }
+
   const originPower = character.originId ? ORIGINS_BY_ID[character.originId]?.power : null
 
   return (
@@ -76,8 +84,8 @@ export function AbilitiesPanel({ character, update }: Props) {
         </p>
       )}
       <div className="space-y-4">
-        <Group label="Racial & Origem" group="racial" character={character} setAbility={setAbility} remove={remove} add={add} lastAddedId={lastAddedId} />
-        <Group label="Classe & Geral" group="classe" character={character} setAbility={setAbility} remove={remove} add={add} lastAddedId={lastAddedId} />
+        <Group label="Racial & Origem" group="racial" character={character} setAbility={setAbility} remove={remove} add={add} lastAddedId={lastAddedId} onDragStart={(id) => (draggingId.current = id)} onDrop={reorder} />
+        <Group label="Classe & Geral" group="classe" character={character} setAbility={setAbility} remove={remove} add={add} lastAddedId={lastAddedId} onDragStart={(id) => (draggingId.current = id)} onDrop={reorder} />
       </div>
     </Panel>
   )
@@ -91,6 +99,8 @@ function Group({
   remove,
   add,
   lastAddedId,
+  onDragStart,
+  onDrop,
 }: {
   label: string
   group: Ability['group']
@@ -99,6 +109,8 @@ function Group({
   remove: (id: string) => void
   add: (group: Ability['group']) => void
   lastAddedId: string | null
+  onDragStart: (id: string) => void
+  onDrop: (id: string) => void
 }) {
   const items = character.abilities.filter((a) => a.group === group)
 
@@ -115,6 +127,9 @@ function Group({
           {items.map((a) => (
             <EditableCard
               key={a.id}
+              reorderable
+              onReorderStart={() => onDragStart(a.id)}
+              onReorderDrop={() => onDrop(a.id)}
               title={a.name || 'Poder sem nome'}
               summary={summarize(a)}
               details={a.notes || 'Sem descrição.'}

@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react'
-import { Check, Pencil, Trash2 } from 'lucide-react'
+import { Check, GripVertical, Pencil, Trash2 } from 'lucide-react'
 import { Button } from './Button'
 
 interface EditableCardProps {
@@ -22,6 +22,12 @@ interface EditableCardProps {
   headerExtra?: ReactNode
   /** Inicia em modo edição (ex.: item recém-adicionado). */
   startEditing?: boolean
+  /** Habilita reordenação por arrastar (mostra a alça e ativa o drag-and-drop). */
+  reorderable?: boolean
+  /** Início do arraste deste card (guarda o id na lista pai). */
+  onReorderStart?: () => void
+  /** Soltou outro card sobre este (reordena na lista pai). */
+  onReorderDrop?: () => void
 }
 
 /**
@@ -40,9 +46,15 @@ export function EditableCard({
   activeLabel = 'Ativo',
   headerExtra,
   startEditing = false,
+  reorderable = false,
+  onReorderStart,
+  onReorderDrop,
 }: EditableCardProps) {
   const [editing, setEditing] = useState(startEditing)
   const [open, setOpen] = useState(false)
+  // `grabbed` libera o draggable só ao segurar a alça; `dragOver` destaca o alvo.
+  const [grabbed, setGrabbed] = useState(false)
+  const [dragOver, setDragOver] = useState(false)
 
   const confirmDelete = () => {
     if (window.confirm(`Excluir "${deleteName || 'este item'}"? Esta ação não pode ser desfeita.`)) {
@@ -50,9 +62,53 @@ export function EditableCard({
     }
   }
 
+  const showHandle = reorderable && !editing
+
   return (
-    <li className="rounded-md border border-[var(--card-border)] bg-[var(--card-bg)] p-2">
+    <li
+      draggable={grabbed}
+      onDragStart={(e) => {
+        if (e.dataTransfer) e.dataTransfer.effectAllowed = 'move'
+        onReorderStart?.()
+      }}
+      onDragEnd={() => {
+        setGrabbed(false)
+        setDragOver(false)
+      }}
+      onDragOver={
+        reorderable
+          ? (e) => {
+              e.preventDefault()
+              setDragOver(true)
+            }
+          : undefined
+      }
+      onDragLeave={reorderable ? () => setDragOver(false) : undefined}
+      onDrop={
+        reorderable
+          ? (e) => {
+              e.preventDefault()
+              setDragOver(false)
+              onReorderDrop?.()
+            }
+          : undefined
+      }
+      className={`rounded-md border bg-[var(--card-bg)] p-2 ${
+        dragOver ? 'border-tormenta-400' : 'border-[var(--card-border)]'
+      } ${grabbed ? 'opacity-60' : ''}`}
+    >
       <div className="flex items-center gap-2">
+        {showHandle && (
+          <span
+            onMouseDown={() => setGrabbed(true)}
+            onMouseUp={() => setGrabbed(false)}
+            className="cursor-grab text-stone-500 hover:text-[var(--text)] active:cursor-grabbing"
+            aria-label="Arrastar para reordenar"
+            title="Arrastar para reordenar"
+          >
+            <GripVertical size={16} />
+          </span>
+        )}
         {onActiveChange && (
           <label className="flex items-center gap-1 text-xs text-stone-400">
             <input

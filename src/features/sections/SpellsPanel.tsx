@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Button } from '../../components/Button'
 import { EditableCard } from '../../components/EditableCard'
 import { Panel } from '../../components/Panel'
 import { inputClass } from '../../components/ui'
+import { arrayMove } from '../../lib/reorder'
 import {
   DURATION_KEYS,
   EMPTY_ITEM_MODIFIERS,
@@ -58,6 +59,13 @@ export function SpellsPanel({ character, update }: Props) {
   const remove = (id: string) =>
     update((c) => ({ ...c, spells: c.spells.filter((s) => s.id !== id) }))
 
+  // Reordenação por arrastar (dentro do círculo; o filtro por círculo é estável).
+  const draggingId = useRef<string | null>(null)
+  const reorder = (overId: string) => {
+    const activeId = draggingId.current
+    if (activeId) update((c) => ({ ...c, spells: arrayMove(c.spells, activeId, overId) }))
+  }
+
   return (
     <Panel title="Magias" collapsible>
       <div className="space-y-3">
@@ -78,6 +86,9 @@ export function SpellsPanel({ character, update }: Props) {
                   {spells.map((s) => (
                     <EditableCard
                       key={s.id}
+                      reorderable
+                      onReorderStart={() => (draggingId.current = s.id)}
+                      onReorderDrop={() => reorder(s.id)}
                       active={s.prepared}
                       onActiveChange={(v) => setField(s.id, { prepared: v })}
                       activeLabel="Preparada"
