@@ -4,8 +4,8 @@ import { CLASSES, ORIGINS, RACES, RACE_TRAITS_BY_ID } from '../../data'
 import { Button } from '../../components/Button'
 import { inputClass } from '../../components/ui'
 import { fileToScaledDataUrl } from '../../lib/image'
-import { deriveCharacter, equippedArmor, equippedShield, totalLevel } from '../../rules'
-import type { Character } from '../../schema'
+import { deriveCharacter, equippedArmor, equippedShield, resolveValue, totalLevel } from '../../rules'
+import type { Character, InventoryItem } from '../../schema'
 
 interface Props {
   character: Character
@@ -101,6 +101,14 @@ export function IdentityHeader({ character, update }: Props) {
       : multiShield
         ? 'Mais de um escudo equipado'
         : ''
+
+  // Resumo de um equipamento: Defesa, penalidade e proficiência exigida.
+  const equipSummary = (item: InventoryItem, defense: number): string => {
+    const penalty = resolveValue(item.modifiers.penalty, equipCtx)
+    const parts = [`+${defense} Def`, `Pen ${penalty}`]
+    if (item.proficiency && item.proficiency !== '—') parts.push(item.proficiency)
+    return `${item.name || 'Sem nome'} (${parts.join(', ')})`
+  }
 
   return (
     <div className="rounded-lg border border-[var(--card-border)] bg-[var(--card-bg)] p-4">
@@ -298,16 +306,10 @@ export function IdentityHeader({ character, update }: Props) {
           {(armorSlot.item || shieldSlot.item) && (
             <dl className="mt-4 flex flex-row gap-4 w-full">
               {armorSlot.item && (
-                <Info
-                  label="Armadura"
-                  value={`${armorSlot.item.name || 'Sem nome'} (+${armorSlot.defense} Def)`}
-                />
+                <Info label="Armadura" value={equipSummary(armorSlot.item, armorSlot.defense)} small />
               )}
               {shieldSlot.item && (
-                <Info
-                  label="Escudo"
-                  value={`${shieldSlot.item.name || 'Sem nome'} (+${shieldSlot.defense} Def)`}
-                />
+                <Info label="Escudo" value={equipSummary(shieldSlot.item, shieldSlot.defense)} small />
               )}
             </dl>
           )}
@@ -342,11 +344,11 @@ export function IdentityHeader({ character, update }: Props) {
   )
 }
 
-function Info({ label, value }: { label: string; value: string }) {
+function Info({ label, value, small }: { label: string; value: string; small?: boolean }) {
   return (
     <div className="flex flex-1 justify-between gap-2 border-b border-stone-800 py-0.5">
       <dt className="text-stone-400">{label}</dt>
-      <dd className="text-right text-[var(--text)]">{value}</dd>
+      <dd className={`text-right text-[var(--text)]${small ? ' text-sm' : ''}`}>{value}</dd>
     </div>
   )
 }
