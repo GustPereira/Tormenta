@@ -93,6 +93,10 @@ export const itemModifiersSchema = z.object({
   movement: modValueSchema.default(0),
   /** Redução de dano. */
   damageReduction: modValueSchema.default(0),
+  /** Soma à CD de resistência das suas magias. */
+  spellDc: modValueSchema.default(0),
+  /** Soma aos testes de manobra de combate. */
+  maneuver: modValueSchema.default(0),
 })
 export type ItemModifiers = z.infer<typeof itemModifiersSchema>
 
@@ -110,6 +114,8 @@ export const EMPTY_ITEM_MODIFIERS: ItemModifiers = {
   penalty: 0,
   movement: 0,
   damageReduction: 0,
+  spellDc: 0,
+  maneuver: 0,
 }
 
 /**

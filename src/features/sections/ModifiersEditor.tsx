@@ -62,6 +62,8 @@ export function ModifiersEditor({ modifiers, onChange, hideDefenseStats = false 
         <ModInput label="Dano" value={modifiers.damage ?? 0} onChange={(v) => onChange({ ...modifiers, damage: v })} />
         <ModInput label="Perícias" value={modifiers.allSkills ?? 0} onChange={(v) => onChange({ ...modifiers, allSkills: v })} />
         <ModInput label="Resist." value={modifiers.resistance ?? 0} onChange={(v) => onChange({ ...modifiers, resistance: v })} />
+        <ModInput label="CD Magia" value={modifiers.spellDc ?? 0} onChange={(v) => onChange({ ...modifiers, spellDc: v })} />
+        <ModInput label="Manobra" value={modifiers.maneuver ?? 0} onChange={(v) => onChange({ ...modifiers, maneuver: v })} />
       </Group>
 
       <Group label="Vitais & Defesa">

@@ -142,6 +142,10 @@ export interface AggregatedModifiers {
   movement: number
   /** Redução de dano total. */
   damageReduction: number
+  /** Bônus total à CD de resistência das magias. */
+  spellDc: number
+  /** Bônus total aos testes de manobra. */
+  maneuver: number
 }
 
 /** Coleta todos os efeitos da ficha: os dos itens (ItemEffect) e os avulsos (Effect). */
@@ -159,7 +163,7 @@ export function aggregateActiveModifiers(
   effects: Effect[],
   ctx: FormulaContext = ZERO_CTX,
 ): AggregatedModifiers {
-  const acc: AggregatedModifiers = { attributes: {}, skills: {}, attack: 0, damage: '', allSkills: 0, resistance: 0, trainedSkills: [], hitPoints: 0, mana: 0, defense: 0, penalty: 0, movement: 0, damageReduction: 0 }
+  const acc: AggregatedModifiers = { attributes: {}, skills: {}, attack: 0, damage: '', allSkills: 0, resistance: 0, trainedSkills: [], hitPoints: 0, mana: 0, defense: 0, penalty: 0, movement: 0, damageReduction: 0, spellDc: 0, maneuver: 0 }
   const damageParts: Array<string | number> = []
   for (const effect of effects) {
     if (!effect.isActive()) continue
@@ -177,6 +181,8 @@ export function aggregateActiveModifiers(
     acc.penalty += resolveValue(m.penalty ?? 0, ctx)
     acc.movement += resolveValue(m.movement ?? 0, ctx)
     acc.damageReduction += resolveValue(m.damageReduction ?? 0, ctx)
+    acc.spellDc += resolveValue(m.spellDc ?? 0, ctx)
+    acc.maneuver += resolveValue(m.maneuver ?? 0, ctx)
   }
   acc.damage = mergeDamage(damageParts, ctx)
   return acc
@@ -254,6 +260,10 @@ export function describeModifiers(m: ItemModifiers): string {
   if (mov) parts.push(`Desloc. ${mov}${isFormula(m.movement ?? 0) ? '' : 'm'}`)
   const rd = formatModValue(m.damageReduction ?? 0)
   if (rd) parts.push(`RD ${rd}`)
+  const sdc = formatModValue(m.spellDc ?? 0)
+  if (sdc) parts.push(`CD Magia ${sdc}`)
+  const man = formatModValue(m.maneuver ?? 0)
+  if (man) parts.push(`Manobra ${man}`)
   for (const [id, v] of Object.entries(m.skills)) {
     const s = formatModValue(v)
     if (s) parts.push(`${SKILLS_BY_ID[id]?.name ?? id} ${s}`)

@@ -7,7 +7,7 @@ function build(overrides: Partial<Character>): Character {
 }
 
 const ZERO_MODS: ItemModifiers = {
-  attributes: {}, skills: {}, attack: 0, damage: 0, allSkills: 0, resistance: 0, trainedSkills: [], hitPoints: 0, mana: 0, defense: 0, penalty: 0, movement: 0, damageReduction: 0,
+  attributes: {}, skills: {}, attack: 0, damage: 0, allSkills: 0, resistance: 0, trainedSkills: [], hitPoints: 0, mana: 0, defense: 0, penalty: 0, movement: 0, damageReduction: 0, spellDc: 0, maneuver: 0,
 }
 
 describe('totalLevel', () => {
@@ -99,7 +99,7 @@ describe('deriveCharacter', () => {
           proficiency: '',
           activeEffect: true,
           notes: '',
-          modifiers: { attributes: { forca: 2 }, skills: { atletismo: 3 }, attack: 0, damage: 0, allSkills: 0, resistance: 0, trainedSkills: [], hitPoints: 5, mana: 2, defense: 1, penalty: 0, movement: 0, damageReduction: 2 },
+          modifiers: { attributes: { forca: 2 }, skills: { atletismo: 3 }, attack: 0, damage: 0, allSkills: 0, resistance: 0, trainedSkills: [], hitPoints: 5, mana: 2, defense: 1, penalty: 0, movement: 0, damageReduction: 2, spellDc: 0, maneuver: 0 },
         },
         {
           id: 'i2',
@@ -112,7 +112,7 @@ describe('deriveCharacter', () => {
           proficiency: '',
           activeEffect: false,
           notes: '',
-          modifiers: { attributes: { forca: 99 }, skills: {}, attack: 0, damage: 0, allSkills: 0, resistance: 0, trainedSkills: [], hitPoints: 999, mana: 0, defense: 0, penalty: 0, movement: 0, damageReduction: 0 },
+          modifiers: { attributes: { forca: 99 }, skills: {}, attack: 0, damage: 0, allSkills: 0, resistance: 0, trainedSkills: [], hitPoints: 999, mana: 0, defense: 0, penalty: 0, movement: 0, damageReduction: 0, spellDc: 0, maneuver: 0 },
         },
       ],
     })
@@ -148,7 +148,7 @@ describe('deriveCharacter', () => {
           proficiency: 'Pesadas',
           activeEffect: true,
           notes: '',
-          modifiers: { attributes: {}, skills: {}, attack: 0, damage: 0, allSkills: 0, resistance: 0, trainedSkills: [], hitPoints: 0, mana: 0, defense: 10, penalty: -5, movement: -3, damageReduction: 0 },
+          modifiers: { attributes: {}, skills: {}, attack: 0, damage: 0, allSkills: 0, resistance: 0, trainedSkills: [], hitPoints: 0, mana: 0, defense: 10, penalty: -5, movement: -3, damageReduction: 0, spellDc: 0, maneuver: 0 },
         },
       ],
     })
@@ -208,7 +208,7 @@ describe('deriveCharacter', () => {
           active: true,
           alwaysActive: false,
           duration: 'Cena',
-          modifiers: { attributes: {}, skills: { atletismo: '@car' }, attack: 0, damage: 0, allSkills: 0, resistance: 0, trainedSkills: [], hitPoints: 0, mana: 0, defense: 0, penalty: 0, movement: 0, damageReduction: 0 },
+          modifiers: { attributes: {}, skills: { atletismo: '@car' }, attack: 0, damage: 0, allSkills: 0, resistance: 0, trainedSkills: [], hitPoints: 0, mana: 0, defense: 0, penalty: 0, movement: 0, damageReduction: 0, spellDc: 0, maneuver: 0 },
         },
       ],
     })

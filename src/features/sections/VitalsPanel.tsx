@@ -1,4 +1,5 @@
 import { ATTRIBUTE_LABELS, RESISTANCE_SKILL_IDS } from '../../data'
+import { baseContributions } from './attackShared'
 import { EffectsTooltip } from '../../components/EffectsTooltip'
 import { Panel } from '../../components/Panel'
 import { inputClass } from '../../components/ui'
@@ -56,6 +57,29 @@ export function VitalsPanel({ character, update }: Props) {
     (s): s is DerivedSkill => Boolean(s),
   )
 
+  // CD de resistência a magias = 10 + ½ nível + atributo-chave (T20, p. 227).
+  // Segue a convenção do app para conjuração: maior entre Inteligência e Carisma.
+  const useInt = d.finalAttributes.inteligencia >= d.finalAttributes.carisma
+  const spellDcContribs = [
+    { name: 'Base', value: 10 },
+    { name: '½ nível', value: halfLevel(d.totalLevel) },
+    {
+      name: useInt ? ATTRIBUTE_LABELS.inteligencia : ATTRIBUTE_LABELS.carisma,
+      value: useInt ? d.finalAttributes.inteligencia : d.finalAttributes.carisma,
+    },
+    ...effectContributions(character, (m) => m.spellDc ?? 0, ctx),
+  ].filter((c) => c.value !== 0)
+
+  // Teste de manobra = teste de ataque corpo a corpo (valor de Luta) + bônus de
+  // manobra dos efeitos (T20, p. 232).
+  const maneuverContribs = [
+    ...baseContributions('luta-for', d, character, ctx),
+    ...effectContributions(character, (m) => m.maneuver ?? 0, ctx),
+  ].filter((c) => c.value !== 0)
+
+  const sumContribs = (cs: EffectContribution[]) =>
+    cs.reduce((s, c) => s + (typeof c.value === 'number' ? c.value : 0), 0)
+
   return (
     <Panel title="Vitais & Defesa">
       {/* Pontos de Vida e Mana */}
@@ -97,6 +121,12 @@ export function VitalsPanel({ character, update }: Props) {
         />
         <Big label="Red. de Dano" value={d.damageReduction} contributions={effectContributions(character, (m) => m.damageReduction, ctx)} />
         <Big label="Deslocamento" value={`${d.deslocamento}m`} contributions={effectContributions(character, (m) => m.movement, ctx)} />
+      </div>
+
+      {/* CD de resistência a magias e teste de manobra */}
+      <div className="mt-3 grid grid-cols-2 gap-3">
+        <Big label="CD Resist. Magia" value={sumContribs(spellDcContribs)} contributions={spellDcContribs} />
+        <Big label="Teste de Manobra" value={signed(sumContribs(maneuverContribs))} contributions={maneuverContribs} />
       </div>
 
       {/* Resistências (testes de resistência) */}
