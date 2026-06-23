@@ -2,148 +2,190 @@
   {
     "id": "mundano",
     "name": "Mundano",
-    "armaduraMarcial": false,
+    "armaMarcial": false,
     "armaduraPesada": false,
-    "escudo": false
+    "escudo": false,
+    "armaExotica": false,
+    "armaFogo": false
   },
   {
     "id": "bruxo",
     "name": "Bruxo",
-    "armaduraMarcial": false,
+    "armaMarcial": false,
     "armaduraPesada": false,
-    "escudo": false
+    "escudo": false,
+    "armaExotica": false,
+    "armaFogo": false
   },
   {
     "id": "feiticeiro",
     "name": "Feiticeiro",
-    "armaduraMarcial": false,
+    "armaMarcial": false,
     "armaduraPesada": false,
-    "escudo": false
+    "escudo": false,
+    "armaExotica": false,
+    "armaFogo": false
   },
   {
     "id": "mago",
     "name": "Mago",
-    "armaduraMarcial": false,
+    "armaMarcial": false,
     "armaduraPesada": false,
-    "escudo": false
+    "escudo": false,
+    "armaExotica": false,
+    "armaFogo": false
   },
   {
     "id": "barbaro",
     "name": "Bárbaro",
-    "armaduraMarcial": true,
+    "armaMarcial": true,
     "armaduraPesada": false,
-    "escudo": true
+    "escudo": true,
+    "armaExotica": false,
+    "armaFogo": false
   },
   {
     "id": "bardo",
     "name": "Bardo",
-    "armaduraMarcial": true,
+    "armaMarcial": true,
     "armaduraPesada": false,
-    "escudo": false
+    "escudo": false,
+    "armaExotica": false,
+    "armaFogo": false
   },
   {
     "id": "bucaneiro",
     "name": "Bucaneiro",
-    "armaduraMarcial": true,
+    "armaMarcial": true,
     "armaduraPesada": false,
-    "escudo": false
+    "escudo": false,
+    "armaExotica": false,
+    "armaFogo": false
   },
   {
     "id": "cacador",
     "name": "Caçador",
-    "armaduraMarcial": true,
+    "armaMarcial": true,
     "armaduraPesada": false,
-    "escudo": true
+    "escudo": true,
+    "armaExotica": false,
+    "armaFogo": false
   },
   {
     "id": "cavaleiro",
     "name": "Cavaleiro",
-    "armaduraMarcial": true,
+    "armaMarcial": true,
     "armaduraPesada": true,
-    "escudo": true
+    "escudo": true,
+    "armaExotica": false,
+    "armaFogo": false
   },
   {
     "id": "clerigo",
     "name": "Clérigo",
-    "armaduraMarcial": false,
+    "armaMarcial": false,
     "armaduraPesada": true,
-    "escudo": true
+    "escudo": true,
+    "armaExotica": false,
+    "armaFogo": false
   },
   {
     "id": "druida",
     "name": "Druida",
-    "armaduraMarcial": false,
+    "armaMarcial": false,
     "armaduraPesada": false,
-    "escudo": true
+    "escudo": true,
+    "armaExotica": false,
+    "armaFogo": false
   },
   {
     "id": "guerreiro",
     "name": "Guerreiro",
-    "armaduraMarcial": true,
+    "armaMarcial": true,
     "armaduraPesada": true,
-    "escudo": true
+    "escudo": true,
+    "armaExotica": false,
+    "armaFogo": false
   },
   {
     "id": "inventor",
     "name": "Inventor",
-    "armaduraMarcial": false,
+    "armaMarcial": false,
     "armaduraPesada": false,
-    "escudo": false
+    "escudo": false,
+    "armaExotica": false,
+    "armaFogo": false
   },
   {
     "id": "ladino",
     "name": "Ladino",
-    "armaduraMarcial": false,
+    "armaMarcial": false,
     "armaduraPesada": false,
-    "escudo": false
+    "escudo": false,
+    "armaExotica": false,
+    "armaFogo": false
   },
   {
     "id": "lutador",
     "name": "Lutador",
-    "armaduraMarcial": false,
+    "armaMarcial": false,
     "armaduraPesada": false,
-    "escudo": false
+    "escudo": false,
+    "armaExotica": false,
+    "armaFogo": false
   },
   {
     "id": "nobre",
     "name": "Nobre",
-    "armaduraMarcial": true,
+    "armaMarcial": true,
     "armaduraPesada": true,
-    "escudo": true
+    "escudo": true,
+    "armaExotica": false,
+    "armaFogo": false
   },
   {
     "id": "paladino",
     "name": "Paladino",
-    "armaduraMarcial": true,
+    "armaMarcial": true,
     "armaduraPesada": true,
-    "escudo": true
+    "escudo": true,
+    "armaExotica": false,
+    "armaFogo": false
   },
   {
     "id": "samurai",
     "name": "Samurai",
-    "armaduraMarcial": true,
+    "armaMarcial": true,
     "armaduraPesada": true,
-    "escudo": false
+    "escudo": false,
+    "armaExotica": false,
+    "armaFogo": false
   },
   {
     "id": "mistico",
     "name": "Mistico",
-    "armaduraMarcial": true,
+    "armaMarcial": true,
     "armaduraPesada": false,
-    "escudo": false
+    "escudo": false,
+    "armaExotica": false,
+    "armaFogo": false
   },
   {
     "id": "miragem",
     "name": "Miragem",
-    "armaduraMarcial": true,
+    "armaMarcial": true,
     "armaduraPesada": false,
-    "escudo": true
+    "escudo": true,
+    "armaExotica": false,
+    "armaFogo": false
   },
   {
     "id": "frade",
     "name": "Frade",
-    "armaduraMarcial": false,
+    "armaMarcial": false,
     "armaduraPesada": false,
-    "escudo": false
+    "escudo": false,
+    "armaExotica": false,
+    "armaFogo": false
   }
 ]

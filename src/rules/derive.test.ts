@@ -311,15 +311,33 @@ describe('deriveCharacter', () => {
     expect(granted('fortitude')).toBe(false)
   })
 
-  it('multiclasse: só a 1ª classe concede proficiências', () => {
+  it('multiclasse: só a 1ª classe concede proficiências (simples+leves são universais)', () => {
     const c = build({
       classes: [
-        { classId: 'ladino', level: 2 }, // sem proficiências
-        { classId: 'guerreiro', level: 1 }, // marcial + pesada + escudo
+        { classId: 'ladino', level: 2 }, // sem proficiências além do básico
+        { classId: 'guerreiro', level: 1 }, // marcial + pesada + escudo (não conta)
       ],
     })
     const d = deriveCharacter(c)
-    expect(d.proficiencies).toEqual({ armaduraMarcial: false, armaduraPesada: false, escudo: false })
+    expect(d.proficiencies).toEqual({
+      armaduras: { leves: true, pesadas: false, escudo: false },
+      armas: { simples: true, marcial: false, exotica: false, fogo: false },
+    })
+  })
+
+  it('guerreiro: simples+leves universais + marcial, pesadas e escudo da classe', () => {
+    const d = deriveCharacter(build({ classes: [{ classId: 'guerreiro', level: 1 }] }))
+    expect(d.proficiencies).toEqual({
+      armaduras: { leves: true, pesadas: true, escudo: true },
+      armas: { simples: true, marcial: true, exotica: false, fogo: false },
+    })
+  })
+
+  it('clérigo tem armadura pesada e escudo, mas NÃO armas marciais', () => {
+    const p = deriveCharacter(build({ classes: [{ classId: 'clerigo', level: 1 }] })).proficiencies
+    expect(p.armaduras.pesadas).toBe(true)
+    expect(p.armaduras.escudo).toBe(true)
+    expect(p.armas.marcial).toBe(false)
   })
 
   it('modificador geral de perícia (allSkills) de um efeito soma em todas as perícias', () => {

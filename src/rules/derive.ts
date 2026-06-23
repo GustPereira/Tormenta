@@ -36,10 +36,13 @@ export interface DerivedSkill {
   unusable: boolean
 }
 
+/**
+ * Proficiências do personagem, agrupadas como no T20. Armas simples e armaduras
+ * leves são universais (todo personagem sabe usar); as demais vêm da 1ª classe.
+ */
 export interface Proficiencies {
-  armaduraMarcial: boolean
-  armaduraPesada: boolean
-  escudo: boolean
+  armaduras: { leves: boolean; pesadas: boolean; escudo: boolean }
+  armas: { simples: boolean; marcial: boolean; exotica: boolean; fogo: boolean }
 }
 
 export interface DerivedCharacter {
@@ -252,13 +255,21 @@ export function deriveCharacter(character: Character): DerivedCharacter {
     }
   })
 
-  // Proficiências: também só da 1ª classe (multiclasse não concede as da nova classe).
-  const proficiencies: Proficiencies = { armaduraMarcial: false, armaduraPesada: false, escudo: false }
+  // Proficiências: armas simples e armaduras leves são universais; as demais vêm
+  // só da 1ª classe (multiclasse não concede as proficiências da nova classe).
   const firstProf = firstClass ? CLASS_PROFICIENCIES_BY_ID[firstClass.classId] : undefined
-  if (firstProf) {
-    proficiencies.armaduraMarcial = firstProf.armaduraMarcial
-    proficiencies.armaduraPesada = firstProf.armaduraPesada
-    proficiencies.escudo = firstProf.escudo
+  const proficiencies: Proficiencies = {
+    armaduras: {
+      leves: true,
+      pesadas: firstProf?.armaduraPesada ?? false,
+      escudo: firstProf?.escudo ?? false,
+    },
+    armas: {
+      simples: true,
+      marcial: firstProf?.armaMarcial ?? false,
+      exotica: firstProf?.armaExotica ?? false,
+      fogo: firstProf?.armaFogo ?? false,
+    },
   }
 
   const traits = character.race ? RACE_TRAITS_BY_ID[character.race.raceId] : undefined

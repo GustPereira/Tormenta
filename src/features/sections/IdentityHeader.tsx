@@ -82,11 +82,7 @@ export function IdentityHeader({ character, update }: Props) {
     traits?.visaoEscuro && 'Visão no escuro',
     traits?.faro && 'Faro',
   ].filter(Boolean) as string[]
-  const profs = [
-    derived.proficiencies.armaduraMarcial && 'Armaduras marciais',
-    derived.proficiencies.armaduraPesada && 'Armaduras pesadas',
-    derived.proficiencies.escudo && 'Escudos',
-  ].filter(Boolean) as string[]
+  const prof = derived.proficiencies
 
   // Equipamentos equipados (o de maior Defesa, se houver mais de um por slot).
   const equipCtx = {
@@ -278,9 +274,26 @@ export function IdentityHeader({ character, update }: Props) {
           <dl className="mt-4 flex flex-row gap-4 w-full">
             <Info label="Sentidos" value={senses.join(', ') || '—'} />
           </dl>
-          <dl className="mt-4 flex flex-row gap-4 w-full">
-            <Info label="Proficiências" value={profs.join(', ') || '—'} />
-          </dl>
+          <div className="mt-4 w-full space-y-0.5">
+            <div className="text-stone-400">Proficiências</div>
+            <ProfRow
+              label="Armaduras"
+              items={[
+                ['Leves', prof.armaduras.leves],
+                ['Pesadas', prof.armaduras.pesadas],
+                ['Escudos', prof.armaduras.escudo],
+              ]}
+            />
+            <ProfRow
+              label="Armas"
+              items={[
+                ['Simples', prof.armas.simples],
+                ['Marcial', prof.armas.marcial],
+                ['Exótica', prof.armas.exotica],
+                ['de Fogo', prof.armas.fogo],
+              ]}
+            />
+          </div>
 
           {(armorSlot.item || shieldSlot.item) && (
             <dl className="mt-4 flex flex-row gap-4 w-full">
@@ -334,6 +347,20 @@ function Info({ label, value }: { label: string; value: string }) {
     <div className="flex flex-1 justify-between gap-2 border-b border-stone-800 py-0.5">
       <dt className="text-stone-400">{label}</dt>
       <dd className="text-right text-[var(--text)]">{value}</dd>
+    </div>
+  )
+}
+
+/** Linha de proficiências de uma categoria: ◉ quando proficiente, 〇 quando não. */
+function ProfRow({ label, items }: { label: string; items: [string, boolean][] }) {
+  return (
+    <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 border-b border-stone-800 py-0.5 text-sm">
+      <span className="w-20 text-xs uppercase text-stone-400">{label}</span>
+      {items.map(([name, on]) => (
+        <span key={name} className={on ? 'text-[var(--text)]' : 'text-stone-600'}>
+          {on ? '◉' : '〇'} {name}
+        </span>
+      ))}
     </div>
   )
 }

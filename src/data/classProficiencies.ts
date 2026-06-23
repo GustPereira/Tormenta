@@ -1,12 +1,22 @@
 import classProfJson from './generated/class-proficiencies.json'
 
-/** Proficiências de armadura/escudo por classe (da planilha de referência). */
+/**
+ * Proficiências extras concedidas pela classe (da planilha de referência).
+ * Armas simples e armaduras leves são universais (todo personagem sabe usar) e
+ * não ficam aqui — são aplicadas direto no motor (ver `Proficiencies`).
+ */
 export interface ClassProficiency {
   id: string
   name: string
-  armaduraMarcial: boolean
+  /** Armas marciais. */
+  armaMarcial: boolean
+  /** Armaduras pesadas. */
   armaduraPesada: boolean
   escudo: boolean
+  /** Armas exóticas (raras; nenhuma classe base concede). */
+  armaExotica: boolean
+  /** Armas de fogo (raras; nenhuma classe base concede). */
+  armaFogo: boolean
 }
 
 export const CLASS_PROFICIENCIES: ClassProficiency[] =

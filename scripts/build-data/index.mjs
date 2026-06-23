@@ -149,7 +149,9 @@ function main() {
     })
   }
 
-  // ----- PROFICIÊNCIAS DE CLASSE (c104 nome, c107 marcial, c108 pesada, c109 escudo) -----
+  // ----- PROFICIÊNCIAS DE CLASSE (c104 nome, c107 armas marciais, c108 armadura pesada, c109 escudo) -----
+  // Armas simples e armaduras leves são universais (todo personagem sabe usar) e
+  // não ficam na planilha. Exótica e de Fogo vêm de poderes, nunca da classe base.
   const classProficiencies = []
   for (let r = 1; r < g.length; r++) {
     const name = at(r, 104)
@@ -157,9 +159,11 @@ function main() {
     classProficiencies.push({
       id: slug(name),
       name,
-      armaduraMarcial: num(at(r, 107)) > 0,
+      armaMarcial: num(at(r, 107)) > 0,
       armaduraPesada: num(at(r, 108)) > 0,
       escudo: num(at(r, 109)) > 0,
+      armaExotica: false,
+      armaFogo: false,
     })
   }
 
