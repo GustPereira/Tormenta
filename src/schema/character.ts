@@ -201,17 +201,32 @@ export const inventoryItemSchema = z.object({
 })
 export type InventoryItem = z.infer<typeof inventoryItemSchema>
 
+/** Tipo de magia (escola de conjuração). */
+export const SPELL_TYPES = ['', 'Arcana', 'Divina', 'Universal'] as const
+export const spellTypeSchema = z.enum(SPELL_TYPES)
+export type SpellType = (typeof SPELL_TYPES)[number]
+
 /** Uma magia conhecida, agrupada por círculo (1 a 5). */
 export const spellSchema = z.object({
   id: z.string(),
   name: z.string(),
   circle: z.number().int().min(1).max(5).default(1),
+  /** Tipo: Arcana, Divina ou Universal. */
+  type: spellTypeSchema.default(''),
+  /** Escola de magia (Abjuração, Evocação, Necromancia…). */
+  school: z.string().default(''),
   /** Custo em pontos de mana para conjurar (inclui aprimoramentos). */
   pm: z.number().int().min(0).default(1),
   /** Ação de execução (ex.: "Padrão", "Movimento", "Completa", "Reação", "Livre"). */
   action: z.string().default('Padrão'),
+  /** Alcance (Pessoal, Toque, Curto, Médio, Longo, Ilimitado). */
+  range: z.string().default(''),
+  /** Alvo, Área ou Efeito (texto livre, ex.: "1 criatura"). */
+  target: z.string().default(''),
   /** Duração (Sustentada, Cena, Instantânea). */
   duration: durationSchema.default('Instantânea'),
+  /** Resistência (ex.: "Vontade anula", "Fortitude parcial"). */
+  resistance: z.string().default(''),
   /** Descrição do efeito da magia. */
   effect: z.string().default(''),
   prepared: z.boolean().default(false),
