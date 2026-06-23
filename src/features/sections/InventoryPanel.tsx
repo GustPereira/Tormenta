@@ -1,4 +1,5 @@
 import { useRef, useState, type ReactNode } from 'react'
+import { Plus } from 'lucide-react'
 import { Button } from '../../components/Button'
 import { EditableCard } from '../../components/EditableCard'
 import { Modal } from '../../components/Modal'
@@ -489,10 +490,12 @@ function ItemGroup({
 }) {
   const [catalogOpen, setCatalogOpen] = useState(false)
   const [query, setQuery] = useState('')
+  const [openCatalogId, setOpenCatalogId] = useState<string | null>(null)
   const q = normalize(query.trim())
   const closeCatalog = () => {
     setCatalogOpen(false)
     setQuery('')
+    setOpenCatalogId(null)
   }
   // Adiciona a cópia ao inventário e fecha o modal do catálogo.
   const pickFromCatalog = (item: CatalogItem) => {
@@ -544,12 +547,34 @@ function ItemGroup({
                   {catItems.map((item) => {
                     const stats = catalogStats(item)
                     return (
-                      <li key={item.id} className="flex flex-wrap items-center gap-2">
-                        <Button variant="secondary" className="text-xs" onClick={() => pickFromCatalog(item)}>
-                          + Adicionar
-                        </Button>
-                        <span className="text-sm text-[var(--text)]">{item.name}</span>
-                        {stats && <span className="text-xs text-stone-500">{stats}</span>}
+                      <li key={item.id} className="rounded border border-stone-800/60">
+                        <div className="flex items-center justify-between gap-2 px-2 py-1">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setOpenCatalogId((id) => (id === item.id ? null : item.id))
+                            }
+                            className="min-w-0 flex-1 text-left"
+                            title="Ver descrição"
+                          >
+                            <span className="text-sm text-[var(--text)]">{item.name}</span>
+                            {stats && <span className="ml-2 text-xs text-stone-500">{stats}</span>}
+                          </button>
+                          <Button
+                            variant="secondary"
+                            className="shrink-0 text-xs"
+                            onClick={() => pickFromCatalog(item)}
+                            aria-label={`Adicionar ${item.name}`}
+                            title="Adicionar"
+                          >
+                            <Plus size={14} />
+                          </Button>
+                        </div>
+                        {openCatalogId === item.id && (
+                          <p className="px-2 pb-2 text-xs text-stone-400">
+                            {item.description || 'Sem descrição.'}
+                          </p>
+                        )}
                       </li>
                     )
                   })}

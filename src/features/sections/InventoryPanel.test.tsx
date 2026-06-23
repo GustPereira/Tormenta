@@ -29,7 +29,7 @@ describe('InventoryPanel — catálogo em modal', () => {
     // Os atributos da arma aparecem ao lado do nome.
     expect(adaga).toHaveTextContent('1d4')
     expect(adaga).toHaveTextContent('Perfuração')
-    await user.click(within(adaga).getByRole('button', { name: '+ Adicionar' }))
+    await user.click(within(adaga).getByRole('button', { name: 'Adicionar Adaga' }))
 
     // O modal fecha e a Adaga passa a constar no inventário.
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()

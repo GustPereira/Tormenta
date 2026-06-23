@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import { Plus } from 'lucide-react'
 import { Button } from '../../components/Button'
 import { EditableCard } from '../../components/EditableCard'
 import { Modal } from '../../components/Modal'
@@ -49,7 +50,7 @@ function fromCatalog(s: CatalogSpell): Spell {
     target: s.target,
     duration: s.duration,
     resistance: s.resistance,
-    effect: '',
+    effect: s.description,
     prepared: false,
     hasEffect: false,
     effectActive: false,
@@ -63,6 +64,7 @@ export function SpellsPanel({ character, update }: Props) {
   const [catalogOpen, setCatalogOpen] = useState(false)
   const [query, setQuery] = useState('')
   const [schoolFilter, setSchoolFilter] = useState('')
+  const [openCatalogId, setOpenCatalogId] = useState<string | null>(null)
   const add = (circle: number) => {
     const id = crypto.randomUUID()
     setLastAddedId(id)
@@ -97,6 +99,7 @@ export function SpellsPanel({ character, update }: Props) {
     setCatalogOpen(false)
     setQuery('')
     setSchoolFilter('')
+    setOpenCatalogId(null)
   }
   // Adiciona a cópia da magia no seu círculo e fecha o catálogo.
   const pickFromCatalog = (s: CatalogSpell) => {
@@ -166,14 +169,32 @@ export function SpellsPanel({ character, update }: Props) {
           ) : (
             <ul className="flex flex-col gap-1">
               {catalogResults.map((s) => (
-                <li key={s.id} className="flex flex-wrap items-center gap-2">
-                  <Button variant="secondary" className="text-xs" onClick={() => pickFromCatalog(s)}>
-                    + Adicionar
-                  </Button>
-                  <span className="text-sm text-[var(--text)]">{s.name}</span>
-                  <span className="text-xs text-stone-500">
-                    {s.type} · {s.school} · {s.range}
-                  </span>
+                <li key={s.id} className="rounded border border-stone-800/60">
+                  <div className="flex items-center justify-between gap-2 px-2 py-1">
+                    <button
+                      type="button"
+                      onClick={() => setOpenCatalogId((id) => (id === s.id ? null : s.id))}
+                      className="min-w-0 flex-1 text-left"
+                      title="Ver descrição"
+                    >
+                      <span className="text-sm text-[var(--text)]">{s.name}</span>
+                      <span className="ml-2 text-xs text-stone-500">
+                        {s.type} · {s.school} · {s.range}
+                      </span>
+                    </button>
+                    <Button
+                      variant="secondary"
+                      className="shrink-0 text-xs"
+                      onClick={() => pickFromCatalog(s)}
+                      aria-label={`Adicionar ${s.name}`}
+                      title="Adicionar"
+                    >
+                      <Plus size={14} />
+                    </Button>
+                  </div>
+                  {openCatalogId === s.id && (
+                    <p className="px-2 pb-2 text-xs text-stone-400">{s.description}</p>
+                  )}
                 </li>
               ))}
             </ul>

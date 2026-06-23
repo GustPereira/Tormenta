@@ -274,19 +274,8 @@ export function IdentityHeader({ character, update }: Props) {
             <Info label="Tipo" value={traits?.tipo ?? '—'} />
             <Info label="Tamanho" value={traits?.tamanho ?? '—'} />
           </dl>
+          
           <div className="mt-4 w-full space-y-0.5">
-            <div className="text-stone-400">Sentidos</div>
-            <ProfRow
-              label=""
-              items={[
-                ['Visão na Penumbra', !!traits?.visaoPenumbra],
-                ['Visão no Escuro', !!traits?.visaoEscuro],
-                ['Faro', !!traits?.faro],
-              ]}
-            />
-          </div>
-          <div className="mt-4 w-full space-y-0.5">
-            <div className="text-stone-400">Proficiências</div>
             <ProfRow
               label="Armaduras"
               items={[
@@ -302,6 +291,16 @@ export function IdentityHeader({ character, update }: Props) {
                 ['Marcial', prof.armas.marcial],
                 ['Exótica', prof.armas.exotica],
                 ['de Fogo', prof.armas.fogo],
+              ]}
+            />
+          </div>
+          <div className="w-full space-y-0.5">
+            <ProfRow
+              label="Sentidos"
+              items={[
+                ['Visão na Penumbra', !!traits?.visaoPenumbra],
+                ['Visão no Escuro', !!traits?.visaoEscuro],
+                ['Faro', !!traits?.faro],
               ]}
             />
           </div>
