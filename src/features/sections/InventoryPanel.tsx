@@ -18,6 +18,10 @@ import {
 import { AttackFields } from './attackShared'
 import { ModifiersEditor } from './ModifiersEditor'
 
+/** Normaliza texto para busca: minúsculas e sem acentos. */
+const normalize = (s: string) =>
+  s.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase()
+
 /** Proficiências de itens de defesa. Define também o slot (escudo vs armadura). */
 const DEFENSE_PROFICIENCIES = ['Leves', 'Pesadas', 'Escudos'] as const
 
@@ -484,11 +488,26 @@ function ItemGroup({
   className?: string
 }) {
   const [catalogOpen, setCatalogOpen] = useState(false)
+  const [query, setQuery] = useState('')
+  const q = normalize(query.trim())
+  const closeCatalog = () => {
+    setCatalogOpen(false)
+    setQuery('')
+  }
   // Adiciona a cópia ao inventário e fecha o modal do catálogo.
   const pickFromCatalog = (item: CatalogItem) => {
     onAddFromCatalog(item)
-    setCatalogOpen(false)
+    closeCatalog()
   }
+  // Categorias com os itens que batem com a busca (categorias vazias somem).
+  const filteredByCat = catalogCategories
+    .map((cat) => ({
+      cat,
+      items: ITEM_CATALOG.filter(
+        (i) => i.category === cat && (!q || normalize(i.name).includes(q)),
+      ),
+    }))
+    .filter((g) => g.items.length > 0)
   return (
     <div className={className}>
       <div className="mb-1 flex items-center justify-between">
@@ -502,29 +521,42 @@ function ItemGroup({
       </div>
 
       {catalogOpen && (
-        <Modal title={`Catálogo — ${title}`} onClose={() => setCatalogOpen(false)}>
+        <Modal title={`Catálogo — ${title}`} onClose={closeCatalog}>
           <p className="mb-2 text-xs text-stone-400">
             Itens prontos — clique para adicionar uma cópia ao inventário.
           </p>
-          {catalogCategories.map((cat) => (
-            <div key={cat} className="mb-2">
-              <h4 className="mb-1 text-xs font-semibold uppercase text-tormenta-300">{cat}</h4>
-              <ul className="flex flex-col gap-1">
-                {ITEM_CATALOG.filter((i) => i.category === cat).map((item) => {
-                  const stats = catalogStats(item)
-                  return (
-                    <li key={item.id} className="flex flex-wrap items-center gap-2">
-                      <Button variant="secondary" className="text-xs" onClick={() => pickFromCatalog(item)}>
-                        + Adicionar
-                      </Button>
-                      <span className="text-sm text-[var(--text)]">{item.name}</span>
-                      {stats && <span className="text-xs text-stone-500">{stats}</span>}
-                    </li>
-                  )
-                })}
-              </ul>
-            </div>
-          ))}
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Buscar pelo nome…"
+            className={inputClass + ' mb-3 w-full'}
+            aria-label="Buscar no catálogo"
+            autoFocus
+          />
+          {filteredByCat.length === 0 ? (
+            <p className="text-sm text-stone-500">Nenhum item encontrado.</p>
+          ) : (
+            filteredByCat.map(({ cat, items: catItems }) => (
+              <div key={cat} className="mb-2">
+                <h4 className="mb-1 text-xs font-semibold uppercase text-tormenta-300">{cat}</h4>
+                <ul className="flex flex-col gap-1">
+                  {catItems.map((item) => {
+                    const stats = catalogStats(item)
+                    return (
+                      <li key={item.id} className="flex flex-wrap items-center gap-2">
+                        <Button variant="secondary" className="text-xs" onClick={() => pickFromCatalog(item)}>
+                          + Adicionar
+                        </Button>
+                        <span className="text-sm text-[var(--text)]">{item.name}</span>
+                        {stats && <span className="text-xs text-stone-500">{stats}</span>}
+                      </li>
+                    )
+                  })}
+                </ul>
+              </div>
+            ))
+          )}
         </Modal>
       )}
 
