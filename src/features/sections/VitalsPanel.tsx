@@ -29,6 +29,9 @@ function skillBreakdown(
   character: Character,
   ctx: FormulaContext,
 ): EffectContribution[] {
+  const isResistance = RESISTANCE_SKILL_IDS.includes(
+    skill.id as (typeof RESISTANCE_SKILL_IDS)[number],
+  )
   return [
     { name: '½ nível', value: halfLevel(d.totalLevel) },
     { name: ATTRIBUTE_LABELS[skill.attribute], value: skill.attributeMod },
@@ -38,7 +41,7 @@ function skillBreakdown(
       (m) =>
         resolveValue(m.skills[skill.id] ?? 0, ctx) +
         resolveValue(m.allSkills ?? 0, ctx) +
-        resolveValue(m.resistance ?? 0, ctx) +
+        (isResistance ? resolveValue(m.resistance ?? 0, ctx) : 0) +
         (skill.armorPenalty ? resolveValue(m.penalty, ctx) : 0),
       ctx,
     ),
@@ -79,6 +82,8 @@ export function VitalsPanel({ character, update }: Props) {
 
   const sumContribs = (cs: EffectContribution[]) =>
     cs.reduce((s, c) => s + (typeof c.value === 'number' ? c.value : 0), 0)
+
+  const initiative = d.skills.find((s) => s.id === 'iniciativa')
 
   return (
     <Panel title="Vitais & Defesa">
@@ -123,10 +128,17 @@ export function VitalsPanel({ character, update }: Props) {
         <Big label="Deslocamento" value={`${d.deslocamento}m`} contributions={effectContributions(character, (m) => m.movement, ctx)} />
       </div>
 
-      {/* CD de resistência a magias e teste de manobra */}
-      <div className="mt-3 grid grid-cols-2 gap-3">
+      {/* CD de resistência a magias, teste de manobra e iniciativa */}
+      <div className="mt-3 grid grid-cols-3 gap-3">
         <Big label="CD Resist. Magia" value={sumContribs(spellDcContribs)} contributions={spellDcContribs} />
         <Big label="Teste de Manobra" value={signed(sumContribs(maneuverContribs))} contributions={maneuverContribs} />
+        {initiative && (
+          <Big
+            label="Iniciativa"
+            value={signed(initiative.total)}
+            contributions={skillBreakdown(initiative, d, character, ctx)}
+          />
+        )}
       </div>
 
       {/* Resistências (testes de resistência) */}
