@@ -143,7 +143,7 @@ export function SpellsPanel({ character, update }: Props) {
       {catalogOpen && (
         <Modal title={`Catálogo de Magias — ${catalogCircle}º Círculo`} onClose={closeCatalog}>
           <p className="mb-2 text-xs text-stone-400">
-            Magias prontas — clique para adicionar uma cópia.
+            {catalogResults.length} {catalogResults.length === 1 ? 'magia' : 'magias'} — clique para adicionar uma cópia.
           </p>
           <div className="mb-3 flex flex-wrap gap-2">
             <input
