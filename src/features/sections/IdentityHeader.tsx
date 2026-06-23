@@ -77,11 +77,6 @@ export function IdentityHeader({ character, update }: Props) {
 
   const derived = deriveCharacter(character)
   const traits = character.race ? RACE_TRAITS_BY_ID[character.race.raceId] : undefined
-  const senses = [
-    traits?.visaoPenumbra && 'Visão na penumbra',
-    traits?.visaoEscuro && 'Visão no escuro',
-    traits?.faro && 'Faro',
-  ].filter(Boolean) as string[]
   const prof = derived.proficiencies
 
   // Equipamentos equipados (o de maior Defesa, se houver mais de um por slot).
@@ -279,9 +274,17 @@ export function IdentityHeader({ character, update }: Props) {
             <Info label="Tipo" value={traits?.tipo ?? '—'} />
             <Info label="Tamanho" value={traits?.tamanho ?? '—'} />
           </dl>
-          <dl className="mt-4 flex flex-row gap-4 w-full">
-            <Info label="Sentidos" value={senses.join(', ') || '—'} />
-          </dl>
+          <div className="mt-4 w-full space-y-0.5">
+            <div className="text-stone-400">Sentidos</div>
+            <ProfRow
+              label=""
+              items={[
+                ['Visão na Penumbra', !!traits?.visaoPenumbra],
+                ['Visão no Escuro', !!traits?.visaoEscuro],
+                ['Faro', !!traits?.faro],
+              ]}
+            />
+          </div>
           <div className="mt-4 w-full space-y-0.5">
             <div className="text-stone-400">Proficiências</div>
             <ProfRow
