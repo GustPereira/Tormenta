@@ -62,6 +62,7 @@ function fromCatalog(s: CatalogSpell): Spell {
 export function SpellsPanel({ character, update }: Props) {
   const [lastAddedId, setLastAddedId] = useState<string | null>(null)
   const [catalogOpen, setCatalogOpen] = useState(false)
+  const [catalogCircle, setCatalogCircle] = useState(1)
   const [query, setQuery] = useState('')
   const [schoolFilter, setSchoolFilter] = useState('')
   const [openCatalogId, setOpenCatalogId] = useState<string | null>(null)
@@ -95,6 +96,14 @@ export function SpellsPanel({ character, update }: Props) {
     }))
   }
 
+  // Abre o catálogo já filtrado por um círculo.
+  const openCatalog = (circle: number) => {
+    setCatalogCircle(circle)
+    setQuery('')
+    setSchoolFilter('')
+    setOpenCatalogId(null)
+    setCatalogOpen(true)
+  }
   const closeCatalog = () => {
     setCatalogOpen(false)
     setQuery('')
@@ -111,6 +120,7 @@ export function SpellsPanel({ character, update }: Props) {
   const q = normalize(query.trim())
   const catalogResults = SPELL_CATALOG.filter(
     (s) =>
+      s.circle === catalogCircle &&
       (!q || normalize(s.name).includes(q)) &&
       (!schoolFilter || s.school === schoolFilter),
   )
@@ -131,14 +141,8 @@ export function SpellsPanel({ character, update }: Props) {
 
   return (
     <Panel title="Magias" collapsible>
-      <div className="mb-2 flex justify-end">
-        <Button variant="ghost" className="text-xs" onClick={() => setCatalogOpen(true)}>
-          Catálogo
-        </Button>
-      </div>
-
       {catalogOpen && (
-        <Modal title="Catálogo de Magias — 1º Círculo" onClose={closeCatalog}>
+        <Modal title={`Catálogo de Magias — ${catalogCircle}º Círculo`} onClose={closeCatalog}>
           <p className="mb-2 text-xs text-stone-400">
             Magias prontas — clique para adicionar uma cópia.
           </p>
@@ -211,7 +215,12 @@ export function SpellsPanel({ character, update }: Props) {
                 <h3 className="text-xs font-semibold uppercase text-tormenta-300">
                   {circle}º Círculo <span className="text-stone-500">({PM_BY_CIRCLE[circle]} PM)</span>
                 </h3>
-                <Button variant="ghost" className="text-xs" onClick={() => add(circle)}>+ magia</Button>
+                <div className="flex gap-1">
+                  <Button variant="ghost" className="text-xs" onClick={() => openCatalog(circle)}>
+                    Catálogo
+                  </Button>
+                  <Button variant="ghost" className="text-xs" onClick={() => add(circle)}>+ magia</Button>
+                </div>
               </div>
               {spells.length === 0 ? (
                 <p className="text-xs text-stone-600">—</p>
