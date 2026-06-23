@@ -543,7 +543,7 @@ function ItemGroup({
             filteredByCat.map(({ cat, items: catItems }) => (
               <div key={cat} className="mb-2">
                 <h4 className="mb-1 text-xs font-semibold uppercase text-tormenta-300">{cat}</h4>
-                <ul className="flex flex-col gap-1">
+                <ul className="flex flex-col gap-1 overflow-y-auto max-h-130">
                   {catItems.map((item) => {
                     const stats = catalogStats(item)
                     return (

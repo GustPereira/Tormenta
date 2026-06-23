@@ -11,6 +11,7 @@ node_modules
 dist
 dist-ssr
 *.local
+magias
 
 # Variáveis de ambiente locais (token de compartilhamento) — .env.example é versionado
 .env

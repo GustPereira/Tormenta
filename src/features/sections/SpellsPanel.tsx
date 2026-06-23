@@ -142,35 +142,37 @@ export function SpellsPanel({ character, update }: Props) {
     <Panel title="Magias" collapsible>
       {catalogOpen && (
         <Modal title={`Catálogo de Magias — ${catalogCircle}º Círculo`} onClose={closeCatalog}>
-          <p className="mb-2 text-xs text-stone-400">
-            {catalogResults.length} {catalogResults.length === 1 ? 'magia' : 'magias'} — clique para adicionar uma cópia.
-          </p>
-          <div className="mb-3 flex flex-wrap gap-2">
-            <input
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Buscar pelo nome…"
-              className={inputClass + ' min-w-40 flex-1'}
-              aria-label="Buscar magia"
-              autoFocus
-            />
-            <select
-              value={schoolFilter}
-              onChange={(e) => setSchoolFilter(e.target.value)}
-              className={inputClass + ' text-sm'}
-              aria-label="Filtrar por escola"
-            >
-              <option value="">Todas as escolas</option>
-              {SPELL_SCHOOLS.map((s) => (
-                <option key={s} value={s}>{s}</option>
-              ))}
-            </select>
+          <div className=''>
+            <p className="mb-2 text-xs text-stone-400">
+              {catalogResults.length} {catalogResults.length === 1 ? 'magia' : 'magias'} — clique para adicionar uma cópia.
+            </p>
+            <div className="mb-3 flex flex-wrap gap-2">
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Buscar pelo nome…"
+                className={inputClass + ' min-w-40 flex-1'}
+                aria-label="Buscar magia"
+                autoFocus
+              />
+              <select
+                value={schoolFilter}
+                onChange={(e) => setSchoolFilter(e.target.value)}
+                className={inputClass + ' text-sm'}
+                aria-label="Filtrar por escola"
+              >
+                <option value="">Todas as escolas</option>
+                {SPELL_SCHOOLS.map((s) => (
+                  <option key={s} value={s}>{s}</option>
+                ))}
+              </select>
+            </div>
           </div>
           {catalogResults.length === 0 ? (
             <p className="text-sm text-stone-500">Nenhuma magia encontrada.</p>
           ) : (
-            <ul className="flex flex-col gap-1">
+            <ul className="flex flex-col gap-1 overflow-y-auto max-h-130">
               {catalogResults.map((s) => (
                 <li key={s.id} className="rounded border border-stone-800/60">
                   <div className="flex items-center justify-between gap-2 px-2 py-1">

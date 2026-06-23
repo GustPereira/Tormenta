@@ -6,6 +6,7 @@ import { inputClass } from '../../components/ui'
 import { fileToScaledDataUrl } from '../../lib/image'
 import { deriveCharacter, equippedArmor, equippedShield, resolveValue, totalLevel } from '../../rules'
 import type { Character, InventoryItem } from '../../schema'
+import { NotesPanel } from './NotesPanel'
 
 interface Props {
   character: Character
@@ -13,6 +14,7 @@ interface Props {
 }
 
 export function IdentityHeader({ character, update }: Props) {
+  const props = { character, update }
   const fileRef = useRef<HTMLInputElement>(null)
   const set = (field: keyof Character, value: unknown) =>
     update((c) => ({ ...c, [field]: value }))
@@ -315,7 +317,9 @@ export function IdentityHeader({ character, update }: Props) {
               )}
             </dl>
           )}
-
+        </div>
+      </div>
+      <NotesPanel {...props} />
           <div className="mt-4 flex justify-end gap-2">
             <Button
               variant="secondary"
@@ -339,9 +343,6 @@ export function IdentityHeader({ character, update }: Props) {
               Encerrar cena
             </Button>
           </div>
-        </div>
-
-      </div>
     </div>
   )
 }
