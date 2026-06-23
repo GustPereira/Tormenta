@@ -110,11 +110,10 @@ export function SpellsPanel({ character, update }: Props) {
     setSchoolFilter('')
     setOpenCatalogId(null)
   }
-  // Adiciona a cópia da magia no seu círculo e fecha o catálogo.
+  // Adiciona a cópia da magia no seu círculo e fecha o catálogo. Não entra em
+  // modo de edição (diferente do "+ magia").
   const pickFromCatalog = (s: CatalogSpell) => {
-    const id = crypto.randomUUID()
-    setLastAddedId(id)
-    update((c) => ({ ...c, spells: [...c.spells, { ...fromCatalog(s), id }] }))
+    update((c) => ({ ...c, spells: [...c.spells, fromCatalog(s)] }))
     closeCatalog()
   }
   const q = normalize(query.trim())
