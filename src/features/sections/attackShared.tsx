@@ -232,7 +232,7 @@ export function AttackBoxes({
           className="flex flex-col items-center rounded-md border border-[var(--card-border)] bg-[var(--card-bg)] p-2"
         >
           <span className="text-xs uppercase text-stone-400">{b.label}</span>
-          <span className="font-display text-xl font-bold text-tormenta-400">{b.value}</span>
+          <div className="flex content-center items-center flex-1 font-display text-xl font-bold text-tormenta-400">{b.value}</div>
         </div>
       ))}
     </div>

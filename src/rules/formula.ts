@@ -94,10 +94,10 @@ export function mergeDamage(parts: Array<string | number>, ctx: FormulaContext):
   let result = ''
   for (const size of sizes) {
     const count = dice.get(size)!
-    result += `${count < 0 ? '-' : result ? '+' : ''}${Math.abs(count)}d${size}`
+    result += `${count < 0 ? ' -' : result ? ' +' : ''}${Math.abs(count)}d${size}`
   }
   if (numeric !== 0) {
-    result += result ? (numeric > 0 ? `+${numeric}` : `-${Math.abs(numeric)}`) : String(numeric)
+    result += result ? (numeric > 0 ? ` +${numeric}` : `-${Math.abs(numeric)}`) : String(numeric)
   } else if (!result && sawNumeric) {
     result = '0'
   }
