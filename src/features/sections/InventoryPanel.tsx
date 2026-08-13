@@ -17,7 +17,7 @@ import {
   type ItemModifiers,
 } from '../../schema'
 import { AttackFields } from './attackShared'
-import { ModifiersEditor } from './ModifiersEditor'
+import { EffectTypeField, ModifiersEditor } from './ModifiersEditor'
 
 /** Normaliza texto para busca: minúsculas e sem acentos. */
 const normalize = (s: string) =>
@@ -59,6 +59,7 @@ function fromCatalog(c: CatalogItem): InventoryItem {
     attack,
     proficiency: c.proficiency ?? '',
     activeEffect: false,
+    effectType: 'Itens',
     modifiers: { ...EMPTY_ITEM_MODIFIERS, attributes: {}, skills: {}, ...c.modifiers },
     notes: c.description ?? '',
   }
@@ -167,6 +168,7 @@ export function InventoryPanel({ character, update }: Props) {
           attack: kind === 'arma' ? blankAttack() : null,
           proficiency: kind === 'defesa' ? 'Leves' : '',
           activeEffect: false,
+          effectType: 'Itens',
           modifiers: { ...EMPTY_ITEM_MODIFIERS, attributes: {}, skills: {} },
           notes: '',
         },
@@ -284,6 +286,12 @@ export function InventoryPanel({ character, update }: Props) {
           <p className="mb-2 text-[11px] text-stone-500">
             Efeitos adicionais (aplicados enquanto equipado):
           </p>
+          <div className="mb-2">
+            <EffectTypeField
+              value={item.effectType}
+              onChange={(v) => setItem(item.id, { effectType: v })}
+            />
+          </div>
           <ModifiersEditor
             modifiers={item.modifiers}
             onChange={(m) => setModifiers(item.id, m)}
@@ -341,6 +349,12 @@ export function InventoryPanel({ character, update }: Props) {
           aria-label="Descrição do item"
         />
         <div className="border-t border-stone-800 pt-2">
+          <div className="mb-2">
+            <EffectTypeField
+              value={item.effectType}
+              onChange={(v) => setItem(item.id, { effectType: v })}
+            />
+          </div>
           <ModifiersEditor modifiers={item.modifiers} onChange={(m) => setModifiers(item.id, m)} />
         </div>
       </div>
@@ -402,6 +416,12 @@ export function InventoryPanel({ character, update }: Props) {
             <p className="mb-2 text-[11px] text-stone-500">
               Efeitos adicionais (aplicados enquanto equipada):
             </p>
+            <div className="mb-2">
+              <EffectTypeField
+                value={item.effectType}
+                onChange={(v) => setItem(item.id, { effectType: v })}
+              />
+            </div>
             <ModifiersEditor modifiers={item.modifiers} onChange={(m) => setModifiers(item.id, m)} />
           </div>
         </div>

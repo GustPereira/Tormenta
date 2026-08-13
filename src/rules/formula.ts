@@ -111,3 +111,30 @@ export function mergeDamage(parts: Array<string | number>, ctx: FormulaContext):
 export function resolveDamage(expr: string, ctx: FormulaContext): string {
   return mergeDamage([expr], ctx)
 }
+
+/**
+ * Média de rolagem de uma expressão de dano (`NdM` → `N*(M+1)/2`, somada aos
+ * termos numéricos/tokens). Usada para comparar qual expressão "é maior"
+ * quando efeitos do mesmo tipo não somam entre si (usa a de maior média).
+ */
+export function damageAverage(expr: string | number, ctx: FormulaContext): number {
+  const trimmed = String(expr).trim()
+  if (!trimmed) return 0
+  const chunks = trimmed.match(/[+-]?\s*[^+-]+/g)
+  if (!chunks) return 0
+  let total = 0
+  for (const chunk of chunks) {
+    const sign = chunk.trim().startsWith('-') ? -1 : 1
+    const body = chunk.replace(/^\s*[+-]\s*/, '').trim()
+    if (!body) continue
+    const d = body.match(/^(\d*)d(\d+)$/i)
+    if (d) {
+      const count = d[1] === '' ? 1 : Number(d[1])
+      const size = Number(d[2])
+      total += sign * count * (size + 1) / 2
+    } else if (/^@?[a-zA-ZÀ-ú]+$/.test(body) || /^\d+(?:\.\d+)?$/.test(body)) {
+      total += sign * resolveValue(body, ctx)
+    }
+  }
+  return total
+}

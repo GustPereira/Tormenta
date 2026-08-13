@@ -12,7 +12,7 @@ import {
   type EffectData,
   type ItemModifiers,
 } from '../../schema'
-import { ModifiersEditor } from './ModifiersEditor'
+import { EffectTypeField, ModifiersEditor } from './ModifiersEditor'
 
 interface Props {
   character: Character
@@ -52,7 +52,7 @@ export function EffectsPanel({ character, update }: Props) {
       ...c,
       effects: [
         ...c.effects,
-        { id, name: '', active: true, alwaysActive: false, duration: 'Cena', modifiers: { ...EMPTY_ITEM_MODIFIERS, attributes: {}, skills: {} } },
+        { id, name: '', active: true, alwaysActive: false, duration: 'Cena', effectType: 'Outros', modifiers: { ...EMPTY_ITEM_MODIFIERS, attributes: {}, skills: {} } },
       ],
     }))
   }
@@ -212,6 +212,12 @@ export function EffectsPanel({ character, update }: Props) {
                   />
                   Sempre ativo (não precisa ativar/desativar)
                 </label>
+                <div className="mb-2">
+                  <EffectTypeField
+                    value={effect.effectType}
+                    onChange={(v) => setEffect(effect.id, { effectType: v })}
+                  />
+                </div>
                 <ModifiersEditor
                   modifiers={effect.modifiers}
                   onChange={(m) => setModifiers(effect.id, m)}

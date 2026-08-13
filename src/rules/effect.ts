@@ -4,11 +4,13 @@ import {
   type Ability,
   type Attributes,
   type Character,
+  type EffectTypeKey,
   type InventoryItem,
   type ItemModifiers,
+  type ModValue,
   type Spell,
 } from '../schema'
-import { isFormula, mergeDamage, resolveValue, type FormulaContext } from './formula'
+import { damageAverage, isFormula, mergeDamage, resolveValue, type FormulaContext } from './formula'
 
 const ZERO_ATTRS: Attributes = {
   forca: 0, destreza: 0, constituicao: 0, inteligencia: 0, sabedoria: 0, carisma: 0,
@@ -25,6 +27,7 @@ export class Effect {
   readonly name: string
   readonly active: boolean
   readonly alwaysActive: boolean
+  readonly effectType: EffectTypeKey
   readonly modifiers: ItemModifiers
 
   // Só os campos usados na agregação (duration não importa aqui).
@@ -34,11 +37,13 @@ export class Effect {
     active: boolean
     modifiers: ItemModifiers
     alwaysActive?: boolean
+    effectType?: EffectTypeKey
   }) {
     this.id = data.id
     this.name = data.name
     this.active = data.active
     this.alwaysActive = data.alwaysActive ?? false
+    this.effectType = data.effectType ?? 'Outros'
     this.modifiers = data.modifiers
   }
 
@@ -66,6 +71,7 @@ export class ItemEffect extends Effect {
       // Equipamentos (armadura/escudo/arma) aplicam quando equipados; demais
       // itens, quando o efeito está marcado como ativo.
       active: item.equipmentType || item.attack ? item.equipped : item.activeEffect,
+      effectType: item.effectType,
       modifiers: item.modifiers,
     })
   }
@@ -87,6 +93,7 @@ export class AbilityEffect extends Effect {
       name: ability.name || 'Habilidade sem nome',
       active: ability.effectActive,
       alwaysActive: ability.alwaysActive,
+      effectType: ability.effectType,
       modifiers: ability.modifiers,
     })
   }
@@ -107,6 +114,7 @@ export class SpellEffect extends Effect {
       id: spell.id,
       name: spell.name || 'Magia sem nome',
       active: spell.effectActive,
+      effectType: spell.effectType,
       modifiers: spell.modifiers,
     })
   }
@@ -158,19 +166,56 @@ export function collectEffects(character: Character): Effect[] {
   ]
 }
 
-/** Soma os modificadores de todos os efeitos ativos. */
-export function aggregateActiveModifiers(
-  effects: Effect[],
-  ctx: FormulaContext = ZERO_CTX,
-): AggregatedModifiers {
-  const acc: AggregatedModifiers = { attributes: {}, skills: {}, attack: 0, damage: '', allSkills: 0, resistance: 0, trainedSkills: [], hitPoints: 0, mana: 0, defense: 0, penalty: 0, movement: 0, damageReduction: 0, spellDc: 0, maneuver: 0 }
-  const damageParts: Array<string | number> = []
-  for (const effect of effects) {
-    if (!effect.isActive()) continue
+/** Campos numéricos simples de ItemModifiers sujeitos à regra de "usa o maior" por tipo. */
+const STACKING_FIELDS = [
+  'attack', 'allSkills', 'resistance', 'hitPoints', 'mana', 'defense',
+  'penalty', 'movement', 'damageReduction', 'spellDc', 'maneuver',
+] as const
+
+/** Tipos de efeito que não somam entre si: dentro do mesmo tipo, usa-se o maior valor por campo. */
+const NON_STACKING_TYPES: readonly EffectTypeKey[] = ['Itens', 'Magias']
+
+/** Maior valor resolvido de um campo entre os efeitos do grupo (0 se o grupo estiver vazio). */
+function maxField(group: Effect[], key: (typeof STACKING_FIELDS)[number], ctx: FormulaContext): number {
+  let best: number | null = null
+  for (const effect of group) {
+    const v = resolveValue(effect.modifiers[key] ?? 0, ctx)
+    if (best === null || v > best) best = v
+  }
+  return best ?? 0
+}
+
+/** Maior valor resolvido de uma chave de `attributes`/`skills` entre os efeitos do grupo. */
+function maxKeyed(group: Effect[], pick: (m: ItemModifiers) => Record<string, ModValue>, key: string, ctx: FormulaContext): number {
+  let best: number | null = null
+  for (const effect of group) {
+    const v = resolveValue(pick(effect.modifiers)[key] ?? 0, ctx)
+    if (best === null || v > best) best = v
+  }
+  return best ?? 0
+}
+
+/** Expressão de dano com a maior média de rolagem dentro do grupo (null se o grupo estiver vazio). */
+function bestDamage(group: Effect[], ctx: FormulaContext): string | number | null {
+  let best: string | number | null = null
+  let bestAvg = -Infinity
+  for (const effect of group) {
+    const dmg = effect.modifiers.damage ?? 0
+    const avg = damageAverage(dmg, ctx)
+    if (best === null || avg > bestAvg) {
+      best = dmg
+      bestAvg = avg
+    }
+  }
+  return best
+}
+
+/** Soma os modificadores de um grupo de efeitos que somam entre si normalmente. */
+function sumGroup(acc: AggregatedModifiers, group: Effect[], damageParts: Array<string | number>, ctx: FormulaContext): void {
+  for (const effect of group) {
     const m = effect.modifiers
     for (const [k, v] of Object.entries(m.attributes)) acc.attributes[k] = (acc.attributes[k] ?? 0) + resolveValue(v, ctx)
     for (const [k, v] of Object.entries(m.skills)) acc.skills[k] = (acc.skills[k] ?? 0) + resolveValue(v, ctx)
-    for (const id of m.trainedSkills ?? []) if (!acc.trainedSkills.includes(id)) acc.trainedSkills.push(id)
     acc.attack += resolveValue(m.attack ?? 0, ctx)
     damageParts.push(m.damage ?? 0)
     acc.allSkills += resolveValue(m.allSkills ?? 0, ctx)
@@ -184,6 +229,55 @@ export function aggregateActiveModifiers(
     acc.spellDc += resolveValue(m.spellDc ?? 0, ctx)
     acc.maneuver += resolveValue(m.maneuver ?? 0, ctx)
   }
+}
+
+/**
+ * Adiciona ao acumulador o maior valor por campo dentro de um grupo de efeitos
+ * do mesmo tipo não-cumulativo (Itens ou Magias): não soma os efeitos entre si,
+ * usa o maior valor de cada campo (regra de bônus de mesmo tipo do T20).
+ */
+function addMaxGroup(acc: AggregatedModifiers, group: Effect[], damageParts: Array<string | number>, ctx: FormulaContext): void {
+  if (group.length === 0) return
+  const keys = new Set<string>()
+  const skillKeys = new Set<string>()
+  for (const effect of group) {
+    for (const k of Object.keys(effect.modifiers.attributes)) keys.add(k)
+    for (const k of Object.keys(effect.modifiers.skills)) skillKeys.add(k)
+  }
+  for (const k of keys) acc.attributes[k] = (acc.attributes[k] ?? 0) + maxKeyed(group, (m) => m.attributes, k, ctx)
+  for (const k of skillKeys) acc.skills[k] = (acc.skills[k] ?? 0) + maxKeyed(group, (m) => m.skills, k, ctx)
+  for (const field of STACKING_FIELDS) acc[field] += maxField(group, field, ctx)
+  const dmg = bestDamage(group, ctx)
+  if (dmg !== null) damageParts.push(dmg)
+}
+
+/** Soma os modificadores de todos os efeitos ativos. */
+export function aggregateActiveModifiers(
+  effects: Effect[],
+  ctx: FormulaContext = ZERO_CTX,
+): AggregatedModifiers {
+  const acc: AggregatedModifiers = { attributes: {}, skills: {}, attack: 0, damage: '', allSkills: 0, resistance: 0, trainedSkills: [], hitPoints: 0, mana: 0, defense: 0, penalty: 0, movement: 0, damageReduction: 0, spellDc: 0, maneuver: 0 }
+  const active = effects.filter((e) => e.isActive())
+  for (const effect of active) {
+    for (const id of effect.modifiers.trainedSkills ?? []) if (!acc.trainedSkills.includes(id)) acc.trainedSkills.push(id)
+  }
+
+  const stackingGroups = new Map<EffectTypeKey, Effect[]>()
+  const summing: Effect[] = []
+  for (const effect of active) {
+    if (NON_STACKING_TYPES.includes(effect.effectType)) {
+      const group = stackingGroups.get(effect.effectType) ?? []
+      group.push(effect)
+      stackingGroups.set(effect.effectType, group)
+    } else {
+      summing.push(effect)
+    }
+  }
+
+  const damageParts: Array<string | number> = []
+  sumGroup(acc, summing, damageParts, ctx)
+  for (const group of stackingGroups.values()) addMaxGroup(acc, group, damageParts, ctx)
+
   acc.damage = mergeDamage(damageParts, ctx)
   return acc
 }

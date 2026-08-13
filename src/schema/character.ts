@@ -22,17 +22,35 @@ export const ACTION_KEYS = [
   'Movimento',
   'Completa',
   'Passivo',
+  'Livre',
 ] as const
 
-export const DURATION_KEYS = ['Sustentada', 'Dia', 'Cena', 'Rodada', 'Instantânea'] as const
+export const DURATION_KEYS = ['Sustentada', 'Dia', 'Cena', 'Rodada', 'Instantânea', 'Passiva'] as const
+
+/**
+ * Tipo/origem do efeito. Efeitos do tipo Itens ou Magias não somam entre si:
+ * dentro do mesmo tipo, só o maior valor por campo conta (regra de bônus de
+ * mesmo tipo do T20). Os demais tipos somam normalmente.
+ */
+export const EFFECT_TYPE_KEYS = [
+  'Outros',
+  'Habilidades',
+  'Perícias',
+  'Itens',
+  'Magias',
+  'Parceiros',
+  'Ambiente',
+] as const
 
 export type AttributeKey = (typeof ATTRIBUTE_KEYS)[number]
 export type ActionKey = (typeof ACTION_KEYS)[number]
 export type DurationKey = (typeof DURATION_KEYS)[number]
+export type EffectTypeKey = (typeof EFFECT_TYPE_KEYS)[number]
 
 export const attributeKeySchema = z.enum(ATTRIBUTE_KEYS)
 export const actionKeySchema = z.enum(ACTION_KEYS)
 export const durationSchema = z.enum(DURATION_KEYS)
+export const effectTypeSchema = z.enum(EFFECT_TYPE_KEYS)
 
 export const attributesSchema = z.object({
   forca: z.number().int(),
@@ -131,6 +149,8 @@ export const effectSchema = z.object({
   alwaysActive: z.boolean().default(false),
   /** Duração do efeito (Cena é encerrada pelo botão "Encerrar cena"). */
   duration: durationSchema.default('Cena'),
+  /** Tipo do efeito — ver EFFECT_TYPE_KEYS. Itens/Magias não somam entre si (usa o maior). */
+  effectType: effectTypeSchema.default('Outros'),
   modifiers: itemModifiersSchema.default(EMPTY_ITEM_MODIFIERS),
 })
 export type EffectData = z.infer<typeof effectSchema>
@@ -196,6 +216,8 @@ export const inventoryItemSchema = z.object({
   proficiency: z.string().default(''),
   /** Se verdadeiro, os modificadores do item são aplicados aos valores derivados. */
   activeEffect: z.boolean().default(false),
+  /** Tipo do efeito — ver EFFECT_TYPE_KEYS. Itens/Magias não somam entre si (usa o maior). */
+  effectType: effectTypeSchema.default('Itens'),
   modifiers: itemModifiersSchema.default(EMPTY_ITEM_MODIFIERS),
   notes: z.string().default(''),
 })
@@ -234,6 +256,8 @@ export const spellSchema = z.object({
   hasEffect: z.boolean().default(false),
   /** Se o efeito da magia está ativo. */
   effectActive: z.boolean().default(false),
+  /** Tipo do efeito — ver EFFECT_TYPE_KEYS. Itens/Magias não somam entre si (usa o maior). */
+  effectType: effectTypeSchema.default('Magias'),
   modifiers: itemModifiersSchema.default(EMPTY_ITEM_MODIFIERS),
   notes: z.string().default(''),
 })
@@ -257,6 +281,8 @@ export const abilitySchema = z.object({
   effectActive: z.boolean().default(false),
   /** Sempre ativo: ignora o toggle (e não mostra o checkbox de ativar). */
   alwaysActive: z.boolean().default(false),
+  /** Tipo do efeito — ver EFFECT_TYPE_KEYS. Itens/Magias não somam entre si (usa o maior). */
+  effectType: effectTypeSchema.default('Habilidades'),
   modifiers: itemModifiersSchema.default(EMPTY_ITEM_MODIFIERS),
 })
 export type Ability = z.infer<typeof abilitySchema>

@@ -8,6 +8,7 @@ function ability(id: string, name: string): Ability {
   return {
     id, name, group: 'racial', notes: '', level: 1, mp: 0, acao: ['Ação Padrão'],
     duration: 'Cena', hasEffect: false, effectActive: false, alwaysActive: false,
+    effectType: 'Habilidades',
     modifiers: { ...EMPTY_ITEM_MODIFIERS },
   }
 }

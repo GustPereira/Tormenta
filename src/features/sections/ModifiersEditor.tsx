@@ -1,7 +1,32 @@
 import { Button } from '../../components/Button'
 import { inputClass } from '../../components/ui'
 import { ATTRIBUTE_ABBR, SKILLS, SKILLS_BY_ID } from '../../data'
-import { ATTRIBUTE_KEYS, type ItemModifiers } from '../../schema'
+import { ATTRIBUTE_KEYS, EFFECT_TYPE_KEYS, type EffectTypeKey, type ItemModifiers } from '../../schema'
+
+/** Dropdown do tipo do efeito (ver EFFECT_TYPE_KEYS). Itens/Magias não somam entre si (usa o maior). */
+export function EffectTypeField({
+  value,
+  onChange,
+}: {
+  value: EffectTypeKey
+  onChange: (v: EffectTypeKey) => void
+}) {
+  return (
+    <label className="flex items-center gap-2 text-xs text-stone-400">
+      Tipo do efeito
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value as EffectTypeKey)}
+        className={inputClass + ' text-sm'}
+        aria-label="Tipo do efeito"
+      >
+        {EFFECT_TYPE_KEYS.map((t) => (
+          <option key={t} value={t}>{t}</option>
+        ))}
+      </select>
+    </label>
+  )
+}
 
 interface Props {
   modifiers: ItemModifiers

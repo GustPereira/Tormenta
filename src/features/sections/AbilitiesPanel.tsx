@@ -15,7 +15,7 @@ import {
   type DurationKey,
   type ItemModifiers,
 } from '../../schema'
-import { ModifiersEditor } from './ModifiersEditor'
+import { EffectTypeField, ModifiersEditor } from './ModifiersEditor'
 
 interface Props {
   character: Character
@@ -54,6 +54,7 @@ export function AbilitiesPanel({ character, update }: Props) {
           hasEffect: false,
           effectActive: false,
           alwaysActive: false,
+          effectType: 'Habilidades',
           modifiers: { ...EMPTY_ITEM_MODIFIERS, attributes: {}, skills: {} },
         },
       ],
@@ -231,6 +232,12 @@ function Group({
                 )}
                 {a.hasEffect && (
                   <div className="border-t border-stone-800 pt-2">
+                    <div className="mb-2">
+                      <EffectTypeField
+                        value={a.effectType}
+                        onChange={(v) => setAbility(a.id, { effectType: v })}
+                      />
+                    </div>
                     <ModifiersEditor
                       modifiers={a.modifiers}
                       onChange={(m: ItemModifiers) => setAbility(a.id, { modifiers: m })}

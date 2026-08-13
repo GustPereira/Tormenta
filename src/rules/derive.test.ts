@@ -98,6 +98,7 @@ describe('deriveCharacter', () => {
           attack: null,
           proficiency: '',
           activeEffect: true,
+          effectType: 'Itens',
           notes: '',
           modifiers: { attributes: { forca: 2 }, skills: { atletismo: 3 }, attack: 0, damage: 0, allSkills: 0, resistance: 0, trainedSkills: [], hitPoints: 5, mana: 2, defense: 1, penalty: 0, movement: 0, damageReduction: 2, spellDc: 0, maneuver: 0 },
         },
@@ -111,6 +112,7 @@ describe('deriveCharacter', () => {
           attack: null,
           proficiency: '',
           activeEffect: false,
+          effectType: 'Itens',
           notes: '',
           modifiers: { attributes: { forca: 99 }, skills: {}, attack: 0, damage: 0, allSkills: 0, resistance: 0, trainedSkills: [], hitPoints: 999, mana: 0, defense: 0, penalty: 0, movement: 0, damageReduction: 0, spellDc: 0, maneuver: 0 },
         },
@@ -147,6 +149,7 @@ describe('deriveCharacter', () => {
           attack: null,
           proficiency: 'Pesadas',
           activeEffect: true,
+          effectType: 'Itens',
           notes: '',
           modifiers: { attributes: {}, skills: {}, attack: 0, damage: 0, allSkills: 0, resistance: 0, trainedSkills: [], hitPoints: 0, mana: 0, defense: 10, penalty: -5, movement: -3, damageReduction: 0, spellDc: 0, maneuver: 0 },
         },
@@ -168,7 +171,7 @@ describe('deriveCharacter', () => {
       inventory: [
         {
           id: 'arm', name: 'Cota de Malha', quantity: 1, spaces: 0,
-          equipped: true, equipmentType: 'armadura', attack: null, proficiency: 'Pesadas', activeEffect: false,
+          equipped: true, equipmentType: 'armadura', attack: null, proficiency: 'Pesadas', activeEffect: false, effectType: 'Itens',
           notes: '', modifiers: { ...ZERO_MODS, defense: 6 },
         },
       ],
@@ -186,7 +189,7 @@ describe('deriveCharacter', () => {
       inventory: [
         {
           id: 'arm', name: 'Couro', quantity: 1, spaces: 0,
-          equipped: true, equipmentType: 'armadura', attack: null, proficiency: 'Leves', activeEffect: false,
+          equipped: true, equipmentType: 'armadura', attack: null, proficiency: 'Leves', activeEffect: false, effectType: 'Itens',
           notes: '', modifiers: { ...ZERO_MODS, defense: 2 },
         },
       ],
@@ -208,6 +211,7 @@ describe('deriveCharacter', () => {
           active: true,
           alwaysActive: false,
           duration: 'Cena',
+          effectType: 'Outros',
           modifiers: { attributes: {}, skills: { atletismo: '@car' }, attack: 0, damage: 0, allSkills: 0, resistance: 0, trainedSkills: [], hitPoints: 0, mana: 0, defense: 0, penalty: 0, movement: 0, damageReduction: 0, spellDc: 0, maneuver: 0 },
         },
       ],
@@ -224,20 +228,20 @@ describe('deriveCharacter', () => {
         // Escudo equipado: sua defesa (2) entra direto; @escudo = 2.
         {
           id: 's2', name: 'Escudo Pesado', quantity: 1, spaces: 1,
-          equipped: true, equipmentType: 'escudo', attack: null, proficiency: 'Escudos', activeEffect: false,
+          equipped: true, equipmentType: 'escudo', attack: null, proficiency: 'Escudos', activeEffect: false, effectType: 'Itens',
           notes: '', modifiers: { ...ZERO_MODS, defense: 2 },
         },
         // Escudo guardado (não equipado): não conta.
         {
           id: 's1', name: 'Escudo Leve', quantity: 1, spaces: 1,
-          equipped: false, equipmentType: 'escudo', attack: null, proficiency: 'Escudos', activeEffect: false,
+          equipped: false, equipmentType: 'escudo', attack: null, proficiency: 'Escudos', activeEffect: false, effectType: 'Itens',
           notes: '', modifiers: { ...ZERO_MODS, defense: 1 },
         },
       ],
       // Efeito que soma a defesa do escudo equipado de novo, via token @escudo.
       effects: [
         {
-          id: 'e', name: 'Bloqueio', active: true, alwaysActive: false, duration: 'Cena',
+          id: 'e', name: 'Bloqueio', active: true, alwaysActive: false, duration: 'Cena', effectType: 'Outros',
           modifiers: { ...ZERO_MODS, defense: '@escudo' },
         },
       ],
@@ -252,7 +256,7 @@ describe('deriveCharacter', () => {
   it('fórmula em atributo (@nivel) resolve contra os atributos base', () => {
     const c = build({
       classes: [{ classId: 'guerreiro', level: 3 }],
-      effects: [{ id: 'e', name: 'Crescimento', active: true, alwaysActive: false, duration: 'Cena', modifiers: { ...ZERO_MODS, attributes: { forca: '@nivel' } } }],
+      effects: [{ id: 'e', name: 'Crescimento', active: true, alwaysActive: false, duration: 'Cena', effectType: 'Outros', modifiers: { ...ZERO_MODS, attributes: { forca: '@nivel' } } }],
     })
     const d = deriveCharacter(c)
     expect(d.finalAttributes.forca).toBe(3)
@@ -264,7 +268,7 @@ describe('deriveCharacter', () => {
     const withEffect = deriveCharacter(
       build({
         classes,
-        effects: [{ id: 'e', name: 'Postura', active: true, alwaysActive: false, duration: 'Cena', modifiers: { ...ZERO_MODS, defense: '@meionivel' } }],
+        effects: [{ id: 'e', name: 'Postura', active: true, alwaysActive: false, duration: 'Cena', effectType: 'Outros', modifiers: { ...ZERO_MODS, defense: '@meionivel' } }],
       }),
     )
     expect(withEffect.defense - base.defense).toBe(4)
@@ -277,7 +281,7 @@ describe('deriveCharacter', () => {
       build({
         classes,
         effects: [
-          { id: 'e', name: 'Vigor', active: true, alwaysActive: false, duration: 'Cena', modifiers: { ...ZERO_MODS, hitPoints: '@nivel', movement: '@meionivel' } },
+          { id: 'e', name: 'Vigor', active: true, alwaysActive: false, duration: 'Cena', effectType: 'Outros', modifiers: { ...ZERO_MODS, hitPoints: '@nivel', movement: '@meionivel' } },
         ],
       }),
     )
@@ -343,7 +347,7 @@ describe('deriveCharacter', () => {
   it('modificador geral de perícia (allSkills) de um efeito soma em todas as perícias', () => {
     const c = build({
       classes: [{ classId: 'guerreiro', level: 1 }],
-      effects: [{ id: 'e', name: 'Bênção', active: true, alwaysActive: false, duration: 'Cena', modifiers: { ...ZERO_MODS, allSkills: 2 } }],
+      effects: [{ id: 'e', name: 'Bênção', active: true, alwaysActive: false, duration: 'Cena', effectType: 'Outros', modifiers: { ...ZERO_MODS, allSkills: 2 } }],
     })
     const d = deriveCharacter(c)
     expect(d.globalSkillBonus).toBe(2)
@@ -354,7 +358,7 @@ describe('deriveCharacter', () => {
   it('efeito ativo torna uma perícia treinada (regra de perícia de classe)', () => {
     const c = build({
       classes: [{ classId: 'guerreiro', level: 1 }],
-      effects: [{ id: 'e', name: 'Foco', active: true, alwaysActive: false, duration: 'Cena', modifiers: { ...ZERO_MODS, trainedSkills: ['ladinagem'] } }],
+      effects: [{ id: 'e', name: 'Foco', active: true, alwaysActive: false, duration: 'Cena', effectType: 'Outros', modifiers: { ...ZERO_MODS, trainedSkills: ['ladinagem'] } }],
     })
     const lad = deriveCharacter(c).skills.find((s) => s.id === 'ladinagem')!
     expect(lad.trained).toBe(true)
@@ -367,7 +371,7 @@ describe('deriveCharacter', () => {
   it('efeito inativo não torna a perícia treinada', () => {
     const c = build({
       classes: [{ classId: 'guerreiro', level: 1 }],
-      effects: [{ id: 'e', name: 'Foco', active: false, alwaysActive: false, duration: 'Cena', modifiers: { ...ZERO_MODS, trainedSkills: ['ladinagem'] } }],
+      effects: [{ id: 'e', name: 'Foco', active: false, alwaysActive: false, duration: 'Cena', effectType: 'Outros', modifiers: { ...ZERO_MODS, trainedSkills: ['ladinagem'] } }],
     })
     expect(deriveCharacter(c).skills.find((s) => s.id === 'ladinagem')!.trained).toBe(false)
   })
@@ -375,7 +379,7 @@ describe('deriveCharacter', () => {
   it('modificador de resistência só soma em Fortitude, Reflexos e Vontade', () => {
     const c = build({
       classes: [{ classId: 'guerreiro', level: 1 }],
-      effects: [{ id: 'e', name: 'Proteção', active: true, alwaysActive: false, duration: 'Cena', modifiers: { ...ZERO_MODS, resistance: 2 } }],
+      effects: [{ id: 'e', name: 'Proteção', active: true, alwaysActive: false, duration: 'Cena', effectType: 'Outros', modifiers: { ...ZERO_MODS, resistance: 2 } }],
     })
     const d = deriveCharacter(c)
     const total = (id: string) => d.skills.find((s) => s.id === id)!.total
@@ -390,7 +394,7 @@ describe('deriveCharacter', () => {
     const c = build({
       attributes: { forca: 0, destreza: 0, constituicao: 0, inteligencia: 0, sabedoria: 0, carisma: 3 },
       classes: [{ classId: 'guerreiro', level: 4 }],
-      effects: [{ id: 'e', name: 'Foco', active: true, alwaysActive: false, duration: 'Cena', modifiers: { ...ZERO_MODS, attack: '@car', allSkills: '@meionivel' } }],
+      effects: [{ id: 'e', name: 'Foco', active: true, alwaysActive: false, duration: 'Cena', effectType: 'Outros', modifiers: { ...ZERO_MODS, attack: '@car', allSkills: '@meionivel' } }],
     })
     const d = deriveCharacter(c)
     expect(d.globalAttackBonus).toBe(3) // @car = 3
@@ -400,7 +404,7 @@ describe('deriveCharacter', () => {
   it('efeito "sempre ativo" aplica mesmo com active=false', () => {
     const c = build({
       classes: [{ classId: 'guerreiro', level: 1 }],
-      effects: [{ id: 'e', name: 'Aura', active: false, alwaysActive: true, duration: 'Cena', modifiers: { ...ZERO_MODS, allSkills: 2 } }],
+      effects: [{ id: 'e', name: 'Aura', active: false, alwaysActive: true, duration: 'Cena', effectType: 'Outros', modifiers: { ...ZERO_MODS, allSkills: 2 } }],
     })
     expect(deriveCharacter(c).globalSkillBonus).toBe(2)
   })
@@ -409,8 +413,8 @@ describe('deriveCharacter', () => {
     const c = build({
       classes: [{ classId: 'guerreiro', level: 1 }],
       effects: [
-        { id: 'a', name: 'Fúria', active: true, alwaysActive: false, duration: 'Cena', modifiers: { ...ZERO_MODS, damage: 2 } },
-        { id: 'b', name: 'Bênção', active: true, alwaysActive: false, duration: 'Cena', modifiers: { ...ZERO_MODS, damage: 1 } },
+        { id: 'a', name: 'Fúria', active: true, alwaysActive: false, duration: 'Cena', effectType: 'Outros', modifiers: { ...ZERO_MODS, damage: 2 } },
+        { id: 'b', name: 'Bênção', active: true, alwaysActive: false, duration: 'Cena', effectType: 'Outros', modifiers: { ...ZERO_MODS, damage: 1 } },
       ],
     })
     expect(deriveCharacter(c).globalDamageBonus).toBe('3')
@@ -420,8 +424,8 @@ describe('deriveCharacter', () => {
     const c = build({
       classes: [{ classId: 'guerreiro', level: 1 }],
       effects: [
-        { id: 'a', name: 'A', active: true, alwaysActive: false, duration: 'Cena', modifiers: { ...ZERO_MODS, damage: '1d8' } },
-        { id: 'b', name: 'B', active: true, alwaysActive: false, duration: 'Cena', modifiers: { ...ZERO_MODS, damage: '1d8+1d4' } },
+        { id: 'a', name: 'A', active: true, alwaysActive: false, duration: 'Cena', effectType: 'Outros', modifiers: { ...ZERO_MODS, damage: '1d8' } },
+        { id: 'b', name: 'B', active: true, alwaysActive: false, duration: 'Cena', effectType: 'Outros', modifiers: { ...ZERO_MODS, damage: '1d8+1d4' } },
       ],
     })
     expect(deriveCharacter(c).globalDamageBonus).toBe('2d8+1d4')
@@ -432,8 +436,8 @@ describe('deriveCharacter', () => {
       attributes: { forca: 0, destreza: 0, constituicao: 0, inteligencia: 0, sabedoria: 0, carisma: 2 },
       classes: [{ classId: 'guerreiro', level: 1 }],
       effects: [
-        { id: 'a', name: 'A', active: true, alwaysActive: false, duration: 'Cena', modifiers: { ...ZERO_MODS, attack: 3 } },
-        { id: 'b', name: 'B', active: true, alwaysActive: false, duration: 'Cena', modifiers: { ...ZERO_MODS, attack: '1+@car' } },
+        { id: 'a', name: 'A', active: true, alwaysActive: false, duration: 'Cena', effectType: 'Outros', modifiers: { ...ZERO_MODS, attack: 3 } },
+        { id: 'b', name: 'B', active: true, alwaysActive: false, duration: 'Cena', effectType: 'Outros', modifiers: { ...ZERO_MODS, attack: '1+@car' } },
       ],
     })
     const d = deriveCharacter(c)

@@ -19,6 +19,7 @@ function item(over: Partial<InventoryItem>): InventoryItem {
     attack: null,
     proficiency: '',
     activeEffect: false,
+    effectType: 'Itens',
     modifiers: { attributes: {}, skills: {}, attack: 0, damage: 0, allSkills: 0, resistance: 0, trainedSkills: [], hitPoints: 0, mana: 0, defense: 0, penalty: 0, movement: 0, damageReduction: 0, spellDc: 0, maneuver: 0 },
     notes: '',
     ...over,
@@ -51,8 +52,8 @@ describe('collectEffects + aggregateActiveModifiers', () => {
         item({ id: 'b', activeEffect: false, modifiers: { attributes: { forca: 99 }, skills: {}, attack: 0, damage: 0, allSkills: 0, resistance: 0, trainedSkills: [], hitPoints: 99, mana: 0, defense: 0, penalty: 0, movement: 0, damageReduction: 0, spellDc: 0, maneuver: 0 } }),
       ],
       effects: [
-        { id: 'e1', name: 'Bênção', active: true, alwaysActive: false, duration: 'Cena', modifiers: { attributes: { forca: 1 }, skills: {}, attack: 0, damage: 0, allSkills: 0, resistance: 0, trainedSkills: [], hitPoints: 0, mana: 3, defense: 0, penalty: 0, movement: 0, damageReduction: 0, spellDc: 0, maneuver: 0 } },
-        { id: 'e2', name: 'Desligado', active: false, alwaysActive: false, duration: 'Cena', modifiers: { attributes: { forca: 50 }, skills: {}, attack: 0, damage: 0, allSkills: 0, resistance: 0, trainedSkills: [], hitPoints: 0, mana: 0, defense: 0, penalty: 0, movement: 0, damageReduction: 0, spellDc: 0, maneuver: 0 } },
+        { id: 'e1', name: 'Bênção', active: true, alwaysActive: false, duration: 'Cena', effectType: 'Outros', modifiers: { attributes: { forca: 1 }, skills: {}, attack: 0, damage: 0, allSkills: 0, resistance: 0, trainedSkills: [], hitPoints: 0, mana: 3, defense: 0, penalty: 0, movement: 0, damageReduction: 0, spellDc: 0, maneuver: 0 } },
+        { id: 'e2', name: 'Desligado', active: false, alwaysActive: false, duration: 'Cena', effectType: 'Outros', modifiers: { attributes: { forca: 50 }, skills: {}, attack: 0, damage: 0, allSkills: 0, resistance: 0, trainedSkills: [], hitPoints: 0, mana: 0, defense: 0, penalty: 0, movement: 0, damageReduction: 0, spellDc: 0, maneuver: 0 } },
       ],
     }
     const agg = aggregateActiveModifiers(collectEffects(c))
@@ -61,6 +62,48 @@ describe('collectEffects + aggregateActiveModifiers', () => {
     expect(agg.mana).toBe(3)
     expect(agg.defense).toBe(1)
     expect(agg.skills.atletismo).toBe(1)
+  })
+
+  it('itens do mesmo tipo não somam entre si: usa o maior valor por campo', () => {
+    const c: Character = {
+      ...createBlankCharacter(),
+      inventory: [
+        item({ id: 'a', activeEffect: true, effectType: 'Itens', modifiers: { attributes: { carisma: 1 }, skills: {}, attack: 0, damage: 0, allSkills: 0, resistance: 0, trainedSkills: [], hitPoints: 0, mana: 0, defense: 0, penalty: 0, movement: 0, damageReduction: 0, spellDc: 0, maneuver: 0 } }),
+        item({ id: 'b', activeEffect: true, effectType: 'Itens', modifiers: { attributes: { carisma: 2 }, skills: {}, attack: 0, damage: 0, allSkills: 0, resistance: 0, trainedSkills: [], hitPoints: 0, mana: 0, defense: 0, penalty: 0, movement: 0, damageReduction: 0, spellDc: 0, maneuver: 0 } }),
+      ],
+    }
+    const agg = aggregateActiveModifiers(collectEffects(c))
+    // item1 dá +1, item2 dá +2: não soma (3), usa o maior (2).
+    expect(agg.attributes.carisma).toBe(2)
+  })
+
+  it('itens e efeitos "outros" somam normalmente entre grupos diferentes', () => {
+    const c: Character = {
+      ...createBlankCharacter(),
+      inventory: [
+        item({ id: 'a', activeEffect: true, effectType: 'Itens', modifiers: { attributes: { carisma: 1 }, skills: {}, attack: 0, damage: 0, allSkills: 0, resistance: 0, trainedSkills: [], hitPoints: 0, mana: 0, defense: 0, penalty: 0, movement: 0, damageReduction: 0, spellDc: 0, maneuver: 0 } }),
+        item({ id: 'b', activeEffect: true, effectType: 'Itens', modifiers: { attributes: { carisma: 2 }, skills: {}, attack: 0, damage: 0, allSkills: 0, resistance: 0, trainedSkills: [], hitPoints: 0, mana: 0, defense: 0, penalty: 0, movement: 0, damageReduction: 0, spellDc: 0, maneuver: 0 } }),
+      ],
+      effects: [
+        { id: 'e', name: 'Bênção', active: true, alwaysActive: false, duration: 'Cena', effectType: 'Outros', modifiers: { attributes: { carisma: 3 }, skills: {}, attack: 0, damage: 0, allSkills: 0, resistance: 0, trainedSkills: [], hitPoints: 0, mana: 0, defense: 0, penalty: 0, movement: 0, damageReduction: 0, spellDc: 0, maneuver: 0 } },
+      ],
+    }
+    const agg = aggregateActiveModifiers(collectEffects(c))
+    // itens: maior dos dois (2) + outros: soma normal (3) = 5.
+    expect(agg.attributes.carisma).toBe(5)
+  })
+
+  it('dano de itens do mesmo tipo usa a expressão de maior média, não soma', () => {
+    const c: Character = {
+      ...createBlankCharacter(),
+      inventory: [
+        item({ id: 'a', activeEffect: true, effectType: 'Itens', modifiers: { attributes: {}, skills: {}, attack: 0, damage: '1d4', allSkills: 0, resistance: 0, trainedSkills: [], hitPoints: 0, mana: 0, defense: 0, penalty: 0, movement: 0, damageReduction: 0, spellDc: 0, maneuver: 0 } }),
+        item({ id: 'b', activeEffect: true, effectType: 'Itens', modifiers: { attributes: {}, skills: {}, attack: 0, damage: '1d6', allSkills: 0, resistance: 0, trainedSkills: [], hitPoints: 0, mana: 0, defense: 0, penalty: 0, movement: 0, damageReduction: 0, spellDc: 0, maneuver: 0 } }),
+      ],
+    }
+    const agg = aggregateActiveModifiers(collectEffects(c))
+    // 1d6 tem média maior que 1d4: só ele conta.
+    expect(agg.damage).toBe('1d6')
   })
 })
 

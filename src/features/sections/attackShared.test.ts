@@ -15,7 +15,7 @@ describe('baseContributions (ataque com base de perícia)', () => {
       // Efeito que dá +1 em todas as perícias (entra no total de Luta).
       effects: [
         {
-          id: 'e', name: 'Bênção', active: true, alwaysActive: false, duration: 'Cena',
+          id: 'e', name: 'Bênção', active: true, alwaysActive: false, duration: 'Cena', effectType: 'Outros',
           modifiers: { ...EMPTY_ITEM_MODIFIERS, allSkills: 1 },
         },
       ],

@@ -17,7 +17,7 @@ import {
   type Spell,
   type SpellType,
 } from '../../schema'
-import { ModifiersEditor } from './ModifiersEditor'
+import { EffectTypeField, ModifiersEditor } from './ModifiersEditor'
 
 interface Props {
   character: Character
@@ -54,6 +54,7 @@ function fromCatalog(s: CatalogSpell): Spell {
     prepared: false,
     hasEffect: false,
     effectActive: false,
+    effectType: 'Magias',
     modifiers: { ...EMPTY_ITEM_MODIFIERS, attributes: {}, skills: {} },
     notes: '',
   }
@@ -89,6 +90,7 @@ export function SpellsPanel({ character, update }: Props) {
           prepared: false,
           hasEffect: false,
           effectActive: false,
+          effectType: 'Magias',
           modifiers: { ...EMPTY_ITEM_MODIFIERS, attributes: {}, skills: {} },
           notes: '',
         },
@@ -456,6 +458,12 @@ export function SpellsPanel({ character, update }: Props) {
                       </label>
                       {s.hasEffect && (
                         <div className="mt-2 border-t border-stone-800 pt-2">
+                          <div className="mb-2">
+                            <EffectTypeField
+                              value={s.effectType}
+                              onChange={(v) => setField(s.id, { effectType: v })}
+                            />
+                          </div>
                           <ModifiersEditor
                             modifiers={s.modifiers}
                             onChange={(m: ItemModifiers) => setField(s.id, { modifiers: m })}
