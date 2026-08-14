@@ -7,9 +7,9 @@ import { Panel } from '../../components/Panel'
 import { signed } from '../../lib/format'
 import {
   deriveCharacter,
-  effectContributions,
+  fieldContributions,
   halfLevel,
-  resolveValue,
+  keyedFieldContributions,
   skillChoiceLimit,
   trainingBonus,
 } from '../../rules'
@@ -100,17 +100,12 @@ export function SkillsPanel({ character, update }: Props) {
                 ...(skill.trained
                   ? [{ name: 'Treino', value: trainingBonus(derived.totalLevel, true) }]
                   : []),
-                ...effectContributions(
-                  character,
-                  (m) =>
-                    resolveValue(m.skills[skill.id] ?? 0, ctx) +
-                    resolveValue(m.allSkills ?? 0, ctx) +
-                    (RESISTANCE_SKILL_IDS.includes(skill.id as (typeof RESISTANCE_SKILL_IDS)[number])
-                      ? resolveValue(m.resistance ?? 0, ctx)
-                      : 0) +
-                    (skill.armorPenalty ? resolveValue(m.penalty, ctx) : 0),
-                  ctx,
-                ),
+                ...keyedFieldContributions(character, (m) => m.skills, skill.id, ctx),
+                ...fieldContributions(character, 'allSkills', ctx),
+                ...(RESISTANCE_SKILL_IDS.includes(skill.id as (typeof RESISTANCE_SKILL_IDS)[number])
+                  ? fieldContributions(character, 'resistance', ctx)
+                  : []),
+                ...(skill.armorPenalty ? fieldContributions(character, 'penalty', ctx) : []),
               ].filter((c) => c.value !== 0)
           return (
             <li

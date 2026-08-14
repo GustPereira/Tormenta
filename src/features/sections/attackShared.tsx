@@ -4,8 +4,9 @@ import { inputClass } from '../../components/ui'
 import { ATTRIBUTE_LABELS, SKILLS_BY_ID } from '../../data'
 import { signed } from '../../lib/format'
 import {
-  effectContributions,
+  fieldContributions,
   halfLevel,
+  keyedFieldContributions,
   resolveValue,
   trainingBonus,
   type DerivedCharacter,
@@ -79,14 +80,9 @@ export function baseContributions(
     { name: '½ nível', value: halfLevel(level) },
     { name: ATTRIBUTE_LABELS[cfg.attribute], value: attrs[cfg.attribute] },
     ...(trained ? [{ name: `Treino (${cfg.skillName})`, value: trainingBonus(level, true) }] : []),
-    ...effectContributions(
-      character,
-      (m) =>
-        resolveValue(m.skills[cfg.skillId] ?? 0, ctx) +
-        resolveValue(m.allSkills ?? 0, ctx) +
-        (armorPenalty ? resolveValue(m.penalty ?? 0, ctx) : 0),
-      ctx,
-    ),
+    ...keyedFieldContributions(character, (m) => m.skills, cfg.skillId, ctx),
+    ...fieldContributions(character, 'allSkills', ctx),
+    ...(armorPenalty ? fieldContributions(character, 'penalty', ctx) : []),
   ].filter((c) => c.value !== 0)
 }
 
@@ -101,13 +97,16 @@ export function attackContributions(
   return [
     ...baseContributions(a.base, derived, character, ctx),
     ...(manual !== 0 ? [{ name: 'Bônus', value: manual }] : []),
-    ...effectContributions(character, (m) => m.attack ?? 0, ctx),
+    ...fieldContributions(character, 'attack', ctx),
   ]
 }
 
 /** Total numérico das contribuições de ataque. */
 export function attackTotal(contributions: EffectContribution[]): number {
-  return contributions.reduce((s, c) => s + (typeof c.value === 'number' ? c.value : 0), 0)
+  return contributions.reduce(
+    (s, c) => s + (c.excluded || typeof c.value !== 'number' ? 0 : c.value),
+    0,
+  )
 }
 
 /** Campos editáveis de um ataque (Base, Bônus, Dano, Crítico, Tipo, Alcance). */

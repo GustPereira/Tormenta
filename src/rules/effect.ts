@@ -175,24 +175,32 @@ const STACKING_FIELDS = [
 /** Tipos de efeito que não somam entre si: dentro do mesmo tipo, usa-se o maior valor por campo. */
 const NON_STACKING_TYPES: readonly EffectTypeKey[] = ['Itens', 'Magias']
 
-/** Maior valor resolvido de um campo entre os efeitos do grupo (0 se o grupo estiver vazio). */
+/**
+ * Total de um campo dentro de um grupo de mesmo tipo: só os *bônus* (valores
+ * positivos) seguem a regra de "não soma, usa o maior" — penalidades (valores
+ * negativos) sempre se acumulam normalmente, mesmo dentro do mesmo tipo (T20).
+ */
 function maxField(group: Effect[], key: (typeof STACKING_FIELDS)[number], ctx: FormulaContext): number {
-  let best: number | null = null
+  let bestPositive = 0
+  let negativeSum = 0
   for (const effect of group) {
     const v = resolveValue(effect.modifiers[key] ?? 0, ctx)
-    if (best === null || v > best) best = v
+    if (v > bestPositive) bestPositive = v
+    else if (v < 0) negativeSum += v
   }
-  return best ?? 0
+  return bestPositive + negativeSum
 }
 
-/** Maior valor resolvido de uma chave de `attributes`/`skills` entre os efeitos do grupo. */
+/** Mesma regra de `maxField`, para uma chave de `attributes`/`skills`. */
 function maxKeyed(group: Effect[], pick: (m: ItemModifiers) => Record<string, ModValue>, key: string, ctx: FormulaContext): number {
-  let best: number | null = null
+  let bestPositive = 0
+  let negativeSum = 0
   for (const effect of group) {
     const v = resolveValue(pick(effect.modifiers)[key] ?? 0, ctx)
-    if (best === null || v > best) best = v
+    if (v > bestPositive) bestPositive = v
+    else if (v < 0) negativeSum += v
   }
-  return best ?? 0
+  return bestPositive + negativeSum
 }
 
 /** Expressão de dano com a maior média de rolagem dentro do grupo (null se o grupo estiver vazio). */
@@ -286,6 +294,12 @@ export interface EffectContribution {
   name: string
   /** Número (mostrado com sinal) ou texto já formatado (ex.: expressão de dano). */
   value: number | string
+  /**
+   * Bônus do mesmo tipo (Itens/Magias) que perdeu para outro maior do mesmo
+   * grupo e por isso não conta no total (regra de bônus de mesmo tipo do T20).
+   * A UI mostra riscado.
+   */
+  excluded?: boolean
 }
 
 /**
@@ -302,6 +316,75 @@ export function effectContributions(
     .filter((e) => e.isActive())
     .map((e) => ({ name: e.name, value: resolveValue(selector(e.modifiers), ctx) }))
     .filter((c) => c.value !== 0)
+}
+
+/**
+ * Monta a lista de contribuições de um grupo de efeitos ativos a partir de um
+ * extrator de valor numérico por efeito, respeitando a regra de bônus de mesmo
+ * tipo: dentro do mesmo tipo não-cumulativo (Itens/Magias), só o *bônus* (valor
+ * positivo) de maior valor do grupo conta — os demais aparecem com `excluded:
+ * true` (a UI mostra riscado); penalidades (valores negativos) aparecem todas,
+ * já que sempre se acumulam. Igual ao total calculado por `aggregateActiveModifiers`.
+ */
+function groupedContributions(active: Effect[], getValue: (effect: Effect) => number): EffectContribution[] {
+  const stackingGroups = new Map<EffectTypeKey, Effect[]>()
+  const summing: Effect[] = []
+  for (const effect of active) {
+    if (NON_STACKING_TYPES.includes(effect.effectType)) {
+      const group = stackingGroups.get(effect.effectType) ?? []
+      group.push(effect)
+      stackingGroups.set(effect.effectType, group)
+    } else {
+      summing.push(effect)
+    }
+  }
+
+  const contributions: EffectContribution[] = []
+  for (const effect of summing) {
+    const value = getValue(effect)
+    if (value !== 0) contributions.push({ name: effect.name, value })
+  }
+  for (const group of stackingGroups.values()) {
+    let bestEffect: Effect | null = null
+    let bestValue = 0
+    for (const effect of group) {
+      const value = getValue(effect)
+      if (value > bestValue) {
+        bestValue = value
+        bestEffect = effect
+      }
+    }
+    for (const effect of group) {
+      const value = getValue(effect)
+      if (value < 0) {
+        contributions.push({ name: effect.name, value })
+      } else if (value > 0) {
+        contributions.push({ name: effect.name, value, excluded: effect !== bestEffect })
+      }
+    }
+  }
+  return contributions
+}
+
+/** Lista as contribuições de um campo simples de `ItemModifiers` (defesa, deslocamento, PV, PM etc.). */
+export function fieldContributions(
+  character: Character,
+  field: (typeof STACKING_FIELDS)[number],
+  ctx: FormulaContext = ZERO_CTX,
+): EffectContribution[] {
+  const active = collectEffects(character).filter((e) => e.isActive())
+  return groupedContributions(active, (effect) => resolveValue(effect.modifiers[field] ?? 0, ctx))
+}
+
+/** Lista as contribuições de uma chave de `attributes`/`skills` (ex.: um atributo ou uma perícia). */
+export function keyedFieldContributions(
+  character: Character,
+  pick: (m: ItemModifiers) => Record<string, ModValue>,
+  key: string,
+  ctx: FormulaContext = ZERO_CTX,
+): EffectContribution[] {
+  const active = collectEffects(character).filter((e) => e.isActive())
+  return groupedContributions(active, (effect) => resolveValue(pick(effect.modifiers)[key] ?? 0, ctx))
 }
 
 /**

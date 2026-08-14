@@ -5,7 +5,7 @@ import { EffectsTooltip } from '../../components/EffectsTooltip'
 import { Panel } from '../../components/Panel'
 import { ATTRIBUTE_ABBR, RACES_BY_ID } from '../../data'
 import { signed } from '../../lib/format'
-import { deriveCharacter, effectContributions } from '../../rules'
+import { deriveCharacter, keyedFieldContributions } from '../../rules'
 import { ATTRIBUTE_KEYS, type AttributeKey, type Character } from '../../schema'
 
 interface Props {
@@ -59,7 +59,7 @@ export function AttributesPanel({ character, update }: Props) {
             className="flex flex-col items-center rounded-md border border-[var(--card-border)] bg-[var(--card-bg)] p-2"
           >
             <span className="text-xs uppercase text-stone-400">{ATTRIBUTE_ABBR[key]}</span>
-            <EffectsTooltip contributions={effectContributions(character, (m) => m.attributes[key] ?? 0, ctx)}>
+            <EffectsTooltip contributions={keyedFieldContributions(character, (m) => m.attributes, key, ctx)}>
               <span className="font-display text-2xl font-bold text-tormenta-400">
                 {signed(derived.finalAttributes[key])}
               </span>

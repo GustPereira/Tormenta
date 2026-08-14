@@ -18,8 +18,8 @@ export function EffectsTooltip({ contributions, children }: Props) {
       {children}
       <span className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-1 hidden -translate-x-1/2 whitespace-nowrap rounded-md border border-[var(--card-border)] bg-stone-900 px-2 py-1 text-left text-xs font-normal text-stone-200 shadow-lg group-hover:block">
         {contributions.map((c, i) => (
-          <span key={i} className="block">
-            <span className="font-semibold text-tormenta-300">
+          <span key={i} className={'block' + (c.excluded ? ' text-stone-500 line-through' : '')}>
+            <span className={c.excluded ? 'font-semibold' : 'font-semibold text-tormenta-300'}>
               {typeof c.value === 'number' ? signed(c.value) : c.value}
             </span>{' '}
             {c.name}

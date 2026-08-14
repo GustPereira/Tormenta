@@ -1,4 +1,4 @@
-import { ATTRIBUTE_LABELS, RESISTANCE_SKILL_IDS } from '../../data'
+import { ATTRIBUTE_LABELS, RACE_TRAITS_BY_ID, RESISTANCE_SKILL_IDS } from '../../data'
 import { baseContributions } from './attackShared'
 import { EffectsTooltip } from '../../components/EffectsTooltip'
 import { Panel } from '../../components/Panel'
@@ -6,9 +6,9 @@ import { inputClass } from '../../components/ui'
 import { signed } from '../../lib/format'
 import {
   deriveCharacter,
-  effectContributions,
+  fieldContributions,
   halfLevel,
-  resolveValue,
+  keyedFieldContributions,
   trainingBonus,
   type DerivedCharacter,
   type DerivedSkill,
@@ -36,15 +36,10 @@ function skillBreakdown(
     { name: '½ nível', value: halfLevel(d.totalLevel) },
     { name: ATTRIBUTE_LABELS[skill.attribute], value: skill.attributeMod },
     ...(skill.trained ? [{ name: 'Treino', value: trainingBonus(d.totalLevel, true) }] : []),
-    ...effectContributions(
-      character,
-      (m) =>
-        resolveValue(m.skills[skill.id] ?? 0, ctx) +
-        resolveValue(m.allSkills ?? 0, ctx) +
-        (isResistance ? resolveValue(m.resistance ?? 0, ctx) : 0) +
-        (skill.armorPenalty ? resolveValue(m.penalty, ctx) : 0),
-      ctx,
-    ),
+    ...keyedFieldContributions(character, (m) => m.skills, skill.id, ctx),
+    ...fieldContributions(character, 'allSkills', ctx),
+    ...(isResistance ? fieldContributions(character, 'resistance', ctx) : []),
+    ...(skill.armorPenalty ? fieldContributions(character, 'penalty', ctx) : []),
   ].filter((c) => c.value !== 0)
 }
 
@@ -70,20 +65,27 @@ export function VitalsPanel({ character, update }: Props) {
       name: useInt ? ATTRIBUTE_LABELS.inteligencia : ATTRIBUTE_LABELS.carisma,
       value: useInt ? d.finalAttributes.inteligencia : d.finalAttributes.carisma,
     },
-    ...effectContributions(character, (m) => m.spellDc ?? 0, ctx),
+    ...fieldContributions(character, 'spellDc', ctx),
   ].filter((c) => c.value !== 0)
 
   // Teste de manobra = teste de ataque corpo a corpo (valor de Luta) + bônus de
   // manobra dos efeitos (T20, p. 232).
   const maneuverContribs = [
     ...baseContributions('luta-for', d, character, ctx),
-    ...effectContributions(character, (m) => m.maneuver ?? 0, ctx),
+    ...fieldContributions(character, 'maneuver', ctx),
   ].filter((c) => c.value !== 0)
 
   const sumContribs = (cs: EffectContribution[]) =>
-    cs.reduce((s, c) => s + (typeof c.value === 'number' ? c.value : 0), 0)
+    cs.reduce((s, c) => s + (c.excluded || typeof c.value !== 'number' ? 0 : c.value), 0)
 
   const initiative = d.skills.find((s) => s.id === 'iniciativa')
+
+  // Deslocamento = base da raça (padrão 9m) + bônus de efeitos, sem descer de 0.
+  const raceTraits = character.race ? RACE_TRAITS_BY_ID[character.race.raceId] : undefined
+  const deslocamentoContribs = [
+    { name: 'Base (raça)', value: raceTraits?.deslocamento ?? 9 },
+    ...fieldContributions(character, 'movement', ctx),
+  ].filter((c) => c.value !== 0)
 
   return (
     <Panel title="Vitais & Defesa">
@@ -94,7 +96,7 @@ export function VitalsPanel({ character, update }: Props) {
           current={character.currentHitPoints}
           max={d.maxHitPoints}
           temp={character.temporaryHitPoints}
-          contributions={effectContributions(character, (m) => m.hitPoints, ctx)}
+          contributions={fieldContributions(character, 'hitPoints', ctx)}
           onChange={(v) => update((c) => ({ ...c, currentHitPoints: v }))}
           onTempChange={(v) => update((c) => ({ ...c, temporaryHitPoints: v }))}
         />
@@ -103,7 +105,7 @@ export function VitalsPanel({ character, update }: Props) {
           current={character.currentMana}
           max={d.maxMana}
           temp={character.temporaryMana}
-          contributions={effectContributions(character, (m) => m.mana, ctx)}
+          contributions={fieldContributions(character, 'mana', ctx)}
           onChange={(v) => update((c) => ({ ...c, currentMana: v }))}
           onTempChange={(v) => update((c) => ({ ...c, temporaryMana: v }))}
         />
@@ -121,11 +123,15 @@ export function VitalsPanel({ character, update }: Props) {
             ...(d.heavyArmorEquipped
               ? []
               : [{ name: 'Destreza', value: d.finalAttributes.destreza }]),
-            ...effectContributions(character, (m) => m.defense, ctx),
+            ...fieldContributions(character, 'defense', ctx),
           ].filter((c) => c.value !== 0)}
         />
-        <Big label="Red. de Dano" value={d.damageReduction} contributions={effectContributions(character, (m) => m.damageReduction, ctx)} />
-        <Big label="Deslocamento" value={`${d.deslocamento}m`} contributions={effectContributions(character, (m) => m.movement, ctx)} />
+        <Big label="Red. de Dano" value={d.damageReduction} contributions={fieldContributions(character, 'damageReduction', ctx)} />
+        <Big
+          label="Deslocamento"
+          value={`${d.deslocamento}m`}
+          contributions={deslocamentoContribs}
+        />
       </div>
 
       {/* CD de resistência a magias, teste de manobra e iniciativa */}
